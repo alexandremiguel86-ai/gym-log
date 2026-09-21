@@ -12,7 +12,9 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
-XLSM = Path(r"D:\ALEXANDRE\Tennis.xlsm")
+# Caminho padrao; `python tools/build_exercises.py <outro.xlsm>` sobrepoe,
+# o que serve para testar sem tocar na planilha de verdade.
+XLSM = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(r"D:\ALEXANDRE\Tennis.xlsm")
 OUT = Path(__file__).resolve().parent.parent / "docs" / "exercises.json"
 SHEET = "Off_Court"
 FIRST_ROW = 3
