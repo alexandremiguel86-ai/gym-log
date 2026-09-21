@@ -163,6 +163,27 @@ End Sub
 
 
 '=======================================================================
+' Diagnostico
+'
+' Rode pela janela Imediata do VBA:  ?GymLogConfigCheck
+' Serve para conferir a configuracao sem disparar a importacao inteira.
+'=======================================================================
+Public Function GymLogConfigCheck() As String
+    Dim url As String
+    url = ReadCsvUrl()
+
+    If Len(Dir$(CONFIG_FILE)) = 0 Then
+        GymLogConfigCheck = "FALTA o arquivo: " & CONFIG_FILE
+    ElseIf Len(url) = 0 Then
+        GymLogConfigCheck = "Arquivo existe, mas nao achei a linha CSV_URL= nele."
+    Else
+        GymLogConfigCheck = "OK - CSV_URL com " & Len(url) & " caracteres, terminando em '" & _
+                            Right$(url, 11) & "'"
+    End If
+End Function
+
+
+'=======================================================================
 ' Planilha
 '=======================================================================
 
@@ -207,25 +228,49 @@ End Function
 
 '--- Le CSV_URL=... do config.local.txt. Linhas em branco e comecadas por '#'
 '--- sao ignoradas, para o arquivo poder ter um comentario explicando o que e.
+'---
+'--- Le o arquivo inteiro e quebra a mao em vez de usar "Line Input": o
+'--- Line Input so reconhece CR e CRLF, e um arquivo salvo por editor Unix
+'--- (LF puro) voltaria como uma unica linha - que comeca com "#" e seria
+'--- descartada como comentario, deixando a URL invisivel.
 Private Function ReadCsvUrl() As String
-    If Len(Dir$(CONFIG_FILE)) = 0 Then Exit Function
+    Dim text As String
+    text = ReadTextFileUtf8(CONFIG_FILE)
+    If Len(text) = 0 Then Exit Function
 
-    Dim fnum As Integer, line As String
-    fnum = FreeFile
-    On Error GoTo Failed
-    Open CONFIG_FILE For Input As #fnum
-    Do Until EOF(fnum)
-        Line Input #fnum, line
-        line = Trim$(line)
-        If Len(line) > 0 And Left$(line, 1) <> "#" Then
-            If LCase$(Left$(line, 8)) = "csv_url=" Then
-                ReadCsvUrl = Trim$(Mid$(line, 9))
-                Exit Do
+    text = Replace$(text, vbCrLf, vbLf)
+    text = Replace$(text, vbCr, vbLf)
+
+    Dim parts() As String, i As Long, line As String
+    parts = Split(text, vbLf)
+    For i = LBound(parts) To UBound(parts)
+        line = Trim$(parts(i))
+        If Len(line) > 0 Then
+            If Left$(line, 1) <> "#" Then
+                If LCase$(Left$(line, 8)) = "csv_url=" Then
+                    ReadCsvUrl = Trim$(Mid$(line, 9))
+                    Exit Function
+                End If
             End If
         End If
-    Loop
+    Next i
+End Function
+
+'--- Le um arquivo de texto como UTF-8 (a URL pode ter caracteres acentuados
+'--- num comentario, e o BOM, se houver, e tratado pelo ADODB.Stream).
+Private Function ReadTextFileUtf8(path As String) As String
+    If Len(Dir$(path)) = 0 Then Exit Function
+
+    Dim stream As Object
+    On Error GoTo Failed
+    Set stream = CreateObject("ADODB.Stream")
+    stream.Type = 2                          ' text
+    stream.Charset = "utf-8"
+    stream.Open
+    stream.LoadFromFile path
+    ReadTextFileUtf8 = stream.ReadText
+    stream.Close
 Failed:
-    Close #fnum
 End Function
 
 Private Function IsIsoDate(s As String) As Boolean
