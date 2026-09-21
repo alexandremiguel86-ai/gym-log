@@ -1,0 +1,10 @@
+# A URL do Apps Script e o TOKEN nunca entram no repositorio: ficam no
+# localStorage do iPhone (tela de Configuracoes) e nas Script Properties.
+settings.local.json
+*.local
+
+__pycache__/
+*.pyc
+.vscode/
+Thumbs.db
+desktop.ini

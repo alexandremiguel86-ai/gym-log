@@ -1,0 +1,418 @@
+{
+ "generated": "2026-09-20",
+ "source": "D:\\ALEXANDRE\\Tennis.xlsm",
+ "groups": [
+  {
+   "name": "Back",
+   "exercises": [
+    {
+     "n": "Lat Pulldown — Pronated Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Lat Pulldown — Supinated Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Lat Pulldown — V-Bar Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Lat Pulldown — Wide Neutral Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Seated Cable Row — Pronated Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Seated Cable Row — Supinated Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Seated Cable Row — V-Bar Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Seated Cable Row — Wide Neutral Grip",
+     "g2": "Back"
+    },
+    {
+     "n": "Single-Arm Dumbbell Row",
+     "g2": "Back"
+    }
+   ]
+  },
+  {
+   "name": "Biceps",
+   "exercises": [
+    {
+     "n": "Cable Biceps Curl — Straight Bar",
+     "g2": "Biceps"
+    },
+    {
+     "n": "Dumbbell Concentration Curl",
+     "g2": "Biceps"
+    },
+    {
+     "n": "EZ-Bar Preacher Curl",
+     "g2": "Biceps"
+    },
+    {
+     "n": "Single-Arm Dumbbell Preacher Curl",
+     "g2": "Biceps"
+    }
+   ]
+  },
+  {
+   "name": "Chest",
+   "exercises": [
+    {
+     "n": "Dumbbell Floor Press",
+     "g2": "Chest"
+    },
+    {
+     "n": "Dumbbell Squeeze Press",
+     "g2": "Chest"
+    }
+   ]
+  },
+  {
+   "name": "Core",
+   "exercises": [
+    {
+     "n": "Lying Leg Raise",
+     "g2": "Core"
+    },
+    {
+     "n": "Lying Scissor Kick",
+     "g2": "Core"
+    },
+    {
+     "n": "Russian Twist",
+     "g2": "Core"
+    },
+    {
+     "n": "Swiss Ball Crunch",
+     "g2": "Core"
+    }
+   ]
+  },
+  {
+   "name": "Lower Body",
+   "exercises": [
+    {
+     "n": "Barbell Romanian Deadlift",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Barbell Sumo Squat",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Hip Thrust",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Leg Extension",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Seated Hip Abduction",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Seated Hip Adduction",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Seated Leg Curl",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Squat",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Unilateral 45° Leg Press",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Unilateral Seated Leg Curl",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "UnilateralLeg Extension",
+     "g2": "Lower Body"
+    }
+   ]
+  },
+  {
+   "name": "Lower Leg",
+   "exercises": [
+    {
+     "n": "Single-Leg Calf Raise",
+     "g2": "Lower Leg"
+    },
+    {
+     "n": "Smith Machine Standing Calf Raise",
+     "g2": "Lower Leg"
+    },
+    {
+     "n": "Toe Raises",
+     "g2": "Lower Leg"
+    },
+    {
+     "n": "Unilateral Seated Calf Raise",
+     "g2": "Lower Leg"
+    }
+   ]
+  },
+  {
+   "name": "Mobility",
+   "exercises": [
+    {
+     "n": "90/90 Hip Switches",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Adductor Rock Back",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Half-Kneeling Adductor Stretch",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Half-Kneeling Hip Flexor Stretch",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Knee-to-Wall Ankle Mobilization",
+     "g2": "Lower Body Mobility"
+    },
+    {
+     "n": "Calf Stretch on Step",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Deep Squat Adductor Stretch",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Pigeon Pose",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Seated Forward Bend",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Seated Glute Stretch",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Standing Calf Stretch",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Standing Forward Bend",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Standing Quad Stretch",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Supine Wall Straddle Stretch",
+     "g2": "Lower Body Stretching"
+    },
+    {
+     "n": "Cat-Camel",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Chair Thoracic Extension",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Foam Roller Thoracic Extension",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Quadruped T-Spine Rotation",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Thoracic Open-Book",
+     "g2": "Thoracic Mobility"
+    }
+   ]
+  },
+  {
+   "name": "Rotator Cuff",
+   "exercises": [
+    {
+     "n": "Shoulder External Rotation",
+     "g2": "Rotator Cuff"
+    },
+    {
+     "n": "Shoulder Internal Rotation",
+     "g2": "Rotator Cuff"
+    }
+   ]
+  },
+  {
+   "name": "Shoulder",
+   "exercises": [
+    {
+     "n": "Dumbbell Lateral Raise",
+     "g2": "Shoulder"
+    },
+    {
+     "n": "Face Pull",
+     "g2": "Shoulder"
+    },
+    {
+     "n": "Reverse Pec Deck",
+     "g2": "Shoulder"
+    },
+    {
+     "n": "Single-Arm Cable Front Raise — Neutral Grip",
+     "g2": "Shoulder"
+    },
+    {
+     "n": "Unilateral Cable Lateral Raise",
+     "g2": "Shoulder"
+    }
+   ]
+  },
+  {
+   "name": "Shoulder Physio",
+   "exercises": [
+    {
+     "n": "Band Overhead Raise with Abduction",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Banded Isometric Horizontal Abduction",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Banded Isometric Shoulder External Rotation",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Banded Wall Clock",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Codman Pendulum",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Overhead Outward Push with Resistance Band",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Prone Shoulder Press",
+     "g2": "Shoulder Physio"
+    },
+    {
+     "n": "Wall Slides",
+     "g2": "Shoulder Physio"
+    }
+   ]
+  },
+  {
+   "name": "Tennis Conditioning",
+   "exercises": [
+    {
+     "n": "Lateral Band Walks",
+     "g2": "Activation"
+    },
+    {
+     "n": "Standing Banded Hip Flexor Raise",
+     "g2": "Activation"
+    },
+    {
+     "n": "Elliptical",
+     "g2": "Conditioning"
+    },
+    {
+     "n": "Jump Rope",
+     "g2": "Conditioning"
+    },
+    {
+     "n": "Stationary Bike",
+     "g2": "Conditioning"
+    },
+    {
+     "n": "Cone Lateral Shuffle",
+     "g2": "Footwork"
+    },
+    {
+     "n": "Disk Cone Drills",
+     "g2": "Footwork"
+    },
+    {
+     "n": "Figure-8 Drill",
+     "g2": "Footwork"
+    },
+    {
+     "n": "Ladder Drills",
+     "g2": "Footwork"
+    },
+    {
+     "n": "Lateral Crossover Step",
+     "g2": "Footwork"
+    },
+    {
+     "n": "Alternating Jumping Lunge",
+     "g2": "Power"
+    },
+    {
+     "n": "Cossack Squat",
+     "g2": "Power"
+    },
+    {
+     "n": "Jumping Squats",
+     "g2": "Power"
+    },
+    {
+     "n": "Lateral / Side Jumps",
+     "g2": "Power"
+    }
+   ]
+  },
+  {
+   "name": "Triceps",
+   "exercises": [
+    {
+     "n": "Rope Cable Triceps Extension at Shoulder Height",
+     "g2": "Triceps"
+    },
+    {
+     "n": "Rope Triceps Pushdown",
+     "g2": "Triceps"
+    },
+    {
+     "n": "Single-Arm Cable Triceps Extension at Shoulder Height",
+     "g2": "Triceps"
+    },
+    {
+     "n": "Single-Arm Cable Triceps Pushdown",
+     "g2": "Triceps"
+    },
+    {
+     "n": "Straight-Bar Cable Triceps Extension at Shoulder Height",
+     "g2": "Triceps"
+    },
+    {
+     "n": "Straight-Bar Triceps Pushdown",
+     "g2": "Triceps"
+    }
+   ]
+  }
+ ]
+}

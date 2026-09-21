@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gym Log">
+<title>Gym Log</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header id="topbar">
+  <button id="back" class="icon-btn" hidden aria-label="Voltar">&#8592;</button>
+  <h1 id="title">Gym Log</h1>
+  <button id="sync-badge" class="badge" hidden></button>
+</header>
+
+<main>
+
+  <!-- ---------- HOME ---------- -->
+  <section id="screen-home" class="screen">
+    <button id="start" class="big primary">INICIAR TREINO</button>
+    <button id="resume" class="big" hidden></button>
+    <div class="spacer"></div>
+    <p id="home-stats" class="muted"></p>
+    <button id="open-settings" class="link">Configuracoes</button>
+  </section>
+
+  <!-- ---------- SESSAO ---------- -->
+  <section id="screen-session" class="screen">
+    <p id="session-date" class="muted"></p>
+    <ul id="entry-list" class="list"></ul>
+    <p id="entry-empty" class="muted center">Nenhum exercicio registrado ainda.</p>
+    <div class="sticky-bottom">
+      <button id="add-exercise" class="big primary">+ ADICIONAR EXERCICIO</button>
+      <button id="finish" class="big ghost">FINALIZAR TREINO</button>
+    </div>
+  </section>
+
+  <!-- ---------- GRUPO ---------- -->
+  <section id="screen-group" class="screen">
+    <div id="group-grid" class="grid"></div>
+  </section>
+
+  <!-- ---------- EXERCICIO ---------- -->
+  <section id="screen-exercise" class="screen">
+    <input id="search" type="search" placeholder="Buscar exercicio..." autocomplete="off">
+    <div id="exercise-list" class="list"></div>
+    <button id="custom-exercise" class="big ghost">Outro exercicio (digitar)</button>
+  </section>
+
+  <!-- ---------- FORMULARIO ---------- -->
+  <section id="screen-form" class="screen">
+    <h2 id="form-exercise"></h2>
+    <p id="form-group" class="muted"></p>
+
+    <div id="custom-fields" hidden>
+      <label>Nome do exercicio
+        <input id="f-name" type="text" autocapitalize="words">
+      </label>
+      <label>Grupo
+        <select id="f-group"></select>
+      </label>
+    </div>
+
+    <button id="last-chip" class="chip" hidden></button>
+
+    <div class="row">
+      <label>Series
+        <input id="f-sets" type="text" inputmode="numeric" enterkeyhint="next">
+      </label>
+      <label>Reps / Tempo
+        <input id="f-reps" type="text" inputmode="text" enterkeyhint="next" placeholder="10 ou 40s">
+      </label>
+    </div>
+
+    <div class="row">
+      <label>Peso / Carga
+        <input id="f-weight" type="text" inputmode="text" enterkeyhint="next" placeholder="56kg">
+      </label>
+      <label>RPE
+        <input id="f-rpe" type="text" inputmode="numeric" enterkeyhint="done" placeholder="7">
+      </label>
+    </div>
+
+    <label>Observacoes
+      <input id="f-notes" type="text" autocapitalize="sentences">
+    </label>
+
+    <div class="sticky-bottom">
+      <button id="save-entry" class="big primary">SALVAR</button>
+      <button id="delete-entry" class="big danger" hidden>EXCLUIR</button>
+    </div>
+  </section>
+
+  <!-- ---------- CONFIGURACOES ---------- -->
+  <section id="screen-settings" class="screen">
+    <p class="muted">
+      Cole aqui a URL do Web App do Apps Script e o token. Ficam salvos apenas
+      neste aparelho e nunca saem para o repositorio.
+    </p>
+    <label>URL do Apps Script (/exec)
+      <input id="s-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </label>
+    <label>Token
+      <input id="s-token" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </label>
+    <button id="save-settings" class="big primary">SALVAR</button>
+    <button id="test-sync" class="big ghost">TESTAR CONEXAO</button>
+    <p id="settings-status" class="muted"></p>
+    <hr>
+    <p class="muted" id="queue-info"></p>
+    <button id="force-sync" class="big ghost">SINCRONIZAR AGORA</button>
+    <button id="export-json" class="link">Exportar backup (JSON)</button>
+  </section>
+
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
