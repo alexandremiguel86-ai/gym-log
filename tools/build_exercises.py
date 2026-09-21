@@ -6,7 +6,6 @@ Sem dependencias externas: o .xlsm e um zip com XML dentro.
 Uso:  python tools/build_exercises.py
 """
 
-import datetime
 import json
 import sys
 import xml.etree.ElementTree as ET
@@ -101,11 +100,10 @@ def main():
         items = sorted(groups[g1], key=lambda e: (e["g2"].lower(), e["n"].lower()))
         ordered.append({"name": g1, "exercises": items})
 
-    payload = {
-        "generated": datetime.date.today().isoformat(),
-        "source": str(XLSM),
-        "groups": ordered,
-    }
+    # Sem data de geracao de proposito: um campo que muda todo dia faria o
+    # arquivo diferir a cada build, e publish_exercises.ps1 nao conseguiria
+    # distinguir "a lista mudou" de "so rodei de novo". O git ja guarda quando.
+    payload = {"source": str(XLSM), "groups": ordered}
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(
