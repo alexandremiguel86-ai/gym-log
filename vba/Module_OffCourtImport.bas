@@ -23,7 +23,7 @@ Option Explicit
 ' nomes de exercicio, series e cargas.
 '=======================================================================
 
-Private Const CSV_URL As String = "COLE_AQUI_A_URL_CSV_PUBLICADA"
+Private Const CSV_URL As String = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGROHwzEAiQvrdXIDJJrm4I810rHWFtSxC2PcV0JsdTxoLhZy1SHcm79RVfpdPM7OI6IbEEUoR3K2C/pub?gid=0&single=true&output=csv"
 
 Private Const SHEET_NAME As String = "Off_Court"
 Private Const FIRST_DATA_ROW As Long = 5
