@@ -8,3 +8,7 @@ __pycache__/
 .vscode/
 Thumbs.db
 desktop.ini
+
+# URL do CSV publicado da planilha: quem tem a URL le o log de treinos inteiro.
+# Nunca versionar.
+config.local.txt

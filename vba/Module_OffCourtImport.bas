@@ -17,13 +17,14 @@ Option Explicit
 ' Setup (uma vez):
 '   No Google Sheets:  File > Share > Publish to web
 '                      aba LOG, formato CSV, Publish.
-'   Cole a URL gerada em CSV_URL abaixo.
+'   Cole a URL gerada no arquivo apontado por CONFIG_FILE abaixo.
 '
-' A URL publicada e de leitura publica para quem a conhece. Contem apenas
-' nomes de exercicio, series e cargas.
+' A URL fica FORA deste arquivo de proposito: quem tem a URL le o seu log de
+' treinos inteiro, e este .bas vive num repositorio publico no GitHub.
+' O config.local.txt esta no .gitignore.
 '=======================================================================
 
-Private Const CSV_URL As String = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGROHwzEAiQvrdXIDJJrm4I810rHWFtSxC2PcV0JsdTxoLhZy1SHcm79RVfpdPM7OI6IbEEUoR3K2C/pub?gid=0&single=true&output=csv"
+Private Const CONFIG_FILE As String = "D:\ALEXANDRE\CLAUDE\GYM_LOG_APP\config.local.txt"
 
 Private Const SHEET_NAME As String = "Off_Court"
 Private Const FIRST_DATA_ROW As Long = 5
@@ -55,14 +56,19 @@ Public Sub ImportGymLog()
         Exit Sub
     End If
 
-    If InStr(1, CSV_URL, "COLE_AQUI") > 0 Then
-        MsgBox "Configure CSV_URL no topo do Module_OffCourtImport.", vbExclamation
+    Dim csvUrl As String
+    csvUrl = ReadCsvUrl()
+    If Len(csvUrl) = 0 Then
+        MsgBox "Nao encontrei a URL do CSV." & vbCrLf & vbCrLf & _
+               "Crie o arquivo:" & vbCrLf & CONFIG_FILE & vbCrLf & vbCrLf & _
+               "com uma linha:" & vbCrLf & "CSV_URL=https://docs.google.com/.../pub?...output=csv", _
+               vbExclamation, "Importar treino"
         Exit Sub
     End If
 
     ' ---- baixa o CSV ---------------------------------------------------
     Dim csv As String
-    csv = FetchUtf8(CSV_URL)
+    csv = FetchUtf8(csvUrl)
     If Len(csv) = 0 Then
         MsgBox "Nao consegui baixar o CSV. Confira a URL publicada e a conexao.", vbCritical
         Exit Sub
@@ -198,6 +204,29 @@ End Function
 '=======================================================================
 ' Dados
 '=======================================================================
+
+'--- Le CSV_URL=... do config.local.txt. Linhas em branco e comecadas por '#'
+'--- sao ignoradas, para o arquivo poder ter um comentario explicando o que e.
+Private Function ReadCsvUrl() As String
+    If Len(Dir$(CONFIG_FILE)) = 0 Then Exit Function
+
+    Dim fnum As Integer, line As String
+    fnum = FreeFile
+    On Error GoTo Failed
+    Open CONFIG_FILE For Input As #fnum
+    Do Until EOF(fnum)
+        Line Input #fnum, line
+        line = Trim$(line)
+        If Len(line) > 0 And Left$(line, 1) <> "#" Then
+            If LCase$(Left$(line, 8)) = "csv_url=" Then
+                ReadCsvUrl = Trim$(Mid$(line, 9))
+                Exit Do
+            End If
+        End If
+    Loop
+Failed:
+    Close #fnum
+End Function
 
 Private Function IsIsoDate(s As String) As Boolean
     If Len(s) <> 10 Then Exit Function
