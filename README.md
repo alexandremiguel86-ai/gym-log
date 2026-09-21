@@ -81,11 +81,24 @@ O repositório é **público**. Nada que dê acesso aos dados pode entrar nele.
 Por isso este projeto vive fora de `PROJECT_TENNIS_PERFORMANCE_TEAM`, que tem perfil de
 lesão e dados de consultas médicas.
 
-> **Histórico:** os commits `cd20707`..`11a7e77` contêm a URL do CSV publicado no
-> `Module_OffCourtImport.bas`, antes de ela ser movida para o `config.local.txt`. Para
-> anular de vez: no Google Sheets, *Arquivo → Compartilhar → Publicar na web →* **Parar de
-> publicar**, e publique de novo — a URL antiga deixa de funcionar e você cola a nova no
-> `config.local.txt`.
+### Sobre a URL do CSV — risco aceito conscientemente
+
+A aba `LOG` é publicada como CSV para o botão **Import Gym Log** conseguir lê-la. Quem
+tiver essa URL lê o log de treinos inteiro: exercícios, séries, cargas, datas e observações.
+Nada de saúde, identificação ou contato.
+
+Ela está no `config.local.txt` (não versionado), mas **também nos commits
+`cd20707`..`11a7e77`**, onde ficou por engano antes de ser movida. Isso é irreversível na
+prática: o Google reaproveita o mesmo identificador de publicação para a mesma planilha, e
+*parar de publicar e republicar* **devolve a URL idêntica** — testado. Reescrever o
+histórico do git também não resolveria direito, porque o GitHub mantém os objetos órfãos
+acessíveis por SHA durante um tempo.
+
+Decisão: aceitar. O conteúdo exposto é baixo risco e a URL não é indexada.
+
+Se um dia isso incomodar, a saída limpa é parar de publicar a aba e fazer o VBA buscar os
+dados pelo próprio Apps Script, autenticado com o `TOKEN` — aí não existe nenhuma URL de
+leitura pública, nem hoje nem no histórico.
 
 ---
 
