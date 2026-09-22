@@ -102,6 +102,27 @@
    ]
   },
   {
+   "name": "Hip Mobility",
+   "exercises": [
+    {
+     "n": "90/90 Hip Switches",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Adductor Rock Back",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Half-Kneeling Adductor Stretch",
+     "g2": "Hip Mobility"
+    },
+    {
+     "n": "Half-Kneeling Hip Flexor Stretch",
+     "g2": "Hip Mobility"
+    }
+   ]
+  },
+  {
    "name": "Lower Body",
    "exercises": [
     {
@@ -151,49 +172,17 @@
    ]
   },
   {
-   "name": "Lower Leg",
+   "name": "Lower Body Mobility",
    "exercises": [
     {
-     "n": "Single-Leg Calf Raise",
-     "g2": "Lower Leg"
-    },
-    {
-     "n": "Smith Machine Standing Calf Raise",
-     "g2": "Lower Leg"
-    },
-    {
-     "n": "Toe Raises",
-     "g2": "Lower Leg"
-    },
-    {
-     "n": "Unilateral Seated Calf Raise",
-     "g2": "Lower Leg"
+     "n": "Knee-to-Wall Ankle Mobilization",
+     "g2": "Lower Body Mobility"
     }
    ]
   },
   {
-   "name": "Mobility",
+   "name": "Lower Body Stretching",
    "exercises": [
-    {
-     "n": "90/90 Hip Switches",
-     "g2": "Hip Mobility"
-    },
-    {
-     "n": "Adductor Rock Back",
-     "g2": "Hip Mobility"
-    },
-    {
-     "n": "Half-Kneeling Adductor Stretch",
-     "g2": "Hip Mobility"
-    },
-    {
-     "n": "Half-Kneeling Hip Flexor Stretch",
-     "g2": "Hip Mobility"
-    },
-    {
-     "n": "Knee-to-Wall Ankle Mobilization",
-     "g2": "Lower Body Mobility"
-    },
     {
      "n": "Calf Stretch on Step",
      "g2": "Lower Body Stretching"
@@ -229,32 +218,41 @@
     {
      "n": "Supine Wall Straddle Stretch",
      "g2": "Lower Body Stretching"
+    }
+   ]
+  },
+  {
+   "name": "Lower Leg",
+   "exercises": [
+    {
+     "n": "Single-Leg Calf Raise",
+     "g2": "Lower Leg"
     },
     {
-     "n": "Cat-Camel",
-     "g2": "Thoracic Mobility"
+     "n": "Smith Machine Standing Calf Raise",
+     "g2": "Lower Leg"
     },
     {
-     "n": "Chair Thoracic Extension",
-     "g2": "Thoracic Mobility"
+     "n": "Toe Raises",
+     "g2": "Lower Leg"
     },
     {
-     "n": "Foam Roller Thoracic Extension",
-     "g2": "Thoracic Mobility"
-    },
-    {
-     "n": "Quadruped T-Spine Rotation",
-     "g2": "Thoracic Mobility"
-    },
-    {
-     "n": "Thoracic Open-Book",
-     "g2": "Thoracic Mobility"
+     "n": "Unilateral Seated Calf Raise",
+     "g2": "Lower Leg"
     }
    ]
   },
   {
    "name": "Rotator Cuff",
    "exercises": [
+    {
+     "n": "90/90 External Rotation",
+     "g2": "Rotator Cuff"
+    },
+    {
+     "n": "90/90 Internal Rotation",
+     "g2": "Rotator Cuff"
+    },
     {
      "n": "Shoulder External Rotation",
      "g2": "Rotator Cuff"
@@ -295,35 +293,91 @@
    "exercises": [
     {
      "n": "Band Overhead Raise with Abduction",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Activation"
+    },
+    {
+     "n": "Banded 90/90 External Rotation",
+     "g2": "Shoulder Activation"
+    },
+    {
+     "n": "Banded 90/90 Internal Rotation",
+     "g2": "Shoulder Activation"
+    },
+    {
+     "n": "Banded External Rotation",
+     "g2": "Shoulder Activation"
+    },
+    {
+     "n": "Banded External Rotation + Forward Raise",
+     "g2": "Shoulder Activation"
+    },
+    {
+     "n": "Banded Internal Rotation",
+     "g2": "Shoulder Activation"
     },
     {
      "n": "Banded Isometric Horizontal Abduction",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Activation"
     },
     {
      "n": "Banded Isometric Shoulder External Rotation",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Activation"
     },
     {
      "n": "Banded Wall Clock",
-     "g2": "Shoulder Physio"
-    },
-    {
-     "n": "Codman Pendulum",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Activation"
     },
     {
      "n": "Overhead Outward Push with Resistance Band",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Activation"
     },
     {
      "n": "Prone Shoulder Press",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Activation"
+    },
+    {
+     "n": "Codman Pendulum",
+     "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Shoulder External Rotation with Dowel",
+     "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Shoulder Mobility Circles",
+     "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Shoulder Shrugs",
+     "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Standing Sleeper Stretch",
+     "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Wall Scapular Mobility",
+     "g2": "Shoulder Mobility"
     },
     {
      "n": "Wall Slides",
-     "g2": "Shoulder Physio"
+     "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Electrotherapy",
+     "g2": "Shoulder Therapy"
+    },
+    {
+     "n": "Hot Pack",
+     "g2": "Shoulder Therapy"
+    },
+    {
+     "n": "Laser",
+     "g2": "Shoulder Therapy"
+    },
+    {
+     "n": "Myofascial Release",
+     "g2": "Shoulder Therapy"
     }
    ]
   },
@@ -385,6 +439,31 @@
     {
      "n": "Lateral / Side Jumps",
      "g2": "Power"
+    }
+   ]
+  },
+  {
+   "name": "Thoracic Mobility",
+   "exercises": [
+    {
+     "n": "Cat-Camel",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Chair Thoracic Extension",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Foam Roller Thoracic Extension",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Quadruped T-Spine Rotation",
+     "g2": "Thoracic Mobility"
+    },
+    {
+     "n": "Thoracic Open-Book",
+     "g2": "Thoracic Mobility"
     }
    ]
   },
