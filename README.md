@@ -5,6 +5,9 @@ digitação. Os registros vão para o Google Sheets e de lá para a aba `Off_Cou
 `Tennis.xlsm`, onde o macro `UpdateOffCourtLog` que já existia gera o bloco de
 `#06_TRAINING_LOG.md`.
 
+A planilha e o markdown moram juntos em
+`D:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\`.
+
 **App:** https://alexandremiguel86-ai.github.io/gym-log/
 
 ```
@@ -150,7 +153,8 @@ Tela de Início**. Abra o app → **Configurações** → cole a URL `/exec` e o
    ```
    CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv
    ```
-3. `Tennis.xlsm` → `Alt+F11` → **File → Import File**, duas vezes:
+3. `PROJECT_TENNIS_PERFORMANCE_TEAM\Tennis.xlsm` → `Alt+F11` → **File → Import File**,
+   duas vezes:
    `vba/Module_OffCourtImport.bas` e `vba/Module_GymLogButtons.bas`.
 4. Os botões da aba `Off_Court` podem ser recriados com
    `tools/setup_buttons.ps1` (veja abaixo).
