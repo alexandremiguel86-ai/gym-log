@@ -36,7 +36,11 @@ if (-not (Test-Path $Workbook)) { throw "Nao encontrei $Workbook" }
 foreach ($f in $modules.Values) { if (-not (Test-Path $f)) { throw "Nao encontrei $f" } }
 
 # Um backup por dia, para nao acumular lixo se rodar varias vezes.
-$backup = Join-Path (Split-Path $Workbook) (
+# Vao para a subpasta backups\ para nao poluir a raiz do projeto, que e onde
+# ficam os arquivos de conhecimento #00..#06.
+$backupDir = Join-Path (Split-Path $Workbook) 'backups'
+if (-not (Test-Path $backupDir)) { New-Item -ItemType Directory -Path $backupDir | Out-Null }
+$backup = Join-Path $backupDir (
     '{0}_backup_{1}{2}' -f [IO.Path]::GetFileNameWithoutExtension($Workbook),
                            (Get-Date -Format 'yyyyMMdd'),
                            [IO.Path]::GetExtension($Workbook))
