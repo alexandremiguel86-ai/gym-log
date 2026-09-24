@@ -1,5 +1,5 @@
 {
- "source": "D:\\ALEXANDRE\\Tennis.xlsm",
+ "source": "D:\\ALEXANDRE\\CLAUDE\\PROJECT_TENNIS_PERFORMANCE_TEAM\\Tennis.xlsm",
  "groups": [
   {
    "name": "Back",
@@ -459,6 +459,10 @@
     {
      "n": "Lateral / Side Jumps",
      "g2": "Power"
+    },
+    {
+     "n": "Rest",
+     "g2": "Rest"
     }
    ]
   },
