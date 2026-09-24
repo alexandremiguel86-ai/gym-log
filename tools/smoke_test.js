@@ -177,8 +177,12 @@ Promise.resolve()
   .then(function () {
     console.log('\n1. Boot');
     check('abre no Inicio', active() === 'screen-home', active());
-    check('88 exercicios carregados',
-      catalog.groups.reduce(function (a, g) { return a + g.exercises.length; }, 0) === 88);
+    // Contagens derivadas do catalogo, nunca fixas: a lista cresce toda vez que
+    // ele adiciona um exercicio na planilha, e um numero magico aqui quebraria
+    // o teste sem que nada estivesse errado.
+    check('catalogo nao vazio',
+      catalog.groups.length > 0 &&
+      catalog.groups.every(function (g) { return g.exercises.length > 0; }));
 
     console.log('\n2. Configuracoes');
     el('s-url').value = 'https://script.google.com/fake/exec';
@@ -194,7 +198,9 @@ Promise.resolve()
     console.log('\n4. Registrar primeiro exercicio');
     el('add-exercise').click();
     check('tela de grupos', active() === 'screen-group', active());
-    check('12 grupos', el('group-grid').children.length === 12, el('group-grid').children.length);
+    check('um botao por grupo do catalogo',
+      el('group-grid').children.length === catalog.groups.length,
+      el('group-grid').children.length + ' vs ' + catalog.groups.length);
     el('group-grid').children[0].click();   // Back (ordem alfabetica)
     check('tela de exercicios', active() === 'screen-exercise', active());
     pick('Single-Arm Dumbbell Row').click();
@@ -298,7 +304,9 @@ Promise.resolve()
     el('group-grid').children[0].click();
     el('custom-exercise').click();
     check('campos custom visiveis', el('custom-fields').hidden === false);
-    check('select de grupos preenchido', el('f-group').children.length === 12, el('f-group').children.length);
+    check('select com todos os grupos',
+      el('f-group').children.length === catalog.groups.length,
+      el('f-group').children.length + ' vs ' + catalog.groups.length);
     el('f-name').value = 'Landmine Press';
     el('f-group').value = 'Shoulder';
     fill('3', '8', '15kg', '7', '');
