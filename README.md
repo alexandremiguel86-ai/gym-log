@@ -39,15 +39,20 @@ digitação manual na aba `Off_Court`.
 A busca procura em **todos** os grupos — digitar "preacher" costuma ser mais rápido do que
 lembrar em qual grupo o exercício está.
 
-### No PC — três botões na aba `Off_Court`
+### No PC — botões na aba `Off_Court`
 
-| Botão | O quê |
+As legendas são escolha dele e podem mudar; o que identifica cada botão é a macro:
+
+| Macro | O quê |
 |---|---|
-| **Import Gym Log** | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) |
-| **Update Training Log** | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
-| **Update Exercise List** | publica a lista de `H:I/J` no app do celular |
+| `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) |
+| `UpdateOffCourtLog` | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
+| `PublishExerciseList` | publica a lista de `H:I/J` no app do celular |
 
-Fluxo normal depois de um treino: **Import Gym Log** → **Update Training Log**.
+Há também um **Filter List**, feito por ele, que reordena a lista de referência em ordem
+alfabética. Não faz parte deste projeto.
+
+Fluxo normal depois de um treino: importar → atualizar o log.
 
 ⚠️ **Import Gym Log limpa `Off_Court!B5:G`** antes de escrever.
 
@@ -153,11 +158,14 @@ Tela de Início**. Abra o app → **Configurações** → cole a URL `/exec` e o
    ```
    CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv
    ```
-3. `PROJECT_TENNIS_PERFORMANCE_TEAM\Tennis.xlsm` → `Alt+F11` → **File → Import File**,
-   duas vezes:
-   `vba/Module_OffCourtImport.bas` e `vba/Module_GymLogButtons.bas`.
-4. Os botões da aba `Off_Court` podem ser recriados com
-   `tools/setup_buttons.ps1` (veja abaixo).
+3. Com o `Tennis.xlsm` **fechado**, instale os módulos VBA:
+   ```
+   powershell -ExecutionPolicy Bypass -File tools\install_vba.ps1
+   ```
+   (ou, à mão: `Alt+F11` → **File → Import File** para cada `.bas`)
+4. Crie os botões na aba `Off_Court` e atribua as macros `ImportGymLog`,
+   `PublishExerciseList` e `UpdateOffCourtLog`. Legendas e posições são sua escolha —
+   nenhum script mexe neles.
 
 ---
 
@@ -209,7 +217,7 @@ stderr *mesmo quando dá certo*. Só o `$LASTEXITCODE` decide sucesso.
 | `docs/sw.js` | Service worker (abre offline) |
 | `tools/build_exercises.py` | `Tennis.xlsm` → `exercises.json` |
 | `tools/publish_exercises.ps1` | rebuild + commit + push (botão da planilha) |
-| `tools/setup_buttons.ps1` | (re)cria os botões da aba `Off_Court` |
+| `tools/install_vba.ps1` | instala os módulos VBA no `Tennis.xlsm` (não toca nos botões) |
 | `tools/make_icons.py` | Gera os ícones (roda uma vez só) |
 | `tools/smoke_test.js` | Teste do fluxo completo em Node, sem navegador |
 | `apps_script/Code.gs` | Recebe os POSTs e escreve no Sheets |
