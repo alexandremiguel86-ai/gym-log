@@ -117,15 +117,17 @@ main { padding: 16px 14px 120px; }
 
 /* ---------- grade de grupos ---------- */
 
+/* 15 grupos = 8 linhas: com 64px + gap 10 a grade inteira cabe na tela do
+   iPhone sem rolar. Nomes de duas linhas so esticam a propria linha. */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--gap);
+  gap: 10px;
 }
 
 .grid button {
-  min-height: 84px;
-  padding: 12px 10px;
+  min-height: 64px;
+  padding: 8px 10px;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
@@ -134,7 +136,7 @@ main { padding: 16px 14px 120px; }
   background: var(--surface);
   color: var(--text);
 }
-.grid button small { display: block; margin-top: 5px; font-weight: 400; color: var(--muted); }
+.grid button small { display: block; margin-top: 3px; font-weight: 400; color: var(--muted); }
 
 /* ---------- listas ---------- */
 

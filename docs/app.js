@@ -420,7 +420,7 @@ function renderGroups() {
     var btn = document.createElement('button');
     btn.textContent = g.name;
     var count = document.createElement('small');
-    count.textContent = g.exercises.length + ' exerc.';
+    count.textContent = plural(g.exercises.length, 'exercise');
     btn.appendChild(count);
     btn.addEventListener('click', function () { openExerciseList(g.name); });
     grid.appendChild(btn);
