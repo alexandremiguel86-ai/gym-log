@@ -763,6 +763,15 @@ loadCatalog().then(function () {
 });
 
 if ('serviceWorker' in navigator) {
+  // Versao nova assumiu o controle: recarrega para ela aparecer ja nesta
+  // abertura, e nao so na seguinte. So na tela inicial - no meio de um
+  // formulario o reload apagaria o que esta sendo digitado.
+  var hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (!hadController) return;           // primeira instalacao, nada a trocar
+    hadController = false;                // no maximo um reload
+    if (stack.length === 1 && stack[0] === 'screen-home') location.reload();
+  });
   window.addEventListener('load', function () {
     navigator.serviceWorker.register('sw.js').catch(function () {});
   });

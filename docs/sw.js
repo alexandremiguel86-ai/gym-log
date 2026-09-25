@@ -4,7 +4,7 @@
  * iPhone continua servindo a versao antiga do cache indefinidamente.
  */
 
-var CACHE = 'gymlog-v8';
+var CACHE = 'gymlog-v9';
 
 // exercises.json muda quando voce publica a lista pela planilha, e voce espera
 // ver a mudanca na proxima vez que abrir o app - nao na seguinte. Por isso ele
@@ -26,7 +26,12 @@ var SHELL = [
 self.addEventListener('install', function (e) {
   e.waitUntil(
     caches.open(CACHE)
-      .then(function (c) { return c.addAll(SHELL); })
+      // cache: 'reload' pula o cache HTTP. O GitHub Pages manda max-age=600: sem
+      // isso, reabrir o app menos de 10 min depois enchia o cache NOVO com o
+      // app.js ANTIGO, e a versao nova nunca aparecia.
+      .then(function (c) {
+        return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); }));
+      })
       .then(function () { return self.skipWaiting(); })
   );
 });
@@ -76,7 +81,7 @@ self.addEventListener('fetch', function (e) {
     caches.match(req, { ignoreSearch: true }).then(function (hit) {
       if (hit) {
         // Atualiza em segundo plano para o proximo carregamento.
-        fetch(req)
+        fetch(req, { cache: 'no-cache' })
           .then(function (res) {
             if (res && res.ok) caches.open(CACHE).then(function (c) { c.put(req, res); });
           })
