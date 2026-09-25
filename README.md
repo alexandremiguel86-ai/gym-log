@@ -73,7 +73,7 @@ Digite nas colunas `H` (nome), `I` (GROUP 1), `J` (GROUP 2) e `K` (GROUP 0: `Gym
 **Update Exercise List**. Ele salva a planilha, regera o JSON, e só faz commit+push se a
 lista realmente mudou. Depois **feche e reabra o app no iPhone**.
 
-O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, verde-escuro, azul, laranja). Um
+O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, roxo, azul, laranja). Um
 grupo sem GROUP 0 aparece numa seção cinza "Other", e o build avisa. Uma categoria nova
 também aparece em cinza até ganhar cor em `CATEGORIES`, no `app.js`.
 

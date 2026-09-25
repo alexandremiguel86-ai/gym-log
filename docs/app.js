@@ -418,7 +418,7 @@ function discardSession() {
 // aparece depois destas, em cinza.
 var CATEGORIES = [
   { name: 'Gym', color: '#00ff00' },
-  { name: 'Gym - Lower Body/Core', color: '#008000' },
+  { name: 'Gym - Lower Body/Core', color: '#be29ec' },
   { name: 'Mobility & Recovery', color: '#4d9bff' },
   { name: 'Conditioning', color: '#ff9f43' }
 ];
