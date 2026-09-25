@@ -29,12 +29,21 @@ digitação manual na aba `Off_Court`.
 
 ### Na academia
 
-1. **INICIAR TREINO**
-2. **+ ADICIONAR EXERCÍCIO** → grupo → exercício
+1. **START WORKOUT**
+2. **+ ADD EXERCISE** → grupo → exercício
 3. O formulário abre **já preenchido com os valores do último treino** daquele exercício.
-   Ajuste só o que mudou → **SALVAR**
+   Ajuste só o que mudou → **SAVE**
 4. Repita. Toque num item da lista para editar ou excluir.
-5. **FINALIZAR TREINO**
+5. **FINISH WORKOUT** (pede confirmação). Só aqui o treino vai para o Google Sheets.
+
+Enquanto o treino está aberto nada foi enviado, então editar e excluir valem de verdade.
+Fechar o app não perde nada: ao reabrir, **CONTINUE** retoma o treino.
+
+**Discard workout** apaga o treino aberto inteiro (também pede confirmação) — útil para
+demonstrar o app sem sujar a planilha.
+
+**PREVIOUS WORKOUTS**, na tela inicial, lista os treinos finalizados deste aparelho, do mais
+recente para o mais antigo. É só leitura.
 
 A busca procura em **todos** os grupos — digitar "preacher" costuma ser mais rápido do que
 lembrar em qual grupo o exercício está.
@@ -62,16 +71,16 @@ Digite nas colunas `H` (nome), `I` (GROUP 1) e `J` (GROUP 2) da `Off_Court`, e c
 **Update Exercise List**. Ele salva a planilha, regera o JSON, e só faz commit+push se a
 lista realmente mudou. Depois **feche e reabra o app no iPhone**.
 
-No celular, a opção *"Outro exercício (digitar)"* aceita um nome livre (o grupo continua
+No celular, a opção *"Other exercise (type it)"* aceita um nome livre (o grupo continua
 obrigatoriamente da lista). Esses registros vão para o Sheets com `custom = TRUE`, e o
 **Import Gym Log** avisa quais não estão na lista de referência — o `UpdateOffCourtLog`
 jogaria esses no grupo "Other".
 
 ### Offline
 
-Tudo é salvo no aparelho antes de qualquer tentativa de rede. Sem sinal, o badge no topo
-mostra `N pendentes` e a fila é enviada sozinha quando a conexão volta (ou ao tocar no
-badge). Nenhum registro é descartado antes de o Apps Script confirmar o `id`.
+Tudo é salvo no aparelho antes de qualquer tentativa de rede. Se o treino for finalizado
+sem sinal, o badge no topo mostra `N pending` e a fila é enviada sozinha quando a conexão
+volta (ou ao tocar no badge). Nenhum registro é descartado antes de o Apps Script confirmar o `id`.
 
 ---
 
@@ -148,7 +157,7 @@ git push -u origin main
 ### 3. Instalar no iPhone
 
 Abra a URL **no Safari** (o Chrome do iOS não instala PWA) → Compartilhar → **Adicionar à
-Tela de Início**. Abra o app → **Configurações** → cole a URL `/exec` e o token → **SALVAR**
+Tela de Início**. Abra o app → **Settings** → cole a URL `/exec` e o token → **SAVE**
 → **TESTAR CONEXÃO**.
 
 ### 4. Fechar o ciclo no PC
@@ -183,8 +192,8 @@ node tools/smoke_test.js              # fluxo completo, sem navegador
 python -m http.server 8000 -d docs    # abrir http://localhost:8000
 ```
 
-O `smoke_test.js` monta um DOM mínimo e simula um treino inteiro (registrar, prefill,
-offline, dedupe, editar, excluir, navegação). Rode depois de mexer no `app.js`.
+O `smoke_test.js` monta um DOM mínimo e simula treinos inteiros (registrar, prefill,
+editar, excluir, finalizar, offline, dedupe, descartar, histórico, navegação). Rode depois de mexer no `app.js`.
 
 **Testar o Apps Script pelo terminal:** o `/exec` responde com um **302** e o corpo real vem
 na URL do `Location`. O `curl -L` reenvia o POST sem `Content-Length` e o Google devolve
@@ -241,13 +250,14 @@ reais na sua planilha. Validar como número quebraria a compatibilidade com o ma
 falha de rede nunca gera linha duplicada.
 
 `notes` vai para a coluna `G` do `Off_Court`, que está livre — o `UpdateOffCourtLog` lê
-apenas `B:F`.
+apenas `B:F`. O app não tem mais campo de observação e envia `notes` sempre vazio; a coluna
+continua porque o `ImportGymLog` lê o CSV por posição.
 
 ## Limitações conhecidas
 
-- **Editar ou excluir um registro já sincronizado** só corrige no celular. O app avisa; a
-  correção no Google Sheets é manual. (Deduplicar por `id` é o que evita duplicatas; fazer
-  update remoto exigiria mais uma rota no Apps Script.)
+- **Treino finalizado não se edita.** O Apps Script só acrescenta linhas (deduplica por
+  `id`), então a correção depois de finalizar é manual no Google Sheets. Por isso o
+  histórico é só leitura.
 - **Histórico só deste aparelho.** O `Último: 3×10 @ 56kg` vem do `localStorage`. Num
   aparelho novo ele começa vazio — os dados antigos continuam no Sheets.
 - **Uma carga por exercício.** Séries com pesos diferentes viram uma linha só, como no

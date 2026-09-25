@@ -5,8 +5,12 @@
  * Script confirma o id. A rede da academia e ruim; perder um treino seria o
  * pior defeito possivel.
  *
+ * O treino so vai para o Sheets ao ser FINALIZADO. Enquanto esta aberto, editar
+ * e excluir sao livres: o Apps Script so acrescenta linhas, entao uma correcao
+ * depois do envio nao chegaria la.
+ *
  * Nada aqui e apagado apos a sincronizacao: o historico local e o que alimenta
- * o "Ultimo: 3x10 @ 56kg" sem precisar de rede.
+ * o "Last: 3x10 @ 56kg" e a tela Previous Workouts sem precisar de rede.
  */
 
 'use strict';
@@ -33,7 +37,7 @@ function save(key, value) {
   } catch (e) {
     // Modo privado do Safari ou cota estourada: avisar alto, porque o
     // registro acabou de NAO ser salvo.
-    toast('ERRO: nao consegui salvar no aparelho');
+    toast('ERROR: could not save on this device');
     return false;
   }
 }
@@ -57,20 +61,22 @@ function todayISO() {
   return d.getFullYear() + '-' + m + '-' + day;
 }
 
-var MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-              'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function prettyDate(iso) {
   var p = String(iso).split('-');
   if (p.length !== 3) return iso;
-  return Number(p[2]) + '/' + MONTHS[Number(p[1]) - 1] + '/' + p[0];
+  return MONTHS[Number(p[1]) - 1] + ' ' + Number(p[2]) + ', ' + p[0];
 }
 
 function shortDate(iso) {
   var p = String(iso).split('-');
   if (p.length !== 3) return iso;
-  return Number(p[2]) + '/' + MONTHS[Number(p[1]) - 1];
+  return MONTHS[Number(p[1]) - 1] + ' ' + Number(p[2]);
 }
+
+function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
 
 function $(id) { return document.getElementById(id); }
 
@@ -87,7 +93,7 @@ function toast(msg) {
 function summarize(entry) {
   var parts = [];
   if (entry.sets && entry.reps) parts.push(entry.sets + 'x' + entry.reps);
-  else if (entry.sets) parts.push(entry.sets + ' series');
+  else if (entry.sets) parts.push(entry.sets + ' sets');
   else if (entry.reps) parts.push(entry.reps);
   if (entry.weight) parts.push('@ ' + entry.weight);
   if (entry.rpe) parts.push('RPE ' + entry.rpe);
@@ -99,11 +105,13 @@ function summarize(entry) {
 var stack = [];
 var TITLES = {
   'screen-home': 'Gym Log',
-  'screen-session': 'Treino',
-  'screen-group': 'Grupo',
-  'screen-exercise': 'Exercicio',
-  'screen-form': 'Registro',
-  'screen-settings': 'Configuracoes'
+  'screen-session': 'Workout',
+  'screen-history': 'Previous Workouts',
+  'screen-workout': 'Workout',
+  'screen-group': 'Group',
+  'screen-exercise': 'Exercise',
+  'screen-form': 'Entry',
+  'screen-settings': 'Settings'
 };
 
 /** Troca a tela visivel. `stack` e o historico; o topo e sempre a tela atual. */
@@ -142,6 +150,7 @@ function goBack() {
   if (id === 'screen-session') renderSession();
   if (id === 'screen-home') renderHome();
   if (id === 'screen-group') renderGroups();
+  if (id === 'screen-history') renderHistory();
   render(id);
 }
 
@@ -157,7 +166,7 @@ function loadCatalog() {
     .catch(function () {
       // Offline e sem cache do service worker ainda: usa a ultima copia.
       catalog = load('gymlog.catalog', { groups: [] });
-      if (!catalog.groups.length) toast('Lista de exercicios indisponivel');
+      if (!catalog.groups.length) toast('Exercise list unavailable');
     });
 }
 
@@ -178,8 +187,10 @@ function lastEntryFor(name, excludeId) {
 
 // ---------------------------------------------------------------- sync
 
+/** Fila de envio. O treino aberto fica de fora ate ser finalizado. */
 function pending() {
-  return entries.filter(function (e) { return !e.synced; });
+  var open = session ? session.id : null;
+  return entries.filter(function (e) { return !e.synced && e.session_id !== open; });
 }
 
 function refreshBadge() {
@@ -188,7 +199,7 @@ function refreshBadge() {
   if (n) {
     badge.hidden = false;
     badge.className = 'badge pending';
-    badge.textContent = n + ' pendente' + (n > 1 ? 's' : '');
+    badge.textContent = n + ' pending';
   } else if (!navigator.onLine) {
     badge.hidden = false;
     badge.className = 'badge';
@@ -203,11 +214,11 @@ var syncing = false;
 function sync(explicit) {
   var queue = pending();
   if (!queue.length) {
-    if (explicit) toast('Tudo sincronizado');
+    if (explicit) toast('All synced');
     return Promise.resolve(true);
   }
   if (!settings.url || !settings.token) {
-    if (explicit) toast('Configure a URL e o token primeiro');
+    if (explicit) toast('Set the URL and token first');
     return Promise.resolve(false);
   }
   if (syncing) return Promise.resolve(false);
@@ -223,7 +234,7 @@ function sync(explicit) {
     .then(function (r) { return r.json(); })
     .then(function (res) {
       if (!res.ok) {
-        toast('Sync falhou: ' + (res.error || 'erro'));
+        toast('Sync failed: ' + (res.error || 'error'));
         return false;
       }
       var accepted = {};
@@ -231,11 +242,11 @@ function sync(explicit) {
       entries.forEach(function (e) { if (accepted[e.id]) e.synced = true; });
       save(K_ENTRIES, entries);
       refreshBadge();
-      if (explicit) toast('Sincronizado (' + (res.accepted || []).length + ')');
+      if (explicit) toast('Synced (' + (res.accepted || []).length + ')');
       return true;
     })
     .catch(function () {
-      if (explicit) toast('Sem conexao - fica na fila');
+      if (explicit) toast('No connection - kept in queue');
       return false;
     })
     .then(function (result) { syncing = false; return result; });
@@ -249,15 +260,81 @@ function renderHome() {
   $('resume').hidden = !open;
   if (open) {
     var n = entries.filter(function (e) { return e.session_id === session.id; }).length;
-    $('resume').textContent = 'CONTINUAR (' + n + ' exerc.)';
+    $('resume').textContent = 'CONTINUE (' + plural(n, 'exercise') + ')';
   }
-  var days = {};
-  entries.forEach(function (e) { days[e.date] = true; });
-  var total = Object.keys(days).length;
-  $('home-stats').textContent = entries.length
-    ? entries.length + ' registros em ' + total + ' treinos'
-    : 'Nenhum treino registrado ainda.';
+  var total = finishedWorkouts().length;
+  $('home-stats').textContent = total
+    ? plural(total, 'workout') + ' logged on this device'
+    : 'No workouts logged yet.';
   refreshBadge();
+}
+
+// ---------------------------------------------------------------- historico
+
+/** Treinos finalizados, do mais recente para o mais antigo. */
+function finishedWorkouts() {
+  var open = session ? session.id : null;
+  var byId = {};
+  var list = [];
+  entries.forEach(function (e, i) {
+    if (e.session_id === open) return;
+    var w = byId[e.session_id];
+    if (!w) {
+      w = byId[e.session_id] = { id: e.session_id, date: e.date, order: i, entries: [] };
+      list.push(w);
+    }
+    w.entries.push(e);
+  });
+  // Mesma data: o treino registrado depois vem primeiro.
+  list.sort(function (a, b) {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return b.order - a.order;
+  });
+  return list;
+}
+
+function renderHistory() {
+  var list = $('history-list');
+  list.innerHTML = '';
+  var workouts = finishedWorkouts();
+  $('history-empty').hidden = workouts.length > 0;
+
+  workouts.forEach(function (w) {
+    var unsent = w.entries.filter(function (e) { return !e.synced; }).length;
+    var li = document.createElement('li');
+    var btn = document.createElement('button');
+    btn.className = 'row-btn';
+    var name = document.createElement('strong');
+    name.textContent = prettyDate(w.date);
+    var meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = plural(w.entries.length, 'exercise') + (unsent ? '  (pending)' : '');
+    btn.appendChild(name);
+    btn.appendChild(meta);
+    btn.addEventListener('click', function () { openWorkout(w); });
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+}
+
+/** Treino antigo, so leitura: editar aqui nao chegaria ao Sheets. */
+function openWorkout(w) {
+  $('workout-date').textContent = prettyDate(w.date);
+  var list = $('workout-list');
+  list.innerHTML = '';
+  w.entries.forEach(function (e) {
+    var li = document.createElement('li');
+    li.className = 'row-btn';
+    var name = document.createElement('strong');
+    name.textContent = e.exercise;
+    var meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = [e.group1, summarize(e)].filter(Boolean).join(' - ');
+    li.appendChild(name);
+    li.appendChild(meta);
+    list.appendChild(li);
+  });
+  show('screen-workout');
 }
 
 // ---------------------------------------------------------------- sessao
@@ -269,7 +346,7 @@ function sessionEntries() {
 
 function renderSession() {
   if (!session) { reset('screen-home'); renderHome(); return; }
-  $('session-date').textContent = 'Treino de ' + prettyDate(session.date);
+  $('session-date').textContent = prettyDate(session.date);
 
   var list = $('entry-list');
   list.innerHTML = '';
@@ -285,8 +362,7 @@ function renderSession() {
     name.textContent = e.exercise;
     var meta = document.createElement('span');
     meta.className = 'meta';
-    meta.textContent = [e.group1, summarize(e)].filter(Boolean).join(' - ')
-      + (e.synced ? '' : '  (pendente)');
+    meta.textContent = [e.group1, summarize(e)].filter(Boolean).join(' - ');
     btn.appendChild(name);
     btn.appendChild(meta);
     btn.addEventListener('click', function () { openForm(e); });
@@ -303,14 +379,36 @@ function startSession() {
   show('screen-session');
 }
 
-function finishSession() {
-  var n = sessionEntries().length;
-  if (n === 0 && !confirm('Treino sem exercicios. Descartar?')) return;
+function closeSession() {
   session = null;
   localStorage.removeItem(K_SESSION);
   renderHome();
   reset('screen-home');
+}
+
+function finishSession() {
+  var n = sessionEntries().length;
+  if (n === 0) {
+    if (confirm('No exercises logged. Discard this workout?')) closeSession();
+    return;
+  }
+  if (!confirm('Finish workout? ' + plural(n, 'exercise') + ' will be sent to the spreadsheet.')) return;
+  closeSession();
   sync(true);
+}
+
+/** Apaga o treino aberto inteiro. Nada dele foi enviado, entao nada sobra no Sheets. */
+function discardSession() {
+  var n = sessionEntries().length;
+  var msg = n
+    ? 'Discard this workout? Its ' + plural(n, 'exercise') + ' will be deleted. This cannot be undone.'
+    : 'Discard this workout?';
+  if (!confirm(msg)) return;
+  var id = session.id;
+  entries = entries.filter(function (e) { return e.session_id !== id; });
+  save(K_ENTRIES, entries);
+  closeSession();
+  toast('Workout discarded');
 }
 
 // ---------------------------------------------------------------- grupo
@@ -388,7 +486,7 @@ function renderExercises(filter) {
   if (!pool.length) {
     var p = document.createElement('p');
     p.className = 'muted center';
-    p.textContent = 'Nada encontrado.';
+    p.textContent = 'Nothing found.';
     box.appendChild(p);
   }
 }
@@ -422,7 +520,7 @@ function openForm(entry) {
     $('f-name').value = draft.exercise;
   }
 
-  $('form-exercise').textContent = draft.exercise || 'Novo exercicio';
+  $('form-exercise').textContent = draft.exercise || 'New exercise';
   $('form-group').textContent = draft.group1
     ? (draft.group2 && draft.group2 !== draft.group1
         ? draft.group1 + ' / ' + draft.group2
@@ -436,7 +534,6 @@ function openForm(entry) {
     $('f-reps').value = entry.reps || '';
     $('f-weight').value = entry.weight || '';
     $('f-rpe').value = entry.rpe || '';
-    $('f-notes').value = entry.notes || '';
     $('last-chip').hidden = true;
   } else {
     // Prefill do ultimo treino deste exercicio: o app abre ja preenchido e
@@ -446,15 +543,14 @@ function openForm(entry) {
     $('f-reps').value = last ? (last.reps || '') : '';
     $('f-weight').value = last ? (last.weight || '') : '';
     $('f-rpe').value = last ? (last.rpe || '') : '';
-    $('f-notes').value = '';
     var chip = $('last-chip');
     if (last) {
       chip.hidden = false;
       chip.innerHTML = '';
       var line = document.createElement('span');
-      line.textContent = 'Ultimo: ' + summarize(last);
+      line.textContent = 'Last: ' + summarize(last);
       var sub = document.createElement('small');
-      sub.textContent = shortDate(last.date) + ' - toque para reusar';
+      sub.textContent = shortDate(last.date) + ' - tap to reuse';
       chip.appendChild(line);
       chip.appendChild(sub);
     } else {
@@ -471,14 +567,14 @@ function openCustomForm() {
 
 function saveEntry() {
   var name = draft.custom ? $('f-name').value.trim() : draft.exercise;
-  if (!name) { toast('Informe o nome do exercicio'); return; }
+  if (!name) { toast('Enter the exercise name'); return; }
 
   var group1 = draft.custom ? $('f-group').value : draft.group1;
   var group2 = draft.custom ? group1 : draft.group2;
 
   var sets = $('f-sets').value.trim();
   var reps = $('f-reps').value.trim();
-  if (!sets && !reps) { toast('Informe ao menos series ou reps'); return; }
+  if (!sets && !reps) { toast('Enter at least sets or reps'); return; }
 
   if (editing) {
     editing.exercise = name;
@@ -488,11 +584,6 @@ function saveEntry() {
     editing.reps = reps;
     editing.weight = $('f-weight').value.trim();
     editing.rpe = $('f-rpe').value.trim();
-    editing.notes = $('f-notes').value.trim();
-    // Editar apos a sincronizacao criaria uma linha nova no Sheets com id
-    // diferente. Mantemos o id e marcamos como pendente: o Apps Script vai
-    // reconhecer o id e ignorar, entao a correcao e feita a mao na planilha.
-    if (editing.synced) toast('Ja sincronizado - corrija tambem no Sheets');
   } else {
     entries.push({
       id: uid(),
@@ -505,7 +596,9 @@ function saveEntry() {
       reps: reps,
       weight: $('f-weight').value.trim(),
       rpe: $('f-rpe').value.trim(),
-      notes: $('f-notes').value.trim(),
+      // Sem campo na tela; a coluna continua no Sheets porque o import do
+      // Excel le as colunas do CSV por posicao.
+      notes: '',
       custom: !!draft.custom,
       synced: false
     });
@@ -516,13 +609,11 @@ function saveEntry() {
   draft = null;
   renderSession();
   backToSession();
-  sync(false);
 }
 
 function deleteEntry() {
   if (!editing) return;
-  if (!confirm('Excluir "' + editing.exercise + '"?')) return;
-  if (editing.synced) toast('Ja sincronizado - apague tambem no Sheets');
+  if (!confirm('Delete "' + editing.exercise + '"?')) return;
   entries = entries.filter(function (e) { return e.id !== editing.id; });
   save(K_ENTRIES, entries);
   editing = null;
@@ -536,8 +627,8 @@ function openSettings() {
   $('s-url').value = settings.url || '';
   $('s-token').value = settings.token || '';
   $('settings-status').textContent = '';
-  $('queue-info').textContent = pending().length + ' registro(s) aguardando envio. '
-    + entries.length + ' no total neste aparelho.';
+  $('queue-info').textContent = pending().length + ' entry(ies) waiting to be sent. '
+    + entries.length + ' in total on this device.';
   show('screen-settings');
 }
 
@@ -545,13 +636,13 @@ function saveSettings() {
   settings.url = $('s-url').value.trim();
   settings.token = $('s-token').value.trim();
   save(K_SETTINGS, settings);
-  toast('Salvo');
+  toast('Saved');
 }
 
 function testSync() {
   var status = $('settings-status');
-  if (!settings.url) { status.textContent = 'Salve a URL primeiro.'; return; }
-  status.textContent = 'Testando...';
+  if (!settings.url) { status.textContent = 'Save the URL first.'; return; }
+  status.textContent = 'Testing...';
   fetch(settings.url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -559,11 +650,11 @@ function testSync() {
   })
     .then(function (r) { return r.json(); })
     .then(function (res) {
-      status.textContent = res.ok ? 'Conexao OK.' : 'Recusado: ' + res.error;
+      status.textContent = res.ok ? 'Connection OK.' : 'Rejected: ' + res.error;
     })
     .catch(function (err) {
-      status.textContent = 'Falhou: ' + err.message
-        + ' (confira se o deploy esta como "Anyone")';
+      status.textContent = 'Failed: ' + err.message
+        + ' (check that the deployment access is "Anyone")';
     });
 }
 
@@ -582,11 +673,13 @@ $('back').addEventListener('click', goBack);
 
 $('start').addEventListener('click', startSession);
 $('resume').addEventListener('click', function () { renderSession(); show('screen-session'); });
+$('open-history').addEventListener('click', function () { renderHistory(); show('screen-history'); });
 $('open-settings').addEventListener('click', openSettings);
 $('sync-badge').addEventListener('click', function () { sync(true); });
 
 $('add-exercise').addEventListener('click', function () { renderGroups(); show('screen-group'); });
 $('finish').addEventListener('click', finishSession);
+$('discard').addEventListener('click', discardSession);
 
 $('search').addEventListener('input', function () { renderExercises(this.value); });
 $('custom-exercise').addEventListener('click', openCustomForm);
@@ -598,7 +691,7 @@ $('last-chip').addEventListener('click', function () {
   $('f-reps').value = last.reps || '';
   $('f-weight').value = last.weight || '';
   $('f-rpe').value = last.rpe || '';
-  toast('Valores do ultimo treino');
+  toast('Values from last workout');
 });
 
 $('save-entry').addEventListener('click', saveEntry);

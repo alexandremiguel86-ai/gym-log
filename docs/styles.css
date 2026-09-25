@@ -113,6 +113,7 @@ main { padding: 16px 14px 120px; }
   text-decoration: underline;
   padding: 14px;
 }
+.link.danger { color: var(--danger); padding: 6px; }
 
 /* ---------- grade de grupos ---------- */
 
@@ -220,6 +221,10 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 .screen:not(.active) .sticky-bottom { display: none; }
+
+/* O rodape do treino tem dois botoes grandes + o "Discard": sem esta folga o
+   ultimo exercicio da lista fica escondido atras dele. */
+#screen-session { padding-bottom: 110px; }
 
 /* ---------- diversos ---------- */
 

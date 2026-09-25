@@ -1,8 +1,9 @@
 /* Teste de fumaca do app.js sem navegador.
  *
  * Monta um DOM minimo a partir dos id= do index.html, carrega o app.js e
- * simula um treino inteiro: iniciar, registrar dois exercicios, conferir o
- * prefill do historico, editar, excluir, finalizar e sincronizar.
+ * simula treinos inteiros: iniciar, registrar, conferir o prefill do historico,
+ * editar, excluir, finalizar (so entao sincroniza), descartar e consultar os
+ * treinos anteriores.
  *
  * Nao substitui o teste no iPhone (layout, Safari, service worker), mas pega
  * erros de referencia e de logica de estado, que sao a maioria.
@@ -153,12 +154,11 @@ function active() {
 }
 function entries() { return JSON.parse(localStorage.getItem('gymlog.entries') || '[]'); }
 function el(id) { return byId[id]; }
-function fill(sets, reps, weight, rpe, notes) {
+function fill(sets, reps, weight, rpe) {
   el('f-sets').value = sets;
   el('f-reps').value = reps;
   el('f-weight').value = weight || '';
   el('f-rpe').value = rpe || '';
-  el('f-notes').value = notes || '';
 }
 /** Encontra o botao de um exercicio na tela de lista. */
 function pick(name) {
@@ -172,8 +172,10 @@ function pick(name) {
 
 // ------------------------------------------------------------ cenario
 
+function wait(ms) { return new Promise(function (r) { setTimeout(r, ms || 20); }); }
+
 Promise.resolve()
-  .then(function () { return new Promise(function (r) { setTimeout(r, 30); }); })
+  .then(function () { return wait(30); })
   .then(function () {
     console.log('\n1. Boot');
     check('abre no Inicio', active() === 'screen-home', active());
@@ -183,6 +185,7 @@ Promise.resolve()
     check('catalogo nao vazio',
       catalog.groups.length > 0 &&
       catalog.groups.every(function (g) { return g.exercises.length > 0; }));
+    check('sem campo de observacao', !byId['f-notes']);
 
     console.log('\n2. Configuracoes');
     el('s-url').value = 'https://script.google.com/fake/exec';
@@ -206,20 +209,27 @@ Promise.resolve()
     pick('Single-Arm Dumbbell Row').click();
     check('tela de formulario', active() === 'screen-form', active());
     check('sem historico ainda -> chip oculto', el('last-chip').hidden === true);
-    fill('2', '10', '25kg', '7', 'ombro ok');
+    fill('2', '10', '25kg', '7');
     el('save-entry').click();
     check('volta para a sessao', active() === 'screen-session', active());
     check('1 registro gravado', entries().length === 1, entries().length);
     check('valores gravados como texto',
       entries()[0].sets === '2' && entries()[0].weight === '25kg');
     check('group1/group2 preenchidos', entries()[0].group1 === 'Back');
+    check('notes vai vazio (coluna mantida no Sheets)', entries()[0].notes === '');
   })
-  .then(function () { return new Promise(function (r) { setTimeout(r, 20); }); })
+  .then(function () { return wait(); })
   .then(function () {
-    console.log('\n5. Sincronizacao automatica ao salvar');
-    check('enviado ao servidor', Object.keys(serverIds).length === 1, Object.keys(serverIds).length);
-    check('marcado como synced', entries()[0].synced === true);
-    check('badge escondido', el('sync-badge').hidden === true);
+    console.log('\n5. Nada e enviado com o treino aberto');
+    check('servidor vazio', Object.keys(serverIds).length === 0, Object.keys(serverIds).length);
+    check('nenhum POST', posted.length === 0, posted.length);
+    check('badge escondido (treino aberto nao e pendencia)', el('sync-badge').hidden === true);
+    el('sync-badge').click();
+    vm.runInContext('sync(true);', sandbox);
+    return wait();
+  })
+  .then(function () {
+    check('sync manual tambem ignora o treino aberto', posted.length === 0, posted.length);
 
     console.log('\n6. Exercicio com tempo (nao numerico)');
     el('add-exercise').click();
@@ -227,19 +237,29 @@ Promise.resolve()
     var idx = catalog.groups.map(function (g) { return g.name; }).indexOf('Tennis Conditioning');
     el('group-grid').children[idx].click();
     pick('Figure-8 Drill').click();
-    fill('4', '40s', '', '', '');
+    fill('4', '40s', '', '');
     el('save-entry').click();
     var e2 = entries()[1];
     check('reps "40s" preservado', e2.reps === '40s', e2.reps);
     check('group2 = Footwork', e2.group2 === 'Footwork', e2.group2);
     check('2 registros na sessao', entries().length === 2);
   })
-  .then(function () { return new Promise(function (r) { setTimeout(r, 20); }); })
+  .then(function () { return wait(); })
   .then(function () {
-    console.log('\n7. Finalizar e iniciar um novo treino');
+    console.log('\n7. Finalizar pede confirmacao e so entao envia');
+    confirmAnswer = false;
+    el('finish').click();
+    check('cancelar mantem o treino aberto', active() === 'screen-session', active());
+    check('cancelar nao envia', posted.length === 0, posted.length);
+    confirmAnswer = true;
     el('finish').click();
     check('volta para o Inicio', active() === 'screen-home', active());
     check('sessao encerrada', localStorage.getItem('gymlog.session') === null);
+    return wait();
+  })
+  .then(function () {
+    check('2 linhas no servidor', Object.keys(serverIds).length === 2, Object.keys(serverIds).length);
+    check('marcados como synced', entries().every(function (e) { return e.synced === true; }));
 
     el('start').click();
     el('add-exercise').click();
@@ -254,52 +274,71 @@ Promise.resolve()
     check('sets prefilled', el('f-sets').value === '2', el('f-sets').value);
     check('reps prefilled', el('f-reps').value === '10', el('f-reps').value);
     check('weight prefilled', el('f-weight').value === '25kg', el('f-weight').value);
-    check('notes NAO prefilled', el('f-notes').value === '', el('f-notes').value);
 
     // so mudou a carga
     el('f-weight').value = '27.5kg';
     el('save-entry').click();
     check('3 registros no total', entries().length === 3, entries().length);
     check('nova sessao separada', entries()[2].session_id !== entries()[0].session_id);
-  })
-  .then(function () { return new Promise(function (r) { setTimeout(r, 20); }); })
-  .then(function () {
-    console.log('\n9. Offline: fila e reenvio');
-    networkUp = false;
+
+    console.log('\n9. Editar e excluir com o treino aberto');
     el('add-exercise').click();
     var idx = catalog.groups.map(function (g) { return g.name; }).indexOf('Core');
     el('group-grid').children[idx].click();
     pick('Swiss Ball Crunch').click();
-    fill('5', '20', '', '', '');
+    fill('5', '20', '', '');
     el('save-entry').click();
-    check('gravado localmente mesmo offline', entries().length === 4, entries().length);
-    check('marcado como pendente', entries()[3].synced !== true);
-    return new Promise(function (r) { setTimeout(r, 20); });
+    var n = entries().length;
+    var rows = el('entry-list').children;
+    rows[rows.length - 1].children[0].click();
+    check('abre o formulario em modo edicao', active() === 'screen-form', active());
+    check('botao excluir visivel', el('delete-entry').hidden === false);
+    check('valores carregados', el('f-sets').value === '5', el('f-sets').value);
+    el('f-sets').value = '4';
+    el('save-entry').click();
+    check('nao criou registro novo', entries().length === n, entries().length);
+    check('edicao aplicada', entries()[n - 1].sets === '4', entries()[n - 1].sets);
+
+    el('entry-list').children[0].children[0].click();
+    el('delete-entry').click();
+    check('registro excluido', entries().length === n - 1, entries().length);
+    check('sobrou o Swiss Ball Crunch', entries()[n - 2].exercise === 'Swiss Ball Crunch');
+    check('nada enviado ainda', Object.keys(serverIds).length === 2, Object.keys(serverIds).length);
   })
   .then(function () {
-    check('badge mostra pendencia', el('sync-badge').textContent.indexOf('1 pendente') === 0,
+    console.log('\n10. Offline ao finalizar: fila e reenvio');
+    networkUp = false;
+    el('finish').click();
+    return wait();
+  })
+  .then(function () {
+    check('gravado localmente mesmo offline', entries()[entries().length - 1].synced !== true);
+    check('badge mostra pendencia', el('sync-badge').textContent.indexOf('1 pending') === 0,
       el('sync-badge').textContent);
     networkUp = true;
     el('sync-badge').click();
-    return new Promise(function (r) { setTimeout(r, 20); });
+    return wait();
   })
   .then(function () {
-    check('sincronizado ao voltar a rede', entries()[3].synced === true);
-    check('4 linhas no servidor', Object.keys(serverIds).length === 4, Object.keys(serverIds).length);
+    check('sincronizado ao voltar a rede', entries()[entries().length - 1].synced === true);
+    check('edicao chegou ao servidor',
+      serverIds[entries()[entries().length - 1].id].sets === '4');
+    check('3 linhas no servidor', Object.keys(serverIds).length === 3, Object.keys(serverIds).length);
 
-    console.log('\n10. Dedupe: reenviar nao duplica');
+    console.log('\n11. Dedupe: reenviar nao duplica');
     // forca tudo para pendente e reenvia
     var all = entries();
     all.forEach(function (e) { e.synced = false; });
     localStorage.setItem('gymlog.entries', JSON.stringify(all));
     vm.runInContext('entries = JSON.parse(localStorage.getItem("gymlog.entries"));', sandbox);
     vm.runInContext('sync(true);', sandbox);
-    return new Promise(function (r) { setTimeout(r, 20); });
+    return wait();
   })
   .then(function () {
-    check('servidor continua com 4 ids', Object.keys(serverIds).length === 4, Object.keys(serverIds).length);
+    check('servidor continua com 3 ids', Object.keys(serverIds).length === 3, Object.keys(serverIds).length);
 
-    console.log('\n11. Exercicio fora da lista');
+    console.log('\n12. Exercicio fora da lista');
+    el('start').click();
     el('add-exercise').click();
     el('group-grid').children[0].click();
     el('custom-exercise').click();
@@ -309,35 +348,18 @@ Promise.resolve()
       el('f-group').children.length + ' vs ' + catalog.groups.length);
     el('f-name').value = 'Landmine Press';
     el('f-group').value = 'Shoulder';
-    fill('3', '8', '15kg', '7', '');
+    fill('3', '8', '15kg', '7');
     el('save-entry').click();
     var last = entries()[entries().length - 1];
     check('exercicio custom gravado', last.exercise === 'Landmine Press', last.exercise);
     check('marcado como custom', last.custom === true);
     check('grupo escolhido da lista', last.group1 === 'Shoulder', last.group1);
-  })
-  .then(function () { return new Promise(function (r) { setTimeout(r, 20); }); })
-  .then(function () {
-    console.log('\n12. Editar e excluir');
-    var n = entries().length;
-    el('entry-list').children[el('entry-list').children.length - 1].children[0].click();
-    check('abre o formulario em modo edicao', active() === 'screen-form', active());
-    check('botao excluir visivel', el('delete-entry').hidden === false);
-    check('valores carregados', el('f-sets').value === '3', el('f-sets').value);
-    el('f-sets').value = '4';
-    el('save-entry').click();
-    check('nao criou registro novo', entries().length === n, entries().length);
-    check('edicao aplicada', entries()[n - 1].sets === '4', entries()[n - 1].sets);
-
-    el('entry-list').children[el('entry-list').children.length - 1].children[0].click();
-    el('delete-entry').click();
-    check('registro excluido', entries().length === n - 1, entries().length);
 
     console.log('\n13. Validacao');
     el('add-exercise').click();
     el('group-grid').children[0].click();
     pick('Single-Arm Dumbbell Row').click();
-    fill('', '', '', '', '');
+    fill('', '', '', '');
     var before = entries().length;
     el('save-entry').click();
     check('recusa registro sem series nem reps', entries().length === before, entries().length);
@@ -353,6 +375,53 @@ Promise.resolve()
     vm.runInContext('goBack();', sandbox);
     check('sessao -> inicio', active() === 'screen-home', active());
     check('voltar oculto na raiz', el('back').hidden === true);
+    check('inicio oferece continuar', el('resume').hidden === false && el('start').hidden === true);
+
+    console.log('\n15. Descartar o treino aberto');
+    el('resume').click();
+    var n = entries().length;
+    confirmAnswer = false;
+    el('discard').click();
+    check('cancelar mantem o treino', active() === 'screen-session' && entries().length === n);
+    confirmAnswer = true;
+    el('discard').click();
+    check('volta para o Inicio', active() === 'screen-home', active());
+    check('sessao encerrada', localStorage.getItem('gymlog.session') === null);
+    check('exercicios do treino apagados', entries().length === n - 1, entries().length);
+    check('nenhum registro de Landmine Press',
+      entries().every(function (e) { return e.exercise !== 'Landmine Press'; }));
+    return wait();
+  })
+  .then(function () {
+    check('nada enviado do treino descartado', Object.keys(serverIds).length === 3,
+      Object.keys(serverIds).length);
+
+    console.log('\n16. Previous Workouts');
+    el('start').click();                     // treino aberto nao aparece no historico
+    vm.runInContext('goBack();', sandbox);
+    el('open-history').click();
+    check('tela de historico', active() === 'screen-history', active());
+    var rows = el('history-list').children;
+    check('2 treinos finalizados', rows.length === 2, rows.length);
+    check('mesma data: o mais recente primeiro',
+      rows[0].children[0].textContent.indexOf('1 exercise') !== -1, rows[0].children[0].textContent);
+    rows[0].children[0].click();
+    check('abre o treino', active() === 'screen-workout', active());
+    check('mostra os exercicios', el('workout-list').children.length === 1 &&
+      el('workout-list').children[0].textContent.indexOf('Swiss Ball Crunch') !== -1,
+      el('workout-list').textContent);
+    vm.runInContext('goBack();', sandbox);
+    check('voltar -> historico', active() === 'screen-history', active());
+
+    // Datas diferentes: ordem pela data, nao pela ordem de gravacao.
+    vm.runInContext(
+      'entries.push({ id: "o1", session_id: "old", date: "2020-01-05", exercise: "X", synced: true });' +
+      'entries.push({ id: "n1", session_id: "new", date: "2099-01-05", exercise: "Y", synced: true });' +
+      'entries.unshift({ id: "m1", session_id: "mid", date: "2050-01-05", exercise: "Z", synced: true });',
+      sandbox);
+    var order = vm.runInContext('finishedWorkouts().map(function (w) { return w.id; }).join(",")', sandbox);
+    check('mais recente -> mais antigo',
+      order.indexOf('new,mid,') === 0 && /,old$/.test(order), order);
 
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
     process.exit(failures ? 1 : 0);

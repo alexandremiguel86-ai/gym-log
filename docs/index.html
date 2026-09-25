@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -15,7 +15,7 @@
 <body>
 
 <header id="topbar">
-  <button id="back" class="icon-btn" hidden aria-label="Voltar">&#8592;</button>
+  <button id="back" class="icon-btn" hidden aria-label="Back">&#8592;</button>
   <h1 id="title">Gym Log</h1>
   <button id="sync-badge" class="badge" hidden></button>
 </header>
@@ -24,22 +24,36 @@
 
   <!-- ---------- HOME ---------- -->
   <section id="screen-home" class="screen">
-    <button id="start" class="big primary">INICIAR TREINO</button>
+    <button id="start" class="big primary">START WORKOUT</button>
     <button id="resume" class="big" hidden></button>
+    <button id="open-history" class="big ghost">PREVIOUS WORKOUTS</button>
     <div class="spacer"></div>
     <p id="home-stats" class="muted"></p>
-    <button id="open-settings" class="link">Configuracoes</button>
+    <button id="open-settings" class="link">Settings</button>
   </section>
 
   <!-- ---------- SESSAO ---------- -->
   <section id="screen-session" class="screen">
     <p id="session-date" class="muted"></p>
     <ul id="entry-list" class="list"></ul>
-    <p id="entry-empty" class="muted center">Nenhum exercicio registrado ainda.</p>
+    <p id="entry-empty" class="muted center">No exercises logged yet.</p>
     <div class="sticky-bottom">
-      <button id="add-exercise" class="big primary">+ ADICIONAR EXERCICIO</button>
-      <button id="finish" class="big ghost">FINALIZAR TREINO</button>
+      <button id="add-exercise" class="big primary">+ ADD EXERCISE</button>
+      <button id="finish" class="big ghost">FINISH WORKOUT</button>
+      <button id="discard" class="link danger">Discard workout</button>
     </div>
+  </section>
+
+  <!-- ---------- HISTORICO ---------- -->
+  <section id="screen-history" class="screen">
+    <ul id="history-list" class="list"></ul>
+    <p id="history-empty" class="muted center">No finished workouts yet.</p>
+  </section>
+
+  <!-- ---------- TREINO ANTIGO (so leitura) ---------- -->
+  <section id="screen-workout" class="screen">
+    <p id="workout-date" class="muted"></p>
+    <ul id="workout-list" class="list"></ul>
   </section>
 
   <!-- ---------- GRUPO ---------- -->
@@ -49,9 +63,9 @@
 
   <!-- ---------- EXERCICIO ---------- -->
   <section id="screen-exercise" class="screen">
-    <input id="search" type="search" placeholder="Buscar exercicio..." autocomplete="off">
+    <input id="search" type="search" placeholder="Search exercise..." autocomplete="off">
     <div id="exercise-list" class="list"></div>
-    <button id="custom-exercise" class="big ghost">Outro exercicio (digitar)</button>
+    <button id="custom-exercise" class="big ghost">Other exercise (type it)</button>
   </section>
 
   <!-- ---------- FORMULARIO ---------- -->
@@ -60,10 +74,10 @@
     <p id="form-group" class="muted"></p>
 
     <div id="custom-fields" hidden>
-      <label>Nome do exercicio
+      <label>Exercise name
         <input id="f-name" type="text" autocapitalize="words">
       </label>
-      <label>Grupo
+      <label>Group
         <select id="f-group"></select>
       </label>
     </div>
@@ -71,16 +85,16 @@
     <button id="last-chip" class="chip" hidden></button>
 
     <div class="row">
-      <label>Series
+      <label>Sets
         <input id="f-sets" type="text" inputmode="numeric" enterkeyhint="next">
       </label>
-      <label>Reps / Tempo
-        <input id="f-reps" type="text" inputmode="text" enterkeyhint="next" placeholder="10 ou 40s">
+      <label>Reps / Time
+        <input id="f-reps" type="text" inputmode="text" enterkeyhint="next" placeholder="10 or 40s">
       </label>
     </div>
 
     <div class="row">
-      <label>Peso / Carga
+      <label>Weight / Load
         <input id="f-weight" type="text" inputmode="text" enterkeyhint="next" placeholder="56kg">
       </label>
       <label>RPE
@@ -88,35 +102,31 @@
       </label>
     </div>
 
-    <label>Observacoes
-      <input id="f-notes" type="text" autocapitalize="sentences">
-    </label>
-
     <div class="sticky-bottom">
-      <button id="save-entry" class="big primary">SALVAR</button>
-      <button id="delete-entry" class="big danger" hidden>EXCLUIR</button>
+      <button id="save-entry" class="big primary">SAVE</button>
+      <button id="delete-entry" class="big danger" hidden>DELETE</button>
     </div>
   </section>
 
   <!-- ---------- CONFIGURACOES ---------- -->
   <section id="screen-settings" class="screen">
     <p class="muted">
-      Cole aqui a URL do Web App do Apps Script e o token. Ficam salvos apenas
-      neste aparelho e nunca saem para o repositorio.
+      Paste the Apps Script Web App URL and the token here. They are stored only
+      on this device and never go to the repository.
     </p>
-    <label>URL do Apps Script (/exec)
+    <label>Apps Script URL (/exec)
       <input id="s-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false">
     </label>
     <label>Token
       <input id="s-token" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
     </label>
-    <button id="save-settings" class="big primary">SALVAR</button>
-    <button id="test-sync" class="big ghost">TESTAR CONEXAO</button>
+    <button id="save-settings" class="big primary">SAVE</button>
+    <button id="test-sync" class="big ghost">TEST CONNECTION</button>
     <p id="settings-status" class="muted"></p>
     <hr>
     <p class="muted" id="queue-info"></p>
-    <button id="force-sync" class="big ghost">SINCRONIZAR AGORA</button>
-    <button id="export-json" class="link">Exportar backup (JSON)</button>
+    <button id="force-sync" class="big ghost">SYNC NOW</button>
+    <button id="export-json" class="link">Export backup (JSON)</button>
   </section>
 
 </main>
