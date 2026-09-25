@@ -225,7 +225,7 @@ Promise.resolve()
     check('secoes na ordem Gym, Gym - Lower Body/Core, Mobility, Conditioning',
       heads.join('|') === 'Gym|Gym - Lower Body/Core|Mobility & Recovery|Conditioning', heads.join('|'));
     check('Back na secao Gym', el('group-grid').children[1].children[0].textContent.indexOf('Back') === 0);
-    check('secao colorida', el('group-grid').children[0].style._props['--cat'] === '#35c07a');
+    check('secao colorida', el('group-grid').children[0].style._props['--cat'] === '#00ff00');
     group('Back').click();
     check('tela de exercicios', active() === 'screen-exercise', active());
     pick('Single-Arm Dumbbell Row').click();
