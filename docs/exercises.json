@@ -130,10 +130,6 @@
      "g2": "Lower Body"
     },
     {
-     "n": "Barbell Sumo Squat",
-     "g2": "Lower Body"
-    },
-    {
      "n": "Hip Thrust",
      "g2": "Lower Body"
     },
@@ -154,7 +150,11 @@
      "g2": "Lower Body"
     },
     {
-     "n": "Squat",
+     "n": "Smith Machine Squat",
+     "g2": "Lower Body"
+    },
+    {
+     "n": "Smith Machine Sumo Squat",
      "g2": "Lower Body"
     },
     {
@@ -162,11 +162,11 @@
      "g2": "Lower Body"
     },
     {
-     "n": "Unilateral Seated Leg Curl",
+     "n": "Unilateral Leg Extension",
      "g2": "Lower Body"
     },
     {
-     "n": "UnilateralLeg Extension",
+     "n": "Unilateral Seated Leg Curl",
      "g2": "Lower Body"
     }
    ]
@@ -238,6 +238,10 @@
     },
     {
      "n": "Unilateral Seated Calf Raise",
+     "g2": "Lower Leg"
+    },
+    {
+     "n": "Unilateral Single Leg Calf Raises",
      "g2": "Lower Leg"
     }
    ]
@@ -364,6 +368,10 @@
      "g2": "Shoulder Mobility"
     },
     {
+     "n": "Standing Chest Stretch",
+     "g2": "Shoulder Mobility"
+    },
+    {
      "n": "Standing Sleeper Stretch",
      "g2": "Shoulder Mobility"
     },
@@ -378,6 +386,18 @@
     {
      "n": "Wall Slides",
      "g2": "Shoulder Mobility"
+    },
+    {
+     "n": "Dumbbell Front Raise",
+     "g2": "Shoulder Strengthening"
+    },
+    {
+     "n": "Dumbbell Lateral Raise — Neutral Grip",
+     "g2": "Shoulder Strengthening"
+    },
+    {
+     "n": "Dumbbell Shoulder Press",
+     "g2": "Shoulder Strengthening"
     },
     {
      "n": "Electrotherapy",
