@@ -85,19 +85,19 @@
    "exercises": [
     {
      "n": "Lying Leg Raise",
-     "g2": "Core"
+     "g2": "Abs"
     },
     {
      "n": "Lying Scissor Kick",
-     "g2": "Core"
+     "g2": "Abs"
     },
     {
      "n": "Russian Twist",
-     "g2": "Core"
+     "g2": "Abs"
     },
     {
      "n": "Swiss Ball Crunch",
-     "g2": "Core"
+     "g2": "Abs"
     }
    ]
   },
@@ -127,47 +127,47 @@
    "exercises": [
     {
      "n": "Barbell Romanian Deadlift",
-     "g2": "Lower Body"
+     "g2": "Hinge"
     },
     {
      "n": "Hip Thrust",
-     "g2": "Lower Body"
+     "g2": "Hinge"
     },
     {
      "n": "Leg Extension",
-     "g2": "Lower Body"
+     "g2": "Isolation"
     },
     {
      "n": "Seated Hip Abduction",
-     "g2": "Lower Body"
+     "g2": "Isolation"
     },
     {
      "n": "Seated Hip Adduction",
-     "g2": "Lower Body"
+     "g2": "Isolation"
     },
     {
      "n": "Seated Leg Curl",
-     "g2": "Lower Body"
-    },
-    {
-     "n": "Smith Machine Squat",
-     "g2": "Lower Body"
-    },
-    {
-     "n": "Smith Machine Sumo Squat",
-     "g2": "Lower Body"
-    },
-    {
-     "n": "Unilateral 45° Leg Press",
-     "g2": "Lower Body"
+     "g2": "Isolation"
     },
     {
      "n": "Unilateral Leg Extension",
-     "g2": "Lower Body"
+     "g2": "Isolation"
     },
     {
      "n": "Unilateral Seated Leg Curl",
-     "g2": "Lower Body"
+     "g2": "Isolation"
+    },
+    {
+     "n": "Smith Machine Squat",
+     "g2": "Squat/Lunge"
+    },
+    {
+     "n": "Smith Machine Sumo Squat",
+     "g2": "Squat/Lunge"
+    },
+    {
+     "n": "Unilateral 45° Leg Press",
+     "g2": "Squat/Lunge"
     }
    ]
   },
@@ -196,7 +196,7 @@
      "g2": "Lower Body Stretching"
     },
     {
-     "n": "Seated Forward Bend",
+     "n": "Seated Forward Bend (Hamstring)",
      "g2": "Lower Body Stretching"
     },
     {
@@ -208,7 +208,7 @@
      "g2": "Lower Body Stretching"
     },
     {
-     "n": "Standing Forward Bend",
+     "n": "Standing Forward Bend (Hamstring)",
      "g2": "Lower Body Stretching"
     },
     {
@@ -469,15 +469,15 @@
      "g2": "Power"
     },
     {
-     "n": "Cossack Squat",
-     "g2": "Power"
-    },
-    {
      "n": "Jumping Squats",
      "g2": "Power"
     },
     {
-     "n": "Lateral / Side Jumps",
+     "n": "Lateral Lunge (Cossack)",
+     "g2": "Power"
+    },
+    {
+     "n": "Lateral/Side Jumps",
      "g2": "Power"
     },
     {
