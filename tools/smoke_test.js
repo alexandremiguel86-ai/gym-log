@@ -222,8 +222,8 @@ Promise.resolve()
     var heads = el('group-grid').children
       .filter(function (c) { return c.className === 'cat-head'; })
       .map(function (c) { return c.textContent; });
-    check('secoes na ordem Gym, Mobility, Conditioning',
-      heads.join('|') === 'Gym|Mobility & Recovery|Conditioning', heads.join('|'));
+    check('secoes na ordem Gym, Gym - Lower Body/Core, Mobility, Conditioning',
+      heads.join('|') === 'Gym|Gym - Lower Body/Core|Mobility & Recovery|Conditioning', heads.join('|'));
     check('Back na secao Gym', el('group-grid').children[1].children[0].textContent.indexOf('Back') === 0);
     check('secao colorida', el('group-grid').children[0].style._props['--cat'] === '#35c07a');
     group('Back').click();

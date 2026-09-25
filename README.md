@@ -69,11 +69,11 @@ Fluxo normal depois de um treino: importar → atualizar o log.
 ### Adicionou um exercício novo
 
 Digite nas colunas `H` (nome), `I` (GROUP 1), `J` (GROUP 2) e `K` (GROUP 0: `Gym`,
-`Mobility & Recovery` ou `Conditioning`) da `Off_Court`, e clique em
+`Gym - Lower Body/Core`, `Mobility & Recovery` ou `Conditioning`) da `Off_Court`, e clique em
 **Update Exercise List**. Ele salva a planilha, regera o JSON, e só faz commit+push se a
 lista realmente mudou. Depois **feche e reabra o app no iPhone**.
 
-O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, azul, laranja). Um
+O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, verde-escuro, azul, laranja). Um
 grupo sem GROUP 0 aparece numa seção cinza "Other", e o build avisa. Uma categoria nova
 também aparece em cinza até ganhar cor em `CATEGORIES`, no `app.js`.
 
