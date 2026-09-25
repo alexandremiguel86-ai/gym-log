@@ -27,7 +27,7 @@ se resolve lá, nunca aqui e nunca editando o markdown à mão.
 
 ## 4. `docs/exercises.json` é gerado
 
-Vem de `Off_Court!H:I/J` via `tools/build_exercises.py`. Editar à mão é trabalho perdido:
+Vem de `Off_Court!H:K` via `tools/build_exercises.py`. Editar à mão é trabalho perdido:
 o próximo build sobrescreve.
 
 ## 5. Mexeu no shell? suba o `CACHE` do `sw.js`

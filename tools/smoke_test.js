@@ -33,6 +33,7 @@ function El(tag, id) {
   this._text = '';
   this.value = '';
   this.hidden = false;
+  this.style = { _props: {}, setProperty: function (k, v) { this._props[k] = v; } };
   this.classList = {
     _self: this,
     add: function (c) { if (!this._self._classes().includes(c)) this._self.className = (this._self.className + ' ' + c).trim(); },
@@ -160,6 +161,20 @@ function fill(sets, reps, weight, rpe) {
   el('f-weight').value = weight || '';
   el('f-rpe').value = rpe || '';
 }
+/** Botoes de grupo, na ordem da tela: secoes (titulo + grade) em sequencia. */
+function groupButtons() {
+  var out = [];
+  el('group-grid').children.forEach(function (c) {
+    if (c.className === 'grid') out = out.concat(c.children);
+  });
+  return out;
+}
+/** Encontra o botao de um grupo na tela de grupos. */
+function group(name) {
+  var found = groupButtons().filter(function (b) { return b.textContent.indexOf(name) === 0; })[0];
+  if (!found) throw new Error('grupo nao encontrado: ' + name);
+  return found;
+}
 /** Encontra o botao de um exercicio na tela de lista. */
 function pick(name) {
   var found = null;
@@ -202,9 +217,16 @@ Promise.resolve()
     el('add-exercise').click();
     check('tela de grupos', active() === 'screen-group', active());
     check('um botao por grupo do catalogo',
-      el('group-grid').children.length === catalog.groups.length,
-      el('group-grid').children.length + ' vs ' + catalog.groups.length);
-    el('group-grid').children[0].click();   // Back (ordem alfabetica)
+      groupButtons().length === catalog.groups.length,
+      groupButtons().length + ' vs ' + catalog.groups.length);
+    var heads = el('group-grid').children
+      .filter(function (c) { return c.className === 'cat-head'; })
+      .map(function (c) { return c.textContent; });
+    check('secoes na ordem Gym, Mobility, Conditioning',
+      heads.join('|') === 'Gym|Mobility & Recovery|Conditioning', heads.join('|'));
+    check('Back na secao Gym', el('group-grid').children[1].children[0].textContent.indexOf('Back') === 0);
+    check('secao colorida', el('group-grid').children[0].style._props['--cat'] === '#35c07a');
+    group('Back').click();
     check('tela de exercicios', active() === 'screen-exercise', active());
     pick('Single-Arm Dumbbell Row').click();
     check('tela de formulario', active() === 'screen-form', active());
@@ -234,8 +256,7 @@ Promise.resolve()
     console.log('\n6. Exercicio com tempo (nao numerico)');
     el('add-exercise').click();
     // grupo Tennis Conditioning
-    var idx = catalog.groups.map(function (g) { return g.name; }).indexOf('Tennis Conditioning');
-    el('group-grid').children[idx].click();
+    group('Tennis Conditioning').click();
     pick('Figure-8 Drill').click();
     fill('4', '40s', '', '');
     el('save-entry').click();
@@ -263,7 +284,7 @@ Promise.resolve()
 
     el('start').click();
     el('add-exercise').click();
-    el('group-grid').children[0].click();   // Back
+    group('Back').click();
     var btn = pick('Single-Arm Dumbbell Row');
     check('lista mostra o ultimo valor', btn.textContent.indexOf('2x10 @ 25kg') !== -1, btn.textContent);
     btn.click();
@@ -283,8 +304,7 @@ Promise.resolve()
 
     console.log('\n9. Editar e excluir com o treino aberto');
     el('add-exercise').click();
-    var idx = catalog.groups.map(function (g) { return g.name; }).indexOf('Core');
-    el('group-grid').children[idx].click();
+    group('Core').click();
     pick('Swiss Ball Crunch').click();
     fill('5', '20', '', '');
     el('save-entry').click();
@@ -340,7 +360,7 @@ Promise.resolve()
     console.log('\n12. Exercicio fora da lista');
     el('start').click();
     el('add-exercise').click();
-    el('group-grid').children[0].click();
+    group('Back').click();
     el('custom-exercise').click();
     check('campos custom visiveis', el('custom-fields').hidden === false);
     check('select com todos os grupos',
@@ -357,7 +377,7 @@ Promise.resolve()
 
     console.log('\n13. Validacao');
     el('add-exercise').click();
-    el('group-grid').children[0].click();
+    group('Back').click();
     pick('Single-Arm Dumbbell Row').click();
     fill('', '', '', '');
     var before = entries().length;

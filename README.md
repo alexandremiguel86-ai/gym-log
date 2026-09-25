@@ -56,10 +56,11 @@ As legendas são escolha dele e podem mudar; o que identifica cada botão é a m
 |---|---|
 | `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) |
 | `UpdateOffCourtLog` | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
-| `PublishExerciseList` | publica a lista de `H:I/J` no app do celular |
+| `PublishExerciseList` | publica a lista de `H:K` no app do celular |
 
 Há também um **Filter List**, feito por ele, que reordena a lista de referência em ordem
-alfabética. Não faz parte deste projeto.
+alfabética. Não faz parte deste projeto, mas ordena `H2:K`: se a lista ganhar outra
+coluna, o intervalo dele precisa crescer junto, senão a coluna nova descola das linhas.
 
 Fluxo normal depois de um treino: importar → atualizar o log.
 
@@ -67,9 +68,14 @@ Fluxo normal depois de um treino: importar → atualizar o log.
 
 ### Adicionou um exercício novo
 
-Digite nas colunas `H` (nome), `I` (GROUP 1) e `J` (GROUP 2) da `Off_Court`, e clique em
+Digite nas colunas `H` (nome), `I` (GROUP 1), `J` (GROUP 2) e `K` (GROUP 0: `Gym`,
+`Mobility & Recovery` ou `Conditioning`) da `Off_Court`, e clique em
 **Update Exercise List**. Ele salva a planilha, regera o JSON, e só faz commit+push se a
 lista realmente mudou. Depois **feche e reabra o app no iPhone**.
+
+O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, azul, laranja). Um
+grupo sem GROUP 0 aparece numa seção cinza "Other", e o build avisa. Uma categoria nova
+também aparece em cinza até ganhar cor em `CATEGORIES`, no `app.js`.
 
 No celular, a opção *"Other exercise (type it)"* aceita um nome livre (o grupo continua
 obrigatoriamente da lista). Esses registros vão para o Sheets com `custom = TRUE`, e o

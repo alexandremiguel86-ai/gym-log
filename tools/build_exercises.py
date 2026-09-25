@@ -1,6 +1,8 @@
 """Gera docs/exercises.json a partir da aba Off_Court de Tennis.xlsm.
 
-Le as colunas H/I/J (EXERCISE | GROUP 1 | GROUP 2) a partir da linha 3.
+Le as colunas H/I/J/K (EXERCISE | GROUP 1 | GROUP 2 | GROUP 0) a partir da
+linha 3. GROUP 0 e a categoria do grupo (Gym, Mobility & Recovery, ...), que o
+app usa para separar a tela de grupos em secoes.
 Sem dependencias externas: o .xlsm e um zip com XML dentro.
 
 Uso:  python tools/build_exercises.py
@@ -18,6 +20,7 @@ XLSM = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(r"D:\ALEXANDRE\CLAUDE\PR
 OUT = Path(__file__).resolve().parent.parent / "docs" / "exercises.json"
 SHEET = "Off_Court"
 FIRST_ROW = 3
+UNKNOWN_CATEGORY = "Other"
 
 NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 RNS = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
@@ -83,6 +86,7 @@ def main():
         rows = read_rows(z, sheet_path(z, SHEET), strings)
 
     groups = {}
+    categories = {}   # GROUP 1 -> {GROUP 0: contagem}
     total = 0
     for n in sorted(rows):
         if n < FIRST_ROW:
@@ -94,13 +98,29 @@ def main():
             continue
         g2 = cells.get("J") or g1
         groups.setdefault(g1, []).append({"n": name, "g2": g2})
+        cat = cells.get("K") or UNKNOWN_CATEGORY
+        counts = categories.setdefault(g1, {})
+        counts[cat] = counts.get(cat, 0) + 1
         total += 1
+
+    # Um grupo tem uma categoria so. Se a coluna K divergir dentro do grupo,
+    # vale a mais frequente e o build avisa - melhor do que partir o grupo em
+    # duas secoes no celular.
+    warnings = []
+    group_category = {}
+    for g1, counts in categories.items():
+        best = max(counts, key=lambda c: counts[c])
+        group_category[g1] = best
+        if len(counts) > 1:
+            warnings.append(f"AVISO: '{g1}' com GROUP 0 misto {counts} - usando '{best}'")
+        if best == UNKNOWN_CATEGORY:
+            warnings.append(f"AVISO: '{g1}' sem GROUP 0 na coluna K - vai para '{UNKNOWN_CATEGORY}'")
 
     # Dentro do grupo: por subgrupo, depois por nome.
     ordered = []
     for g1 in sorted(groups):
         items = sorted(groups[g1], key=lambda e: (e["g2"].lower(), e["n"].lower()))
-        ordered.append({"name": g1, "exercises": items})
+        ordered.append({"name": g1, "category": group_category[g1], "exercises": items})
 
     # Sem data de geracao de proposito: um campo que muda todo dia faria o
     # arquivo diferir a cada build, e publish_exercises.ps1 nao conseguiria
@@ -113,7 +133,9 @@ def main():
     )
     print(f"{OUT}: {total} exercicios em {len(ordered)} grupos")
     for g in ordered:
-        print(f"  {len(g['exercises']):3d}  {g['name']}")
+        print(f"  {len(g['exercises']):3d}  {g['name']}  [{g['category']}]")
+    for w in warnings:
+        print(w)
 
 
 if __name__ == "__main__":

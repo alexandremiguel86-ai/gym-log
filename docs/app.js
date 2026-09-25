@@ -413,17 +413,65 @@ function discardSession() {
 
 // ---------------------------------------------------------------- grupo
 
-function renderGroups() {
-  var grid = $('group-grid');
-  grid.innerHTML = '';
+// Ordem e cor das secoes. A categoria de cada grupo vem da coluna K (GROUP 0)
+// do Off_Court via exercises.json; uma categoria nova que nao esteja aqui
+// aparece depois destas, em cinza.
+var CATEGORIES = [
+  { name: 'Gym', color: '#35c07a' },
+  { name: 'Mobility & Recovery', color: '#4d9bff' },
+  { name: 'Conditioning', color: '#ff9f43' }
+];
+var OTHER_COLOR = '#98a1b3';
+
+function groupsByCategory() {
+  var order = CATEGORIES.map(function (c) { return c.name; });
+  var sections = [];
+  var byName = {};
   catalog.groups.forEach(function (g) {
-    var btn = document.createElement('button');
-    btn.textContent = g.name;
-    var count = document.createElement('small');
-    count.textContent = plural(g.exercises.length, 'exercise');
-    btn.appendChild(count);
-    btn.addEventListener('click', function () { openExerciseList(g.name); });
-    grid.appendChild(btn);
+    var cat = g.category || 'Other';
+    if (!byName[cat]) {
+      var known = order.indexOf(cat);
+      byName[cat] = {
+        name: cat,
+        color: known === -1 ? OTHER_COLOR : CATEGORIES[known].color,
+        rank: known === -1 ? order.length : known,
+        groups: []
+      };
+      sections.push(byName[cat]);
+    }
+    byName[cat].groups.push(g);
+  });
+  sections.sort(function (a, b) {
+    return a.rank - b.rank || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+  });
+  return sections;
+}
+
+function renderGroups() {
+  var box = $('group-grid');
+  box.innerHTML = '';
+  groupsByCategory().forEach(function (sec) {
+    var head = document.createElement('div');
+    head.className = 'cat-head';
+    head.style.setProperty('--cat', sec.color);
+    head.textContent = sec.name;
+    box.appendChild(head);
+
+    var grid = document.createElement('div');
+    grid.className = 'grid';
+    grid.style.setProperty('--cat', sec.color);
+    sec.groups.forEach(function (g) {
+      var btn = document.createElement('button');
+      var label = document.createElement('span');
+      label.textContent = g.name;
+      btn.appendChild(label);
+      var count = document.createElement('small');
+      count.textContent = plural(g.exercises.length, 'exercise');
+      btn.appendChild(count);
+      btn.addEventListener('click', function () { openExerciseList(g.name); });
+      grid.appendChild(btn);
+    });
+    box.appendChild(grid);
   });
 }
 
