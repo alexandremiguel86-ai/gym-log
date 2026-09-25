@@ -85,7 +85,7 @@
   },
   {
    "name": "Core",
-   "category": "Gym",
+   "category": "Gym - Lower Body/Core",
    "exercises": [
     {
      "n": "Lying Leg Raise",
@@ -129,7 +129,7 @@
   },
   {
    "name": "Lower Body",
-   "category": "Gym",
+   "category": "Gym - Lower Body/Core",
    "exercises": [
     {
      "n": "Barbell Romanian Deadlift",
@@ -231,7 +231,7 @@
   },
   {
    "name": "Lower Leg",
-   "category": "Gym",
+   "category": "Gym - Lower Body/Core",
    "exercises": [
     {
      "n": "Single-Leg Calf Raise",
