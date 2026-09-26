@@ -503,7 +503,25 @@ Promise.resolve()
     el('lang-pt').click();
     check('volta para portugues', el('start').textContent === 'INICIAR TREINO', el('start').textContent);
     el('open-history').click();
-    check('some fora do inicio', el('lang-toggle').hidden === true);
+    check('visivel no historico', el('lang-toggle').hidden === false);
+    el('lang-en').click();
+    check('titulo do historico troca na hora', el('title').textContent === 'Previous Workouts', el('title').textContent);
+    check('continua no historico', vm.runInContext('stack[stack.length - 1]', sandbox) === 'screen-history');
+    el('lang-pt').click();
+    check('historico volta para portugues', el('title').textContent === 'Treinos Anteriores', el('title').textContent);
+
+    console.log('\n19. Idioma trocado no meio do formulario');
+    vm.runInContext('reset("screen-home"); startSession(); ' +
+      'openForm({ exercise: "Lat Pulldown — Pronated Grip", group1: "Gym", group2: "Gym" });', sandbox);
+    el('f-sets').value = '3';
+    el('f-weight').value = '20kg + Bar';
+    el('lang-en').click();
+    check('nome do exercicio em ingles', el('form-exercise').textContent === 'Lat Pulldown — Pronated Grip', el('form-exercise').textContent);
+    check('series digitadas ficam', el('f-sets').value === '3', el('f-sets').value);
+    check('peso digitado fica', el('f-weight').value === '20kg + Bar', el('f-weight').value);
+    el('lang-pt').click();
+    check('nome volta para portugues', el('form-exercise').textContent !== 'Lat Pulldown — Pronated Grip', el('form-exercise').textContent);
+    check('ainda no formulario', vm.runInContext('stack[stack.length - 1]', sandbox) === 'screen-form');
 
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
     process.exit(failures ? 1 : 0);

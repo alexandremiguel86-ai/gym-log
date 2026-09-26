@@ -330,7 +330,6 @@ function render(id) {
   $(id).classList.add('active');
   $('title').textContent = TITLES[id] ? t(TITLES[id]) : 'Gym Log';
   $('back').hidden = stack.length <= 1;
-  $('lang-toggle').hidden = id !== 'screen-home';
   window.scrollTo(0, 0);
 }
 
@@ -529,8 +528,11 @@ function renderHistory() {
   });
 }
 
+var currentWorkout = null;
+
 /** Treino antigo, so leitura: editar aqui nao chegaria ao Sheets. */
 function openWorkout(w) {
+  currentWorkout = w;
   $('workout-date').textContent = prettyDate(w.date);
   var list = $('workout-list');
   list.innerHTML = '';
@@ -773,25 +775,8 @@ function openForm(entry) {
   };
 
   $('custom-fields').hidden = !draft.custom;
-  if (draft.custom) {
-    var sel = $('f-group');
-    sel.innerHTML = '';
-    groupNames().forEach(function (name) {
-      var opt = document.createElement('option');
-      opt.value = name;                 // valor em ingles: e o que e gravado
-      opt.textContent = termLabel(name);
-      if (name === draft.group1) opt.selected = true;
-      sel.appendChild(opt);
-    });
-    $('f-name').value = draft.exercise;
-  }
-
-  $('form-exercise').textContent = draft.exercise ? exLabel(draft.exercise) : t('newExercise');
-  $('form-group').textContent = draft.group1
-    ? (draft.group2 && draft.group2 !== draft.group1
-        ? termLabel(draft.group1) + ' / ' + termLabel(draft.group2)
-        : termLabel(draft.group1))
-    : '';
+  if (draft.custom) $('f-name').value = draft.exercise;
+  formLabels(draft.group1);
 
   $('delete-entry').hidden = !isExisting;
 
@@ -809,22 +794,45 @@ function openForm(entry) {
     $('f-reps').value = last ? (last.reps || '') : '';
     $('f-weight').value = last ? (last.weight || '') : '';
     $('f-rpe').value = last ? (last.rpe || '') : '';
-    var chip = $('last-chip');
-    if (last) {
-      chip.hidden = false;
-      chip.innerHTML = '';
-      var line = document.createElement('span');
-      line.textContent = t('last', { s: summarize(last) });
-      var sub = document.createElement('small');
-      sub.textContent = t('tapReuse', { d: shortDate(last.date) });
-      chip.appendChild(line);
-      chip.appendChild(sub);
-    } else {
-      chip.hidden = true;
-    }
+    $('last-chip').hidden = !last;
+    if (last) lastChipText(last);
   }
 
   show('screen-form');
+}
+
+/** Textos do formulario que dependem do idioma. Nao toca nos campos digitados,
+    para a troca de idioma no meio do preenchimento nao apagar nada. */
+function formLabels(selectedGroup) {
+  if (draft.custom) {
+    var sel = $('f-group');
+    sel.innerHTML = '';
+    groupNames().forEach(function (name) {
+      var opt = document.createElement('option');
+      opt.value = name;                 // valor em ingles: e o que e gravado
+      opt.textContent = termLabel(name);
+      if (name === selectedGroup) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  $('form-exercise').textContent = draft.exercise ? exLabel(draft.exercise) : t('newExercise');
+  $('form-group').textContent = draft.group1
+    ? (draft.group2 && draft.group2 !== draft.group1
+        ? termLabel(draft.group1) + ' / ' + termLabel(draft.group2)
+        : termLabel(draft.group1))
+    : '';
+}
+
+function lastChipText(last) {
+  var chip = $('last-chip');
+  chip.innerHTML = '';
+  var line = document.createElement('span');
+  line.textContent = t('last', { s: summarize(last) });
+  var sub = document.createElement('small');
+  sub.textContent = t('tapReuse', { d: shortDate(last.date) });
+  chip.appendChild(line);
+  chip.appendChild(sub);
 }
 
 function openCustomForm() {
@@ -898,20 +906,40 @@ function openSettings() {
   show('screen-settings');
 }
 
-/** Troca o idioma na hora; so a tela de Configuracoes esta aberta nesse momento. */
+/** Seletor de idioma das Configuracoes. */
 function changeLanguage() {
   setLanguage($('s-lang').value);
-  $('queue-info').textContent = t('queueInfo', { p: pending().length, t: entries.length });
-  render('screen-settings');
 }
 
-/** Botao PT/EN da tela inicial. */
+/** Troca o idioma na hora e redesenha a tela aberta, qualquer que seja.
+    Chamado pelo botao PT/EN do topo e pelo seletor das Configuracoes. */
 function setLanguage(lang) {
   settings.lang = lang === 'pt' ? 'pt' : 'en';
   save(K_SETTINGS, settings);
   $('s-lang').value = settings.lang;
   applyStaticText();
-  if (stack[stack.length - 1] === 'screen-home') { renderHome(); render('screen-home'); }
+  refreshBadge();
+
+  var id = stack[stack.length - 1];
+  var y = window.scrollY;
+  if (id === 'screen-home') renderHome();
+  if (id === 'screen-session') renderSession();
+  if (id === 'screen-history') renderHistory();
+  if (id === 'screen-workout' && currentWorkout) openWorkout(currentWorkout);
+  if (id === 'screen-group') renderGroups();
+  if (id === 'screen-exercise') renderExercises($('search').value);
+  if (id === 'screen-form') {
+    formLabels($('f-group').value);
+    var last = !editing && draft.exercise ? lastEntryFor(draft.exercise) : null;
+    if (last) lastChipText(last);
+  }
+  if (id === 'screen-settings') {
+    $('queue-info').textContent = t('queueInfo', { p: pending().length, t: entries.length });
+  }
+  if (!id) return;                      // antes do catalogo carregar
+  render(id);
+  if (id === 'screen-exercise') $('title').textContent = termLabel(currentGroup);
+  window.scrollTo(0, y);                // trocar o idioma nao deve pular para o topo
 }
 
 function saveSettings() {

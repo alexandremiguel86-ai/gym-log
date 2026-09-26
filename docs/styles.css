@@ -64,15 +64,15 @@ body {
   color: var(--text);
 }
 
-/* Troca de idioma, so na tela inicial. display:flex anularia o atributo
-   hidden, por isso a regra [hidden] explicita. */
+/* Troca de idioma, em todas as telas. flex-shrink:0 para o titulo e que
+   encolher (com reticencias) quando faltar espaco, e nao o botao. */
 .lang-toggle {
   display: flex;
+  flex-shrink: 0;
   border: 1px solid var(--line);
   border-radius: 20px;
   overflow: hidden;
 }
-.lang-toggle[hidden] { display: none; }
 .lang-toggle button {
   border: 0;
   padding: 7px 10px;
