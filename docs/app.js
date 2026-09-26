@@ -11,6 +11,10 @@
  *
  * Nada aqui e apagado apos a sincronizacao: o historico local e o que alimenta
  * o "Last: 3x10 @ 56kg" e a tela Previous Workouts sem precisar de rede.
+ *
+ * Idioma: ingles ou portugues so muda o que aparece na tela. O que e gravado e
+ * enviado ao Sheets e SEMPRE o nome em ingles (exercise/group1/group2), porque
+ * e ele que o ImportGymLog e o #06_TRAINING_LOG.md esperam.
  */
 
 'use strict';
@@ -37,7 +41,7 @@ function save(key, value) {
   } catch (e) {
     // Modo privado do Safari ou cota estourada: avisar alto, porque o
     // registro acabou de NAO ser salvo.
-    toast('ERROR: could not save on this device');
+    toast(t('saveError'));
     return false;
   }
 }
@@ -45,7 +49,211 @@ function save(key, value) {
 var entries = load(K_ENTRIES, []);
 var session = load(K_SESSION, null);
 var settings = load(K_SETTINGS, { url: '', token: '' });
+if (settings.lang !== 'pt') settings.lang = 'en';
 var catalog = { groups: [] };
+
+// ---------------------------------------------------------------- idioma
+
+var STRINGS = {
+  en: {
+    saveError: 'ERROR: could not save on this device',
+    catalogError: 'Exercise list unavailable',
+    pending: '{n} pending',
+    allSynced: 'All synced',
+    needSettings: 'Set the URL and token first',
+    syncFailed: 'Sync failed: {e}',
+    synced: 'Synced ({n})',
+    noConnection: 'No connection - kept in queue',
+    continueBtn: 'CONTINUE ({n})',
+    homeStats: '{n} logged on this device',
+    homeEmpty: 'No workouts logged yet.',
+    pendingTag: '  (pending)',
+    confirmEmpty: 'No exercises logged. Discard this workout?',
+    confirmFinish: 'Finish workout? {n} will be sent to the spreadsheet.',
+    confirmDiscardN: 'Discard this workout? Its {n} will be deleted. This cannot be undone.',
+    confirmDiscard: 'Discard this workout?',
+    discarded: 'Workout discarded',
+    nothingFound: 'Nothing found.',
+    newExercise: 'New exercise',
+    last: 'Last: {s}',
+    tapReuse: '{d} - tap to reuse',
+    needName: 'Enter the exercise name',
+    needSetsReps: 'Enter at least sets or reps',
+    confirmDelete: 'Delete "{x}"?',
+    queueInfo: '{p} entry(ies) waiting to be sent. {t} in total on this device.',
+    saved: 'Saved',
+    saveUrlFirst: 'Save the URL first.',
+    testing: 'Testing...',
+    connOk: 'Connection OK.',
+    rejected: 'Rejected: {e}',
+    failed: 'Failed: {e} (check that the deployment access is "Anyone")',
+    lastValues: 'Values from last workout',
+    sets: 'sets',
+    exercise: ['exercise', 'exercises'],
+    workout: ['workout', 'workouts'],
+    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    't-home': 'Gym Log',
+    't-session': 'Workout',
+    't-history': 'Previous Workouts',
+    't-workout': 'Workout',
+    't-group': 'Group',
+    't-exercise': 'Exercise',
+    't-form': 'Entry',
+    't-settings': 'Settings',
+    start: 'START WORKOUT',
+    'open-history': 'PREVIOUS WORKOUTS',
+    'open-settings': 'Settings',
+    'entry-empty': 'No exercises logged yet.',
+    'add-exercise': '+ ADD EXERCISE',
+    finish: 'FINISH WORKOUT',
+    discard: 'Discard workout',
+    'history-empty': 'No finished workouts yet.',
+    'custom-exercise': 'Other exercise (type it)',
+    'l-name': 'Exercise name',
+    'l-group': 'Group',
+    'l-sets': 'Sets',
+    'l-reps': 'Reps / Time',
+    'l-weight': 'Weight / Load',
+    'l-rpe': 'RPE',
+    'save-entry': 'SAVE',
+    'delete-entry': 'DELETE',
+    'settings-intro': 'Paste the Apps Script Web App URL and the token here. They are stored only on this device and never go to the repository.',
+    'l-lang': 'Language',
+    'l-url': 'Apps Script URL (/exec)',
+    'l-token': 'Token',
+    'save-settings': 'SAVE',
+    'test-sync': 'TEST CONNECTION',
+    'force-sync': 'SYNC NOW',
+    'export-json': 'Export backup (JSON)',
+    'ph-search': 'Search exercise...',
+    'ph-reps': '10 or 40s'
+  },
+  pt: {
+    saveError: 'ERRO: nao foi possivel salvar neste aparelho',
+    catalogError: 'Lista de exercícios indisponível',
+    pending: '{n} pendente(s)',
+    allSynced: 'Tudo enviado',
+    needSettings: 'Configure a URL e o token primeiro',
+    syncFailed: 'Falha no envio: {e}',
+    synced: 'Enviado ({n})',
+    noConnection: 'Sem conexão - fica na fila',
+    continueBtn: 'CONTINUAR ({n})',
+    homeStats: '{n} registrados neste aparelho',
+    homeEmpty: 'Nenhum treino registrado ainda.',
+    pendingTag: '  (pendente)',
+    confirmEmpty: 'Nenhum exercício registrado. Descartar este treino?',
+    confirmFinish: 'Finalizar o treino? {n} serão enviados para a planilha.',
+    confirmDiscardN: 'Descartar este treino? Seus {n} serão apagados. Não dá para desfazer.',
+    confirmDiscard: 'Descartar este treino?',
+    discarded: 'Treino descartado',
+    nothingFound: 'Nada encontrado.',
+    newExercise: 'Novo exercício',
+    last: 'Último: {s}',
+    tapReuse: '{d} - toque para reusar',
+    needName: 'Informe o nome do exercício',
+    needSetsReps: 'Informe ao menos séries ou reps',
+    confirmDelete: 'Excluir "{x}"?',
+    queueInfo: '{p} registro(s) aguardando envio. {t} no total neste aparelho.',
+    saved: 'Salvo',
+    saveUrlFirst: 'Salve a URL primeiro.',
+    testing: 'Testando...',
+    connOk: 'Conexão OK.',
+    rejected: 'Recusado: {e}',
+    failed: 'Falhou: {e} (confira se o acesso do deploy é "Anyone")',
+    lastValues: 'Valores do último treino',
+    sets: 'séries',
+    exercise: ['exercício', 'exercícios'],
+    workout: ['treino', 'treinos'],
+    months: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
+    't-home': 'Gym Log',
+    't-session': 'Treino',
+    't-history': 'Treinos Anteriores',
+    't-workout': 'Treino',
+    't-group': 'Grupo',
+    't-exercise': 'Exercício',
+    't-form': 'Registro',
+    't-settings': 'Configurações',
+    start: 'INICIAR TREINO',
+    'open-history': 'TREINOS ANTERIORES',
+    'open-settings': 'Configurações',
+    'entry-empty': 'Nenhum exercício registrado ainda.',
+    'add-exercise': '+ ADICIONAR EXERCÍCIO',
+    finish: 'FINALIZAR TREINO',
+    discard: 'Descartar treino',
+    'history-empty': 'Nenhum treino finalizado ainda.',
+    'custom-exercise': 'Outro exercício (digitar)',
+    'l-name': 'Nome do exercício',
+    'l-group': 'Grupo',
+    'l-sets': 'Séries',
+    'l-reps': 'Reps / Tempo',
+    'l-weight': 'Peso / Carga',
+    'l-rpe': 'RPE',
+    'save-entry': 'SALVAR',
+    'delete-entry': 'EXCLUIR',
+    'settings-intro': 'Cole aqui a URL do Web App do Apps Script e o token. Ficam salvos só neste aparelho e nunca vão para o repositório.',
+    'l-lang': 'Idioma',
+    'l-url': 'URL do Apps Script (/exec)',
+    'l-token': 'Token',
+    'save-settings': 'SALVAR',
+    'test-sync': 'TESTAR CONEXÃO',
+    'force-sync': 'ENVIAR AGORA',
+    'export-json': 'Exportar backup (JSON)',
+    'ph-search': 'Buscar exercício...',
+    'ph-reps': '10 ou 40s'
+  }
+};
+
+/** Texto no idioma escolhido; {chave} e trocado por vars.chave. */
+function t(key, vars) {
+  var table = STRINGS[settings.lang] || STRINGS.en;
+  var str = table[key] !== undefined ? table[key] : STRINGS.en[key];
+  if (vars) {
+    Object.keys(vars).forEach(function (k) { str = String(str).split('{' + k + '}').join(vars[k]); });
+  }
+  return str;
+}
+
+/** "3 exercises" / "3 exercícios". */
+function plural(n, word) {
+  var forms = t(word);
+  return n + ' ' + forms[n === 1 ? 0 : 1];
+}
+
+// Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
+// tem o texto num <span id="l-..."> para nao apagar o campo.
+var STATIC_TEXT = ['start', 'open-history', 'open-settings', 'entry-empty', 'add-exercise',
+  'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-sets',
+  'l-reps', 'l-weight', 'l-rpe', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
+  'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
+var STATIC_PLACEHOLDER = { search: 'ph-search', 'f-reps': 'ph-reps' };
+
+function applyStaticText() {
+  STATIC_TEXT.forEach(function (id) { $(id).textContent = t(id); });
+  Object.keys(STATIC_PLACEHOLDER).forEach(function (id) {
+    $(id).placeholder = t(STATIC_PLACEHOLDER[id]);
+  });
+  document.documentElement.lang = settings.lang === 'pt' ? 'pt-BR' : 'en';
+}
+
+// Nomes vindos da planilha: L (exercicio) e N:O (grupos). Sem traducao, ou
+// exercicio digitado a mao, fica o ingles.
+var ptNames = {};
+
+function indexNames() {
+  ptNames = {};
+  catalog.groups.forEach(function (g) {
+    g.exercises.forEach(function (e) { if (e.pt) ptNames[e.n] = e.pt; });
+  });
+}
+
+function exLabel(name) {
+  return settings.lang === 'pt' && ptNames[name] ? ptNames[name] : name;
+}
+
+function termLabel(term) {
+  var terms = catalog.terms || {};
+  return settings.lang === 'pt' && terms[term] ? terms[term] : term;
+}
 
 // ---------------------------------------------------------------- util
 
@@ -61,22 +269,21 @@ function todayISO() {
   return d.getFullYear() + '-' + m + '-' + day;
 }
 
-var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
 function prettyDate(iso) {
   var p = String(iso).split('-');
   if (p.length !== 3) return iso;
-  return MONTHS[Number(p[1]) - 1] + ' ' + Number(p[2]) + ', ' + p[0];
+  var m = t('months')[Number(p[1]) - 1];
+  return settings.lang === 'pt'
+    ? Number(p[2]) + ' ' + m + ' ' + p[0]
+    : m + ' ' + Number(p[2]) + ', ' + p[0];
 }
 
 function shortDate(iso) {
   var p = String(iso).split('-');
   if (p.length !== 3) return iso;
-  return MONTHS[Number(p[1]) - 1] + ' ' + Number(p[2]);
+  var m = t('months')[Number(p[1]) - 1];
+  return settings.lang === 'pt' ? Number(p[2]) + ' ' + m : m + ' ' + Number(p[2]);
 }
-
-function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
 
 function $(id) { return document.getElementById(id); }
 
@@ -93,7 +300,7 @@ function toast(msg) {
 function summarize(entry) {
   var parts = [];
   if (entry.sets && entry.reps) parts.push(entry.sets + 'x' + entry.reps);
-  else if (entry.sets) parts.push(entry.sets + ' sets');
+  else if (entry.sets) parts.push(entry.sets + ' ' + t('sets'));
   else if (entry.reps) parts.push(entry.reps);
   if (entry.weight) parts.push('@ ' + entry.weight);
   if (entry.rpe) parts.push('RPE ' + entry.rpe);
@@ -104,14 +311,14 @@ function summarize(entry) {
 
 var stack = [];
 var TITLES = {
-  'screen-home': 'Gym Log',
-  'screen-session': 'Workout',
-  'screen-history': 'Previous Workouts',
-  'screen-workout': 'Workout',
-  'screen-group': 'Group',
-  'screen-exercise': 'Exercise',
-  'screen-form': 'Entry',
-  'screen-settings': 'Settings'
+  'screen-home': 't-home',
+  'screen-session': 't-session',
+  'screen-history': 't-history',
+  'screen-workout': 't-workout',
+  'screen-group': 't-group',
+  'screen-exercise': 't-exercise',
+  'screen-form': 't-form',
+  'screen-settings': 't-settings'
 };
 
 /** Troca a tela visivel. `stack` e o historico; o topo e sempre a tela atual. */
@@ -119,7 +326,7 @@ function render(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
   $(id).classList.add('active');
-  $('title').textContent = TITLES[id] || 'Gym Log';
+  $('title').textContent = TITLES[id] ? t(TITLES[id]) : 'Gym Log';
   $('back').hidden = stack.length <= 1;
   window.scrollTo(0, 0);
 }
@@ -161,12 +368,14 @@ function loadCatalog() {
     .then(function (r) { return r.json(); })
     .then(function (data) {
       catalog = data;
+      indexNames();
       try { localStorage.setItem('gymlog.catalog', JSON.stringify(data)); } catch (e) {}
     })
     .catch(function () {
       // Offline e sem cache do service worker ainda: usa a ultima copia.
       catalog = load('gymlog.catalog', { groups: [] });
-      if (!catalog.groups.length) toast('Exercise list unavailable');
+      indexNames();
+      if (!catalog.groups.length) toast(t('catalogError'));
     });
 }
 
@@ -199,7 +408,7 @@ function refreshBadge() {
   if (n) {
     badge.hidden = false;
     badge.className = 'badge pending';
-    badge.textContent = n + ' pending';
+    badge.textContent = t('pending', { n: n });
   } else if (!navigator.onLine) {
     badge.hidden = false;
     badge.className = 'badge';
@@ -214,11 +423,11 @@ var syncing = false;
 function sync(explicit) {
   var queue = pending();
   if (!queue.length) {
-    if (explicit) toast('All synced');
+    if (explicit) toast(t('allSynced'));
     return Promise.resolve(true);
   }
   if (!settings.url || !settings.token) {
-    if (explicit) toast('Set the URL and token first');
+    if (explicit) toast(t('needSettings'));
     return Promise.resolve(false);
   }
   if (syncing) return Promise.resolve(false);
@@ -234,7 +443,7 @@ function sync(explicit) {
     .then(function (r) { return r.json(); })
     .then(function (res) {
       if (!res.ok) {
-        toast('Sync failed: ' + (res.error || 'error'));
+        toast(t('syncFailed', { e: res.error || 'error' }));
         return false;
       }
       var accepted = {};
@@ -242,11 +451,11 @@ function sync(explicit) {
       entries.forEach(function (e) { if (accepted[e.id]) e.synced = true; });
       save(K_ENTRIES, entries);
       refreshBadge();
-      if (explicit) toast('Synced (' + (res.accepted || []).length + ')');
+      if (explicit) toast(t('synced', { n: (res.accepted || []).length }));
       return true;
     })
     .catch(function () {
-      if (explicit) toast('No connection - kept in queue');
+      if (explicit) toast(t('noConnection'));
       return false;
     })
     .then(function (result) { syncing = false; return result; });
@@ -260,12 +469,12 @@ function renderHome() {
   $('resume').hidden = !open;
   if (open) {
     var n = entries.filter(function (e) { return e.session_id === session.id; }).length;
-    $('resume').textContent = 'CONTINUE (' + plural(n, 'exercise') + ')';
+    $('resume').textContent = t('continueBtn', { n: plural(n, 'exercise') });
   }
   var total = finishedWorkouts().length;
   $('home-stats').textContent = total
-    ? plural(total, 'workout') + ' logged on this device'
-    : 'No workouts logged yet.';
+    ? t('homeStats', { n: plural(total, 'workout') })
+    : t('homeEmpty');
   refreshBadge();
 }
 
@@ -308,7 +517,7 @@ function renderHistory() {
     name.textContent = prettyDate(w.date);
     var meta = document.createElement('span');
     meta.className = 'meta';
-    meta.textContent = plural(w.entries.length, 'exercise') + (unsent ? '  (pending)' : '');
+    meta.textContent = plural(w.entries.length, 'exercise') + (unsent ? t('pendingTag') : '');
     btn.appendChild(name);
     btn.appendChild(meta);
     btn.addEventListener('click', function () { openWorkout(w); });
@@ -326,10 +535,10 @@ function openWorkout(w) {
     var li = document.createElement('li');
     li.className = 'row-btn';
     var name = document.createElement('strong');
-    name.textContent = e.exercise;
+    name.textContent = exLabel(e.exercise);
     var meta = document.createElement('span');
     meta.className = 'meta';
-    meta.textContent = [e.group1, summarize(e)].filter(Boolean).join(' - ');
+    meta.textContent = [termLabel(e.group1), summarize(e)].filter(Boolean).join(' - ');
     li.appendChild(name);
     li.appendChild(meta);
     list.appendChild(li);
@@ -359,10 +568,10 @@ function renderSession() {
     btn.className = 'row-btn';
     btn.innerHTML = '';
     var name = document.createElement('strong');
-    name.textContent = e.exercise;
+    name.textContent = exLabel(e.exercise);
     var meta = document.createElement('span');
     meta.className = 'meta';
-    meta.textContent = [e.group1, summarize(e)].filter(Boolean).join(' - ');
+    meta.textContent = [termLabel(e.group1), summarize(e)].filter(Boolean).join(' - ');
     btn.appendChild(name);
     btn.appendChild(meta);
     btn.addEventListener('click', function () { openForm(e); });
@@ -389,10 +598,10 @@ function closeSession() {
 function finishSession() {
   var n = sessionEntries().length;
   if (n === 0) {
-    if (confirm('No exercises logged. Discard this workout?')) closeSession();
+    if (confirm(t('confirmEmpty'))) closeSession();
     return;
   }
-  if (!confirm('Finish workout? ' + plural(n, 'exercise') + ' will be sent to the spreadsheet.')) return;
+  if (!confirm(t('confirmFinish', { n: plural(n, 'exercise') }))) return;
   closeSession();
   sync(true);
 }
@@ -401,14 +610,14 @@ function finishSession() {
 function discardSession() {
   var n = sessionEntries().length;
   var msg = n
-    ? 'Discard this workout? Its ' + plural(n, 'exercise') + ' will be deleted. This cannot be undone.'
-    : 'Discard this workout?';
+    ? t('confirmDiscardN', { n: plural(n, 'exercise') })
+    : t('confirmDiscard');
   if (!confirm(msg)) return;
   var id = session.id;
   entries = entries.filter(function (e) { return e.session_id !== id; });
   save(K_ENTRIES, entries);
   closeSession();
-  toast('Workout discarded');
+  toast(t('discarded'));
 }
 
 // ---------------------------------------------------------------- grupo
@@ -455,7 +664,7 @@ function renderGroups() {
     var head = document.createElement('div');
     head.className = 'cat-head';
     head.style.setProperty('--cat', sec.color);
-    head.textContent = sec.name;
+    head.textContent = termLabel(sec.name);
     box.appendChild(head);
 
     var grid = document.createElement('div');
@@ -464,7 +673,7 @@ function renderGroups() {
     sec.groups.forEach(function (g) {
       var btn = document.createElement('button');
       var label = document.createElement('span');
-      label.textContent = g.name;
+      label.textContent = termLabel(g.name);
       btn.appendChild(label);
       var count = document.createElement('small');
       count.textContent = plural(g.exercises.length, 'exercise');
@@ -485,7 +694,7 @@ function openExerciseList(groupName) {
   $('search').value = '';
   renderExercises('');
   show('screen-exercise');
-  $('title').textContent = groupName;
+  $('title').textContent = termLabel(groupName);
 }
 
 function renderExercises(filter) {
@@ -499,10 +708,15 @@ function renderExercises(filter) {
   catalog.groups.forEach(function (g) {
     if (!q && g.name !== currentGroup) return;
     g.exercises.forEach(function (e) {
-      pool.push({ n: e.n, g1: g.name, g2: e.g2 });
+      pool.push({ n: e.n, pt: e.pt || '', g1: g.name, g2: e.g2 });
     });
   });
-  if (q) pool = pool.filter(function (e) { return e.n.toLowerCase().indexOf(q) !== -1; });
+  // Busca nos dois idiomas: quem usa em portugues ainda pode digitar "row".
+  if (q) {
+    pool = pool.filter(function (e) {
+      return e.n.toLowerCase().indexOf(q) !== -1 || e.pt.toLowerCase().indexOf(q) !== -1;
+    });
+  }
 
   var lastSub = null;
   pool.forEach(function (e) {
@@ -511,13 +725,13 @@ function renderExercises(filter) {
       lastSub = sub;
       var h = document.createElement('div');
       h.className = 'sub';
-      h.textContent = sub;
+      h.textContent = termLabel(sub);
       box.appendChild(h);
     }
     var btn = document.createElement('button');
     btn.className = 'row-btn';
     var name = document.createElement('strong');
-    name.textContent = e.n;
+    name.textContent = exLabel(e.n);
     btn.appendChild(name);
     var last = lastEntryFor(e.n);
     if (last) {
@@ -535,7 +749,7 @@ function renderExercises(filter) {
   if (!pool.length) {
     var p = document.createElement('p');
     p.className = 'muted center';
-    p.textContent = 'Nothing found.';
+    p.textContent = t('nothingFound');
     box.appendChild(p);
   }
 }
@@ -561,19 +775,19 @@ function openForm(entry) {
     sel.innerHTML = '';
     groupNames().forEach(function (name) {
       var opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
+      opt.value = name;                 // valor em ingles: e o que e gravado
+      opt.textContent = termLabel(name);
       if (name === draft.group1) opt.selected = true;
       sel.appendChild(opt);
     });
     $('f-name').value = draft.exercise;
   }
 
-  $('form-exercise').textContent = draft.exercise || 'New exercise';
+  $('form-exercise').textContent = draft.exercise ? exLabel(draft.exercise) : t('newExercise');
   $('form-group').textContent = draft.group1
     ? (draft.group2 && draft.group2 !== draft.group1
-        ? draft.group1 + ' / ' + draft.group2
-        : draft.group1)
+        ? termLabel(draft.group1) + ' / ' + termLabel(draft.group2)
+        : termLabel(draft.group1))
     : '';
 
   $('delete-entry').hidden = !isExisting;
@@ -597,9 +811,9 @@ function openForm(entry) {
       chip.hidden = false;
       chip.innerHTML = '';
       var line = document.createElement('span');
-      line.textContent = 'Last: ' + summarize(last);
+      line.textContent = t('last', { s: summarize(last) });
       var sub = document.createElement('small');
-      sub.textContent = shortDate(last.date) + ' - tap to reuse';
+      sub.textContent = t('tapReuse', { d: shortDate(last.date) });
       chip.appendChild(line);
       chip.appendChild(sub);
     } else {
@@ -616,14 +830,14 @@ function openCustomForm() {
 
 function saveEntry() {
   var name = draft.custom ? $('f-name').value.trim() : draft.exercise;
-  if (!name) { toast('Enter the exercise name'); return; }
+  if (!name) { toast(t('needName')); return; }
 
   var group1 = draft.custom ? $('f-group').value : draft.group1;
   var group2 = draft.custom ? group1 : draft.group2;
 
   var sets = $('f-sets').value.trim();
   var reps = $('f-reps').value.trim();
-  if (!sets && !reps) { toast('Enter at least sets or reps'); return; }
+  if (!sets && !reps) { toast(t('needSetsReps')); return; }
 
   if (editing) {
     editing.exercise = name;
@@ -662,7 +876,7 @@ function saveEntry() {
 
 function deleteEntry() {
   if (!editing) return;
-  if (!confirm('Delete "' + editing.exercise + '"?')) return;
+  if (!confirm(t('confirmDelete', { x: exLabel(editing.exercise) }))) return;
   entries = entries.filter(function (e) { return e.id !== editing.id; });
   save(K_ENTRIES, entries);
   editing = null;
@@ -675,23 +889,32 @@ function deleteEntry() {
 function openSettings() {
   $('s-url').value = settings.url || '';
   $('s-token').value = settings.token || '';
+  $('s-lang').value = settings.lang;
   $('settings-status').textContent = '';
-  $('queue-info').textContent = pending().length + ' entry(ies) waiting to be sent. '
-    + entries.length + ' in total on this device.';
+  $('queue-info').textContent = t('queueInfo', { p: pending().length, t: entries.length });
   show('screen-settings');
+}
+
+/** Troca o idioma na hora; so a tela de Configuracoes esta aberta nesse momento. */
+function changeLanguage() {
+  settings.lang = $('s-lang').value === 'pt' ? 'pt' : 'en';
+  save(K_SETTINGS, settings);
+  applyStaticText();
+  $('queue-info').textContent = t('queueInfo', { p: pending().length, t: entries.length });
+  render('screen-settings');
 }
 
 function saveSettings() {
   settings.url = $('s-url').value.trim();
   settings.token = $('s-token').value.trim();
   save(K_SETTINGS, settings);
-  toast('Saved');
+  toast(t('saved'));
 }
 
 function testSync() {
   var status = $('settings-status');
-  if (!settings.url) { status.textContent = 'Save the URL first.'; return; }
-  status.textContent = 'Testing...';
+  if (!settings.url) { status.textContent = t('saveUrlFirst'); return; }
+  status.textContent = t('testing');
   fetch(settings.url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -699,11 +922,10 @@ function testSync() {
   })
     .then(function (r) { return r.json(); })
     .then(function (res) {
-      status.textContent = res.ok ? 'Connection OK.' : 'Rejected: ' + res.error;
+      status.textContent = res.ok ? t('connOk') : t('rejected', { e: res.error });
     })
     .catch(function (err) {
-      status.textContent = 'Failed: ' + err.message
-        + ' (check that the deployment access is "Anyone")';
+      status.textContent = t('failed', { e: err.message });
     });
 }
 
@@ -740,13 +962,14 @@ $('last-chip').addEventListener('click', function () {
   $('f-reps').value = last.reps || '';
   $('f-weight').value = last.weight || '';
   $('f-rpe').value = last.rpe || '';
-  toast('Values from last workout');
+  toast(t('lastValues'));
 });
 
 $('save-entry').addEventListener('click', saveEntry);
 $('delete-entry').addEventListener('click', deleteEntry);
 
 $('save-settings').addEventListener('click', saveSettings);
+$('s-lang').addEventListener('change', changeLanguage);
 $('test-sync').addEventListener('click', testSync);
 $('force-sync').addEventListener('click', function () { sync(true); });
 $('export-json').addEventListener('click', exportJSON);
@@ -756,6 +979,7 @@ window.addEventListener('offline', refreshBadge);
 
 // ---------------------------------------------------------------- boot
 
+applyStaticText();
 loadCatalog().then(function () {
   renderHome();
   reset('screen-home');

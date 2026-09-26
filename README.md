@@ -56,10 +56,10 @@ As legendas são escolha dele e podem mudar; o que identifica cada botão é a m
 |---|---|
 | `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) |
 | `UpdateOffCourtLog` | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
-| `PublishExerciseList` | publica a lista de `H:K` no app do celular |
+| `PublishExerciseList` | traduz o que é novo (L, N:O) e publica a lista de `H:L` no app |
 
 Há também um **Filter List**, feito por ele, que reordena a lista de referência em ordem
-alfabética. Não faz parte deste projeto, mas ordena `H2:K`: se a lista ganhar outra
+alfabética. Não faz parte deste projeto, mas ordena `H2:L`: se a lista ganhar outra
 coluna, o intervalo dele precisa crescer junto, senão a coluna nova descola das linhas.
 
 Fluxo normal depois de um treino: importar → atualizar o log.
@@ -76,6 +76,29 @@ lista realmente mudou. Depois **feche e reabra o app no iPhone**.
 O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, roxo, azul, laranja). Um
 grupo sem GROUP 0 aparece numa seção cinza "Other", e o build avisa. Uma categoria nova
 também aparece em cinza até ganhar cor em `CATEGORIES`, no `app.js`.
+
+### Português
+
+**Settings → Language** troca o app entre English e Português. Só muda o que aparece na
+tela: o app **sempre grava e envia o nome em inglês**, então o Sheets, o **Import Gym Log** e
+o `#06_TRAINING_LOG.md` não mudam. A busca acha pelos dois idiomas.
+
+Os nomes em português moram na `Off_Court`:
+
+| Onde | O quê |
+|---|---|
+| `L` (EXERCISE (PT)) | nome do exercício, na mesma linha dele |
+| `N:O` (TERM (EN) \| TERM (PT)) | glossário dos GROUP 1, 2 e 0, um termo por linha |
+
+Você continua editando só `H:K`, em inglês. A cada **Update Exercise List**, o
+`tools/translate_pt.py` procura exercício com `L` vazio e grupo fora do glossário, pede a
+tradução ao Claude Code (`claude -p`, usando as traduções que já existem como glossário) e o
+VBA escreve **só nas células vazias**. Uma tradução corrigida à mão nunca é sobrescrita.
+Renomeou um exercício em inglês e quer uma tradução nova? Apague a célula `L` dele.
+
+Se a tradução falhar (sem internet, Claude Code deslogado), a publicação segue: o app mostra
+em inglês o que ficou sem português, e o próximo clique tenta de novo. A primeira leva
+(116 exercícios) levou ~2 min; depois só vai o que é novo.
 
 No celular, a opção *"Other exercise (type it)"* aceita um nome livre (o grupo continua
 obrigatoriamente da lista). Esses registros vão para o Sheets com `custom = TRUE`, e o
@@ -231,13 +254,14 @@ stderr *mesmo quando dá certo*. Só o `$LASTEXITCODE` decide sucesso.
 | `docs/exercises.json` | **Gerado.** Não editar à mão |
 | `docs/sw.js` | Service worker (abre offline) |
 | `tools/build_exercises.py` | `Tennis.xlsm` → `exercises.json` |
+| `tools/translate_pt.py` | Traduz para português o que falta em `L` / `N:O` |
 | `tools/publish_exercises.ps1` | rebuild + commit + push (botão da planilha) |
 | `tools/install_vba.ps1` | instala os módulos VBA no `Tennis.xlsm` (não toca nos botões) |
 | `tools/make_icons.py` | Gera os ícones (roda uma vez só) |
 | `tools/smoke_test.js` | Teste do fluxo completo em Node, sem navegador |
 | `apps_script/Code.gs` | Recebe os POSTs e escreve no Sheets |
 | `vba/Module_OffCourtImport.bas` | Sheets → `Off_Court!B2:G` |
-| `vba/Module_GymLogButtons.bas` | Publica a lista de exercícios |
+| `vba/Module_GymLogButtons.bas` | Traduz (preenche `L` / `N:O` vazios) e publica a lista |
 | `config.local.txt` | **Não versionado.** URL do CSV publicado |
 
 ## Modelo de dados

@@ -1,5 +1,38 @@
 {
  "source": "D:\\ALEXANDRE\\CLAUDE\\PROJECT_TENNIS_PERFORMANCE_TEAM\\Tennis.xlsm",
+ "terms": {
+  "Back": "Costas",
+  "Gym": "Academia",
+  "Biceps": "Bíceps",
+  "Chest": "Peito",
+  "Core": "Core",
+  "Abs": "Abdômen",
+  "Gym - Lower Body/Core": "Academia - Membros Inferiores/Core",
+  "Hip Mobility": "Mobilidade de Quadril",
+  "Mobility & Recovery": "Mobilidade e Recuperação",
+  "Lower Body": "Membros Inferiores",
+  "Hinge": "Dobradiça",
+  "Isolation": "Isolamento",
+  "Squat/Lunge": "Agachamento/Avanço",
+  "Lower Body Mobility": "Mobilidade de Membros Inferiores",
+  "Lower Body Stretching": "Alongamento de Membros Inferiores",
+  "Lower Leg": "Perna Inferior",
+  "Rotator Cuff": "Manguito Rotador",
+  "Shoulder": "Ombro",
+  "Shoulder Physio": "Fisio de Ombro",
+  "Shoulder Activation": "Ativação de Ombro",
+  "Shoulder Mobility": "Mobilidade de Ombro",
+  "Shoulder Strengthening": "Fortalecimento de Ombro",
+  "Shoulder Therapy": "Terapia de Ombro",
+  "Tennis Conditioning": "Condicionamento para Tênis",
+  "Activation": "Ativação",
+  "Conditioning": "Condicionamento",
+  "Footwork": "Movimentação de Pés",
+  "Power": "Potência",
+  "Rest": "Descanso",
+  "Thoracic Mobility": "Mobilidade Torácica",
+  "Triceps": "Tríceps"
+ },
  "groups": [
   {
    "name": "Back",
@@ -7,39 +40,48 @@
    "exercises": [
     {
      "n": "Lat Pulldown — Pronated Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Puxada Alta — Pegada Pronada"
     },
     {
      "n": "Lat Pulldown — Supinated Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Puxada Alta — Pegada Supinada"
     },
     {
      "n": "Lat Pulldown — V-Bar Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Puxada Alta — Triângulo"
     },
     {
      "n": "Lat Pulldown — Wide Neutral Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Puxada Alta — Pegada Neutra Aberta"
     },
     {
      "n": "Seated Cable Row — Pronated Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Remada Sentada no Cabo — Pegada Pronada"
     },
     {
      "n": "Seated Cable Row — Supinated Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Remada Sentada no Cabo — Pegada Supinada"
     },
     {
      "n": "Seated Cable Row — V-Bar Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Remada Sentada no Cabo — Triângulo"
     },
     {
      "n": "Seated Cable Row — Wide Neutral Grip",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Remada Sentada no Cabo — Pegada Neutra Aberta"
     },
     {
      "n": "Single-Arm Dumbbell Row",
-     "g2": "Back"
+     "g2": "Back",
+     "pt": "Remada Unilateral com Haltere"
     }
    ]
   },
@@ -49,23 +91,28 @@
    "exercises": [
     {
      "n": "Cable Biceps Curl — Straight Bar",
-     "g2": "Biceps"
+     "g2": "Biceps",
+     "pt": "Rosca Direta no Cabo — Barra Reta"
     },
     {
      "n": "Dumbbell Concentration Curl",
-     "g2": "Biceps"
+     "g2": "Biceps",
+     "pt": "Rosca Concentrada com Haltere"
     },
     {
      "n": "Dumbbell Curl",
-     "g2": "Biceps"
+     "g2": "Biceps",
+     "pt": "Rosca com Haltere"
     },
     {
      "n": "EZ-Bar Preacher Curl",
-     "g2": "Biceps"
+     "g2": "Biceps",
+     "pt": "Rosca Scott com Barra EZ"
     },
     {
      "n": "Single-Arm Dumbbell Preacher Curl",
-     "g2": "Biceps"
+     "g2": "Biceps",
+     "pt": "Rosca Scott Unilateral com Haltere"
     }
    ]
   },
@@ -75,11 +122,13 @@
    "exercises": [
     {
      "n": "Dumbbell Floor Press",
-     "g2": "Chest"
+     "g2": "Chest",
+     "pt": "Supino no Chão com Halteres"
     },
     {
      "n": "Dumbbell Squeeze Press",
-     "g2": "Chest"
+     "g2": "Chest",
+     "pt": "Supino Squeeze com Halteres"
     }
    ]
   },
@@ -89,19 +138,23 @@
    "exercises": [
     {
      "n": "Lying Leg Raise",
-     "g2": "Abs"
+     "g2": "Abs",
+     "pt": "Elevação de Pernas Deitado"
     },
     {
      "n": "Lying Scissor Kick",
-     "g2": "Abs"
+     "g2": "Abs",
+     "pt": "Tesoura Deitado"
     },
     {
      "n": "Russian Twist",
-     "g2": "Abs"
+     "g2": "Abs",
+     "pt": "Russian Twist"
     },
     {
      "n": "Swiss Ball Crunch",
-     "g2": "Abs"
+     "g2": "Abs",
+     "pt": "Abdominal no Swiss Ball"
     }
    ]
   },
@@ -111,19 +164,23 @@
    "exercises": [
     {
      "n": "90/90 Hip Switches",
-     "g2": "Hip Mobility"
+     "g2": "Hip Mobility",
+     "pt": "Rotação de Quadril 90/90"
     },
     {
      "n": "Adductor Rock Back",
-     "g2": "Hip Mobility"
+     "g2": "Hip Mobility",
+     "pt": "Rock Back de Adutores"
     },
     {
      "n": "Half-Kneeling Adductor Stretch",
-     "g2": "Hip Mobility"
+     "g2": "Hip Mobility",
+     "pt": "Alongamento de Adutores Semi-Ajoelhado"
     },
     {
      "n": "Half-Kneeling Hip Flexor Stretch",
-     "g2": "Hip Mobility"
+     "g2": "Hip Mobility",
+     "pt": "Alongamento de Flexores do Quadril Semi-Ajoelhado"
     }
    ]
   },
@@ -133,47 +190,58 @@
    "exercises": [
     {
      "n": "Barbell Romanian Deadlift",
-     "g2": "Hinge"
+     "g2": "Hinge",
+     "pt": "Deadlift Romeno com Barra"
     },
     {
      "n": "Hip Thrust",
-     "g2": "Hinge"
+     "g2": "Hinge",
+     "pt": "Hip Thrust"
     },
     {
      "n": "Leg Extension",
-     "g2": "Isolation"
+     "g2": "Isolation",
+     "pt": "Cadeira Extensora"
     },
     {
      "n": "Seated Hip Abduction",
-     "g2": "Isolation"
+     "g2": "Isolation",
+     "pt": "Cadeira Abdutora"
     },
     {
      "n": "Seated Hip Adduction",
-     "g2": "Isolation"
+     "g2": "Isolation",
+     "pt": "Cadeira Adutora"
     },
     {
      "n": "Seated Leg Curl",
-     "g2": "Isolation"
+     "g2": "Isolation",
+     "pt": "Cadeira Flexora Sentada"
     },
     {
      "n": "Unilateral Leg Extension",
-     "g2": "Isolation"
+     "g2": "Isolation",
+     "pt": "Cadeira Extensora Unilateral"
     },
     {
      "n": "Unilateral Seated Leg Curl",
-     "g2": "Isolation"
+     "g2": "Isolation",
+     "pt": "Cadeira Flexora Unilateral"
     },
     {
      "n": "Smith Machine Squat",
-     "g2": "Squat/Lunge"
+     "g2": "Squat/Lunge",
+     "pt": "Agachamento no Smith"
     },
     {
      "n": "Smith Machine Sumo Squat",
-     "g2": "Squat/Lunge"
+     "g2": "Squat/Lunge",
+     "pt": "Agachamento Sumo no Smith"
     },
     {
      "n": "Unilateral 45° Leg Press",
-     "g2": "Squat/Lunge"
+     "g2": "Squat/Lunge",
+     "pt": "Leg Press 45° Unilateral"
     }
    ]
   },
@@ -183,7 +251,8 @@
    "exercises": [
     {
      "n": "Knee-to-Wall Ankle Mobilization",
-     "g2": "Lower Body Mobility"
+     "g2": "Lower Body Mobility",
+     "pt": "Mobilização de Tornozelo — Joelho na Parede"
     }
    ]
   },
@@ -193,39 +262,48 @@
    "exercises": [
     {
      "n": "Calf Stretch on Step",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento de Panturrilha no Degrau"
     },
     {
      "n": "Deep Squat Adductor Stretch",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento de Adutores no Agachamento Profundo"
     },
     {
      "n": "Pigeon Pose",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Postura do Pombo"
     },
     {
      "n": "Seated Forward Bend (Hamstring)",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Flexão Anterior Sentado (Isquiotibiais)"
     },
     {
      "n": "Seated Glute Stretch",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento de Glúteo Sentado"
     },
     {
      "n": "Standing Calf Stretch",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento de Panturrilha em Pé"
     },
     {
      "n": "Standing Forward Bend (Hamstring)",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Flexão Anterior em Pé (Isquiotibiais)"
     },
     {
      "n": "Standing Quad Stretch",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento de Quadríceps em Pé"
     },
     {
      "n": "Supine Wall Straddle Stretch",
-     "g2": "Lower Body Stretching"
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento com Pernas Abertas na Parede"
     }
    ]
   },
@@ -235,23 +313,28 @@
    "exercises": [
     {
      "n": "Single-Leg Calf Raise",
-     "g2": "Lower Leg"
+     "g2": "Lower Leg",
+     "pt": "Elevação de Panturrilha Unilateral"
     },
     {
      "n": "Smith Machine Standing Calf Raise",
-     "g2": "Lower Leg"
+     "g2": "Lower Leg",
+     "pt": "Elevação de Panturrilha em Pé no Smith"
     },
     {
      "n": "Toe Raises",
-     "g2": "Lower Leg"
+     "g2": "Lower Leg",
+     "pt": "Elevação dos Dedos dos Pés"
     },
     {
      "n": "Unilateral Seated Calf Raise",
-     "g2": "Lower Leg"
+     "g2": "Lower Leg",
+     "pt": "Elevação de Panturrilha Sentado Unilateral"
     },
     {
      "n": "Unilateral Single Leg Calf Raises",
-     "g2": "Lower Leg"
+     "g2": "Lower Leg",
+     "pt": "Elevação de Panturrilha em Uma Perna"
     }
    ]
   },
@@ -261,19 +344,23 @@
    "exercises": [
     {
      "n": "90/90 External Rotation",
-     "g2": "Rotator Cuff"
+     "g2": "Rotator Cuff",
+     "pt": "Rotação Externa 90/90"
     },
     {
      "n": "90/90 Internal Rotation",
-     "g2": "Rotator Cuff"
+     "g2": "Rotator Cuff",
+     "pt": "Rotação Interna 90/90"
     },
     {
      "n": "Shoulder External Rotation",
-     "g2": "Rotator Cuff"
+     "g2": "Rotator Cuff",
+     "pt": "Rotação Externa de Ombro"
     },
     {
      "n": "Shoulder Internal Rotation",
-     "g2": "Rotator Cuff"
+     "g2": "Rotator Cuff",
+     "pt": "Rotação Interna de Ombro"
     }
    ]
   },
@@ -283,23 +370,28 @@
    "exercises": [
     {
      "n": "Dumbbell Lateral Raise",
-     "g2": "Shoulder"
+     "g2": "Shoulder",
+     "pt": "Elevação Lateral com Haltere"
     },
     {
      "n": "Face Pull",
-     "g2": "Shoulder"
+     "g2": "Shoulder",
+     "pt": "Face Pull"
     },
     {
      "n": "Reverse Pec Deck",
-     "g2": "Shoulder"
+     "g2": "Shoulder",
+     "pt": "Pec Deck Inverso"
     },
     {
      "n": "Single-Arm Cable Front Raise — Neutral Grip",
-     "g2": "Shoulder"
+     "g2": "Shoulder",
+     "pt": "Elevação Frontal Unilateral no Cabo — Pegada Neutra"
     },
     {
      "n": "Unilateral Cable Lateral Raise",
-     "g2": "Shoulder"
+     "g2": "Shoulder",
+     "pt": "Elevação Lateral Unilateral no Cabo"
     }
    ]
   },
@@ -309,123 +401,153 @@
    "exercises": [
     {
      "n": "Band Overhead Raise with Abduction",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Elevação Acima da Cabeça com Band e Abdução"
     },
     {
      "n": "Banded 90/90 External Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Externa 90/90 com Band"
     },
     {
      "n": "Banded 90/90 Internal Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Interna 90/90 com Band"
     },
     {
      "n": "Banded Alternating External Rotation + Bilateral External Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Externa Alternada + Rotação Externa Bilateral com Band"
     },
     {
      "n": "Banded External Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Externa com Band"
     },
     {
      "n": "Banded External Rotation + Forward Raise",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Externa + Elevação Frontal com Band"
     },
     {
      "n": "Banded Internal Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Interna com Band"
     },
     {
      "n": "Banded Isometric Horizontal Abduction",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Abdução Horizontal Isométrica com Band"
     },
     {
      "n": "Banded Isometric Shoulder External Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Externa Isométrica de Ombro com Band"
     },
     {
      "n": "Banded Shoulder Abduction & Rotation",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Abdução e Rotação de Ombro com Band"
     },
     {
      "n": "Banded Wall Clock",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Relógio na Parede com Band"
     },
     {
      "n": "Overhead Outward Push with Resistance Band",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Empurrão para Fora Acima da Cabeça com Band"
     },
     {
      "n": "Prone Shoulder Press",
-     "g2": "Shoulder Activation"
+     "g2": "Shoulder Activation",
+     "pt": "Press de Ombro em Decúbito Ventral"
     },
     {
      "n": "Codman Pendulum",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Pêndulo de Codman"
     },
     {
      "n": "Dynamic Wall Chest Stretch",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Alongamento Dinâmico de Peito na Parede"
     },
     {
      "n": "Shoulder External Rotation with Dowel",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Rotação Externa de Ombro com Bastão"
     },
     {
      "n": "Shoulder Mobility Circles",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Círculos de Mobilidade de Ombro"
     },
     {
      "n": "Shoulder Shrugs",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Encolhimento de Ombros"
     },
     {
      "n": "Standing Chest Stretch",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Alongamento de Peito em Pé"
     },
     {
      "n": "Standing Sleeper Stretch",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Sleeper Stretch em Pé"
     },
     {
      "n": "Wall Arm Circles",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Círculos de Braço na Parede"
     },
     {
      "n": "Wall Scapular Mobility",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Mobilidade Escapular na Parede"
     },
     {
      "n": "Wall Slides",
-     "g2": "Shoulder Mobility"
+     "g2": "Shoulder Mobility",
+     "pt": "Wall Slides"
     },
     {
      "n": "Dumbbell Front Raise",
-     "g2": "Shoulder Strengthening"
+     "g2": "Shoulder Strengthening",
+     "pt": "Elevação Frontal com Haltere"
     },
     {
      "n": "Dumbbell Lateral Raise — Neutral Grip",
-     "g2": "Shoulder Strengthening"
+     "g2": "Shoulder Strengthening",
+     "pt": "Elevação Lateral com Haltere — Pegada Neutra"
     },
     {
      "n": "Dumbbell Shoulder Press",
-     "g2": "Shoulder Strengthening"
+     "g2": "Shoulder Strengthening",
+     "pt": "Press de Ombro com Halteres"
     },
     {
      "n": "Electrotherapy",
-     "g2": "Shoulder Therapy"
+     "g2": "Shoulder Therapy",
+     "pt": "Eletroterapia"
     },
     {
      "n": "Hot Pack",
-     "g2": "Shoulder Therapy"
+     "g2": "Shoulder Therapy",
+     "pt": "Compressa Quente"
     },
     {
      "n": "Laser",
-     "g2": "Shoulder Therapy"
+     "g2": "Shoulder Therapy",
+     "pt": "Laser"
     },
     {
      "n": "Myofascial Release",
-     "g2": "Shoulder Therapy"
+     "g2": "Shoulder Therapy",
+     "pt": "Liberação Miofascial"
     }
    ]
   },
@@ -435,67 +557,83 @@
    "exercises": [
     {
      "n": "Lateral Band Walks",
-     "g2": "Activation"
+     "g2": "Activation",
+     "pt": "Caminhada Lateral com Band"
     },
     {
      "n": "Standing Banded Hip Flexor Raise",
-     "g2": "Activation"
+     "g2": "Activation",
+     "pt": "Elevação de Quadril em Pé com Band"
     },
     {
      "n": "Elliptical",
-     "g2": "Conditioning"
+     "g2": "Conditioning",
+     "pt": "Elíptico"
     },
     {
      "n": "Jump Rope",
-     "g2": "Conditioning"
+     "g2": "Conditioning",
+     "pt": "Corda"
     },
     {
      "n": "Stairs",
-     "g2": "Conditioning"
+     "g2": "Conditioning",
+     "pt": "Escadas"
     },
     {
      "n": "Stationary Bike",
-     "g2": "Conditioning"
+     "g2": "Conditioning",
+     "pt": "Bike"
     },
     {
      "n": "Cone Lateral Shuffle",
-     "g2": "Footwork"
+     "g2": "Footwork",
+     "pt": "Shuffle Lateral com Cones"
     },
     {
      "n": "Disk Cone Drills",
-     "g2": "Footwork"
+     "g2": "Footwork",
+     "pt": "Exercícios com Cones de Disco"
     },
     {
      "n": "Figure-8 Drill",
-     "g2": "Footwork"
+     "g2": "Footwork",
+     "pt": "Exercício em Figura de 8"
     },
     {
      "n": "Ladder Drills",
-     "g2": "Footwork"
+     "g2": "Footwork",
+     "pt": "Escada de Agilidade"
     },
     {
      "n": "Lateral Crossover Step",
-     "g2": "Footwork"
+     "g2": "Footwork",
+     "pt": "Crossover Lateral"
     },
     {
      "n": "Alternating Jumping Lunge",
-     "g2": "Power"
+     "g2": "Power",
+     "pt": "Avanço com Salto Alternado"
     },
     {
      "n": "Jumping Squats",
-     "g2": "Power"
+     "g2": "Power",
+     "pt": "Agachamento com Salto"
     },
     {
      "n": "Lateral Lunge (Cossack)",
-     "g2": "Power"
+     "g2": "Power",
+     "pt": "Avanço Lateral (Cossaco)"
     },
     {
      "n": "Lateral/Side Jumps",
-     "g2": "Power"
+     "g2": "Power",
+     "pt": "Saltos Laterais"
     },
     {
      "n": "Rest",
-     "g2": "Rest"
+     "g2": "Rest",
+     "pt": "Descanso"
     }
    ]
   },
@@ -505,23 +643,28 @@
    "exercises": [
     {
      "n": "Cat-Camel",
-     "g2": "Thoracic Mobility"
+     "g2": "Thoracic Mobility",
+     "pt": "Gato-Camelo"
     },
     {
      "n": "Chair Thoracic Extension",
-     "g2": "Thoracic Mobility"
+     "g2": "Thoracic Mobility",
+     "pt": "Extensão Torácica na Cadeira"
     },
     {
      "n": "Foam Roller Thoracic Extension",
-     "g2": "Thoracic Mobility"
+     "g2": "Thoracic Mobility",
+     "pt": "Extensão Torácica no Foam Roller"
     },
     {
      "n": "Quadruped T-Spine Rotation",
-     "g2": "Thoracic Mobility"
+     "g2": "Thoracic Mobility",
+     "pt": "Rotação Torácica em Quadrupedia"
     },
     {
      "n": "Thoracic Open-Book",
-     "g2": "Thoracic Mobility"
+     "g2": "Thoracic Mobility",
+     "pt": "Open Book Torácico"
     }
    ]
   },
@@ -531,27 +674,33 @@
    "exercises": [
     {
      "n": "Rope Cable Triceps Extension at Shoulder Height",
-     "g2": "Triceps"
+     "g2": "Triceps",
+     "pt": "Extensão de Tríceps na Corda na Altura do Ombro"
     },
     {
      "n": "Rope Triceps Pushdown",
-     "g2": "Triceps"
+     "g2": "Triceps",
+     "pt": "Pushdown de Tríceps na Corda"
     },
     {
      "n": "Single-Arm Cable Triceps Extension at Shoulder Height",
-     "g2": "Triceps"
+     "g2": "Triceps",
+     "pt": "Extensão de Tríceps Unilateral no Cabo na Altura do Ombro"
     },
     {
      "n": "Single-Arm Cable Triceps Pushdown",
-     "g2": "Triceps"
+     "g2": "Triceps",
+     "pt": "Pushdown de Tríceps Unilateral no Cabo"
     },
     {
      "n": "Straight-Bar Cable Triceps Extension at Shoulder Height",
-     "g2": "Triceps"
+     "g2": "Triceps",
+     "pt": "Extensão de Tríceps no Cabo com Barra Reta na Altura do Ombro"
     },
     {
      "n": "Straight-Bar Triceps Pushdown",
-     "g2": "Triceps"
+     "g2": "Triceps",
+     "pt": "Pushdown de Tríceps com Barra Reta"
     }
    ]
   }

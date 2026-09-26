@@ -27,8 +27,12 @@ se resolve lá, nunca aqui e nunca editando o markdown à mão.
 
 ## 4. `docs/exercises.json` é gerado
 
-Vem de `Off_Court!H:K` via `tools/build_exercises.py`. Editar à mão é trabalho perdido:
-o próximo build sobrescreve.
+Vem de `Off_Court!H:L` + glossário `N:O` via `tools/build_exercises.py`. Editar à mão é
+trabalho perdido: o próximo build sobrescreve.
+
+O português (`L`, `N:O`) é preenchido pelo botão só em célula **vazia**; nunca sobrescrever
+uma tradução que o usuário corrigiu. O app mostra português, mas **grava e envia sempre o
+nome em inglês**.
 
 ## 5. Mexeu no shell? suba o `CACHE` do `sw.js`
 

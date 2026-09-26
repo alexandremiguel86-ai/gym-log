@@ -3,6 +3,11 @@
 Le as colunas H/I/J/K (EXERCISE | GROUP 1 | GROUP 2 | GROUP 0) a partir da
 linha 3. GROUP 0 e a categoria do grupo (Gym, Mobility & Recovery, ...), que o
 app usa para separar a tela de grupos em secoes.
+
+Portugues (preenchido pelo botao via translate_pt.py, corrigivel a mao):
+  L    EXERCISE (PT) na linha do exercicio  -> "pt" de cada exercicio
+  N:O  glossario TERM (EN) | TERM (PT)      -> "terms" no topo do JSON
+Sem traducao, o app mostra o nome em ingles.
 Sem dependencias externas: o .xlsm e um zip com XML dentro.
 
 Uso:  python tools/build_exercises.py
@@ -87,7 +92,12 @@ def main():
 
     groups = {}
     categories = {}   # GROUP 1 -> {GROUP 0: contagem}
+    untranslated = []
+    terms = {}
     total = 0
+    for n in sorted(rows):
+        if n >= FIRST_ROW and rows[n].get("N") and rows[n].get("O"):
+            terms[rows[n]["N"]] = rows[n]["O"]
     for n in sorted(rows):
         if n < FIRST_ROW:
             continue
@@ -97,7 +107,12 @@ def main():
         if not name or not g1:
             continue
         g2 = cells.get("J") or g1
-        groups.setdefault(g1, []).append({"n": name, "g2": g2})
+        item = {"n": name, "g2": g2}
+        if cells.get("L"):
+            item["pt"] = cells["L"]
+        else:
+            untranslated.append(name)
+        groups.setdefault(g1, []).append(item)
         cat = cells.get("K") or UNKNOWN_CATEGORY
         counts = categories.setdefault(g1, {})
         counts[cat] = counts.get(cat, 0) + 1
@@ -125,7 +140,14 @@ def main():
     # Sem data de geracao de proposito: um campo que muda todo dia faria o
     # arquivo diferir a cada build, e publish_exercises.ps1 nao conseguiria
     # distinguir "a lista mudou" de "so rodei de novo". O git ja guarda quando.
-    payload = {"source": str(XLSM), "groups": ordered}
+    payload = {"source": str(XLSM), "terms": terms, "groups": ordered}
+
+    used = {g["name"] for g in ordered} | {g["category"] for g in ordered} |            {e["g2"] for g in ordered for e in g["exercises"]}
+    missing_terms = sorted(t for t in used if t not in terms)
+    if untranslated:
+        warnings.append(f"AVISO: {len(untranslated)} exercicio(s) sem portugues em L")
+    if missing_terms:
+        warnings.append(f"AVISO: termo(s) sem portugues em N:O: {', '.join(missing_terms)}")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(

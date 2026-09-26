@@ -84,6 +84,7 @@ var document = {
     return [];
   },
   querySelector: function () { return null; },
+  documentElement: {},
   createElement: function (tag) { return new El(tag); },
   addEventListener: function () {}
 };
@@ -442,6 +443,53 @@ Promise.resolve()
     var order = vm.runInContext('finishedWorkouts().map(function (w) { return w.id; }).join(",")', sandbox);
     check('mais recente -> mais antigo',
       order.indexOf('new,mid,') === 0 && /,old$/.test(order), order);
+
+    console.log('\n17. Portugues');
+    vm.runInContext('openSettings();', sandbox);
+    check('ingles por padrao', el('s-lang').value === 'en', el('s-lang').value);
+    el('s-lang').value = 'pt';
+    el('s-lang').dispatch('change');
+    check('idioma salvo', JSON.parse(localStorage.getItem('gymlog.settings')).lang === 'pt');
+    check('titulo traduzido', el('title').textContent === 'Configurações', el('title').textContent);
+    check('botao traduzido', el('start').textContent === 'INICIAR TREINO', el('start').textContent);
+    check('rotulo traduzido', el('l-sets').textContent === 'Séries', el('l-sets').textContent);
+    check('placeholder traduzido', el('search').placeholder === 'Buscar exercício...', el('search').placeholder);
+
+    vm.runInContext('reset("screen-home"); renderHome();', sandbox);
+    el('resume').click();
+    el('add-exercise').click();
+    var heads = el('group-grid').children
+      .filter(function (c) { return c.className === 'cat-head'; })
+      .map(function (c) { return c.textContent; });
+    check('secoes em portugues', heads[0] === catalog.terms['Gym'], heads.join('|'));
+    var back = catalog.groups.filter(function (g) { return g.name === 'Back'; })[0];
+    var ex = back.exercises.filter(function (e) { return e.pt; })[0];
+    group(catalog.terms['Back']).click();
+    check('titulo do grupo em portugues', el('title').textContent === catalog.terms['Back'], el('title').textContent);
+    pick(ex.pt).click();
+    check('formulario em portugues', el('form-exercise').textContent === ex.pt, el('form-exercise').textContent);
+    fill('3', '12', '30kg', '');
+    el('save-entry').click();
+    var saved = entries()[entries().length - 1];
+    check('grava o nome em INGLES', saved.exercise === ex.n, saved.exercise);
+    check('grava o grupo em INGLES', saved.group1 === 'Back' && saved.group2 === ex.g2,
+      saved.group1 + '/' + saved.group2);
+    var rows = el('entry-list').children;
+    check('lista do treino em portugues',
+      rows[rows.length - 1].children[0].children[0].textContent === ex.pt,
+      rows[rows.length - 1].children[0].children[0].textContent);
+
+    vm.runInContext('currentGroup = "Back"; renderExercises("puxada");', sandbox);
+    var found = el('exercise-list').children.filter(function (c) { return c.className === 'row-btn'; });
+    check('busca em portugues',
+      found.length > 0 && found[0].children[0].textContent.indexOf('Puxada') === 0, found.length);
+    vm.runInContext('renderExercises("pulldown");', sandbox);
+    found = el('exercise-list').children.filter(function (c) { return c.className === 'row-btn'; });
+    check('busca em ingles continua valendo', found.length > 0, found.length);
+    check('sem traducao fica o ingles',
+      vm.runInContext('exLabel("Landmine Press")', sandbox) === 'Landmine Press');
+    check('data em portugues', vm.runInContext('prettyDate("2026-09-26")', sandbox) === '26 set 2026',
+      vm.runInContext('prettyDate("2026-09-26")', sandbox));
 
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
     process.exit(failures ? 1 : 0);

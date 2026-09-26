@@ -74,10 +74,10 @@
     <p id="form-group" class="muted"></p>
 
     <div id="custom-fields" hidden>
-      <label>Exercise name
+      <label><span id="l-name">Exercise name</span>
         <input id="f-name" type="text" autocapitalize="words">
       </label>
-      <label>Group
+      <label><span id="l-group">Group</span>
         <select id="f-group"></select>
       </label>
     </div>
@@ -85,19 +85,19 @@
     <button id="last-chip" class="chip" hidden></button>
 
     <div class="row">
-      <label>Sets
+      <label><span id="l-sets">Sets</span>
         <input id="f-sets" type="text" inputmode="numeric" enterkeyhint="next">
       </label>
-      <label>Reps / Time
+      <label><span id="l-reps">Reps / Time</span>
         <input id="f-reps" type="text" inputmode="text" enterkeyhint="next" placeholder="10 or 40s">
       </label>
     </div>
 
     <div class="row">
-      <label>Weight / Load
+      <label><span id="l-weight">Weight / Load</span>
         <input id="f-weight" type="text" inputmode="text" enterkeyhint="next" placeholder="56kg">
       </label>
-      <label>RPE
+      <label><span id="l-rpe">RPE</span>
         <input id="f-rpe" type="text" inputmode="numeric" enterkeyhint="done" placeholder="7">
       </label>
     </div>
@@ -110,14 +110,21 @@
 
   <!-- ---------- CONFIGURACOES ---------- -->
   <section id="screen-settings" class="screen">
-    <p class="muted">
+    <label><span id="l-lang">Language</span>
+      <select id="s-lang">
+        <option value="en">English</option>
+        <option value="pt">Português</option>
+      </select>
+    </label>
+    <hr>
+    <p id="settings-intro" class="muted">
       Paste the Apps Script Web App URL and the token here. They are stored only
       on this device and never go to the repository.
     </p>
-    <label>Apps Script URL (/exec)
+    <label><span id="l-url">Apps Script URL (/exec)</span>
       <input id="s-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false">
     </label>
-    <label>Token
+    <label><span id="l-token">Token</span>
       <input id="s-token" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
     </label>
     <button id="save-settings" class="big primary">SAVE</button>
