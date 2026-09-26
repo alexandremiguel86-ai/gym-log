@@ -8,7 +8,6 @@
   --line: #2f3542;
   --text: #f2f4f8;
   --muted: #98a1b3;
-  --placeholder: #b6bcc8;
   --accent: #2f7dff;
   --danger: #e04f5f;
   --ok: #35c07a;
@@ -226,9 +225,6 @@ input, select {
   -webkit-appearance: none;
   appearance: none;
 }
-/* Um pouco mais claro que o cinza padrao do Safari (#a9a9a9). */
-input::placeholder { color: var(--placeholder); opacity: 1; }
-
 input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }

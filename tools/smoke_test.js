@@ -297,8 +297,13 @@ Promise.resolve()
     check('reps prefilled', el('f-reps').value === '10', el('f-reps').value);
     check('weight prefilled', el('f-weight').value === '25kg', el('f-weight').value);
 
-    // so mudou a carga
+    // so mudou a carga: tocar no campo apaga o valor anterior
+    el('f-weight').dispatch('focus');
+    check('tocar apaga o valor do treino anterior', el('f-weight').value === '', el('f-weight').value);
     el('f-weight').value = '27.5kg';
+    el('f-weight').dispatch('focus');
+    check('o que foi digitado nao some ao tocar de novo', el('f-weight').value === '27.5kg', el('f-weight').value);
+    check('campo nao tocado fica preenchido', el('f-reps').value === '10', el('f-reps').value);
     el('save-entry').click();
     check('3 registros no total', entries().length === 3, entries().length);
     check('nova sessao separada', entries()[2].session_id !== entries()[0].session_id);
@@ -315,6 +320,8 @@ Promise.resolve()
     check('abre o formulario em modo edicao', active() === 'screen-form', active());
     check('botao excluir visivel', el('delete-entry').hidden === false);
     check('valores carregados', el('f-sets').value === '5', el('f-sets').value);
+    el('f-sets').dispatch('focus');
+    check('editando: tocar nao apaga', el('f-sets').value === '5', el('f-sets').value);
     el('f-sets').value = '4';
     el('save-entry').click();
     check('nao criou registro novo', entries().length === n, entries().length);
