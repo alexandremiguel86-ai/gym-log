@@ -4,7 +4,7 @@
  * iPhone continua servindo a versao antiga do cache indefinidamente.
  */
 
-var CACHE = 'gymlog-v10';
+var CACHE = 'gymlog-v11';
 
 // exercises.json muda quando voce publica a lista pela planilha, e voce espera
 // ver a mudanca na proxima vez que abrir o app - nao na seguinte. Por isso ele

@@ -233,6 +233,8 @@ function applyStaticText() {
     $(id).placeholder = t(STATIC_PLACEHOLDER[id]);
   });
   document.documentElement.lang = settings.lang === 'pt' ? 'pt-BR' : 'en';
+  $('lang-pt').className = settings.lang === 'pt' ? 'active' : '';
+  $('lang-en').className = settings.lang === 'en' ? 'active' : '';
 }
 
 // Nomes vindos da planilha: L (exercicio) e N:O (grupos). Sem traducao, ou
@@ -328,6 +330,7 @@ function render(id) {
   $(id).classList.add('active');
   $('title').textContent = TITLES[id] ? t(TITLES[id]) : 'Gym Log';
   $('back').hidden = stack.length <= 1;
+  $('lang-toggle').hidden = id !== 'screen-home';
   window.scrollTo(0, 0);
 }
 
@@ -897,11 +900,18 @@ function openSettings() {
 
 /** Troca o idioma na hora; so a tela de Configuracoes esta aberta nesse momento. */
 function changeLanguage() {
-  settings.lang = $('s-lang').value === 'pt' ? 'pt' : 'en';
-  save(K_SETTINGS, settings);
-  applyStaticText();
+  setLanguage($('s-lang').value);
   $('queue-info').textContent = t('queueInfo', { p: pending().length, t: entries.length });
   render('screen-settings');
+}
+
+/** Botao PT/EN da tela inicial. */
+function setLanguage(lang) {
+  settings.lang = lang === 'pt' ? 'pt' : 'en';
+  save(K_SETTINGS, settings);
+  $('s-lang').value = settings.lang;
+  applyStaticText();
+  if (stack[stack.length - 1] === 'screen-home') { renderHome(); render('screen-home'); }
 }
 
 function saveSettings() {
@@ -970,6 +980,8 @@ $('delete-entry').addEventListener('click', deleteEntry);
 
 $('save-settings').addEventListener('click', saveSettings);
 $('s-lang').addEventListener('change', changeLanguage);
+$('lang-pt').addEventListener('click', function () { setLanguage('pt'); });
+$('lang-en').addEventListener('click', function () { setLanguage('en'); });
 $('test-sync').addEventListener('click', testSync);
 $('force-sync').addEventListener('click', function () { sync(true); });
 $('export-json').addEventListener('click', exportJSON);

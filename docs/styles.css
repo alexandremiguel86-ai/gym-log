@@ -64,6 +64,25 @@ body {
   color: var(--text);
 }
 
+/* Troca de idioma, so na tela inicial. display:flex anularia o atributo
+   hidden, por isso a regra [hidden] explicita. */
+.lang-toggle {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.lang-toggle[hidden] { display: none; }
+.lang-toggle button {
+  border: 0;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--muted);
+}
+.lang-toggle button.active { background: var(--surface-2); color: var(--text); }
+
 .badge {
   border: 0;
   border-radius: 20px;

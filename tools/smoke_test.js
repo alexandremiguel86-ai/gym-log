@@ -491,6 +491,20 @@ Promise.resolve()
     check('data em portugues', vm.runInContext('prettyDate("2026-09-26")', sandbox) === '26 set 2026',
       vm.runInContext('prettyDate("2026-09-26")', sandbox));
 
+    console.log('\n18. Botao de idioma na tela inicial');
+    vm.runInContext('reset("screen-home"); renderHome();', sandbox);
+    check('visivel no inicio', el('lang-toggle').hidden === false);
+    check('PT marcado', el('lang-pt').className === 'active' && el('lang-en').className === '');
+    el('lang-en').click();
+    check('troca para ingles', el('start').textContent === 'START WORKOUT', el('start').textContent);
+    check('EN marcado', el('lang-en').className === 'active');
+    check('salvo', JSON.parse(localStorage.getItem('gymlog.settings')).lang === 'en');
+    check('select das configuracoes acompanha', el('s-lang').value === 'en');
+    el('lang-pt').click();
+    check('volta para portugues', el('start').textContent === 'INICIAR TREINO', el('start').textContent);
+    el('open-history').click();
+    check('some fora do inicio', el('lang-toggle').hidden === true);
+
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
     process.exit(failures ? 1 : 0);
   })
