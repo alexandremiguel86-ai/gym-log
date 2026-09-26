@@ -126,7 +126,10 @@ var STRINGS = {
     'force-sync': 'SYNC NOW',
     'export-json': 'Export backup (JSON)',
     'ph-search': 'Search exercise...',
-    'ph-reps': '10 or 40s'
+    'ph-sets': 'e.g. 3',
+    'ph-reps': 'e.g. 10 or 30s',
+    'ph-weight': 'e.g. 10kg',
+    'ph-rpe': 'e.g. 7'
   },
   pt: {
     saveError: 'ERRO: nao foi possivel salvar neste aparelho',
@@ -199,7 +202,10 @@ var STRINGS = {
     'force-sync': 'ENVIAR AGORA',
     'export-json': 'Exportar backup (JSON)',
     'ph-search': 'Buscar exercício...',
-    'ph-reps': '10 ou 40s'
+    'ph-sets': 'ex.: 3',
+    'ph-reps': 'ex.: 10 ou 30s',
+    'ph-weight': 'ex.: 10kg',
+    'ph-rpe': 'ex.: 7'
   }
 };
 
@@ -225,7 +231,10 @@ var STATIC_TEXT = ['start', 'open-history', 'open-settings', 'entry-empty', 'add
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-sets',
   'l-reps', 'l-weight', 'l-rpe', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
-var STATIC_PLACEHOLDER = { search: 'ph-search', 'f-reps': 'ph-reps' };
+var STATIC_PLACEHOLDER = {
+  search: 'ph-search', 'f-sets': 'ph-sets', 'f-reps': 'ph-reps',
+  'f-weight': 'ph-weight', 'f-rpe': 'ph-rpe'
+};
 
 function applyStaticText() {
   STATIC_TEXT.forEach(function (id) { $(id).textContent = t(id); });
