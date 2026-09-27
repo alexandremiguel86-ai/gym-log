@@ -796,30 +796,18 @@ function openForm(entry) {
     $('f-rpe').value = entry.rpe || '';
     $('last-chip').hidden = true;
   } else {
-    // Prefill do ultimo treino deste exercicio: o app abre ja preenchido e
-    // voce so ajusta o que mudou.
+    // Campos de hoje comecam vazios: valor ja escrito pareceria ja registrado.
+    // O ultimo treino aparece so como referencia, no chip; tocar nele copia.
     var last = draft.exercise ? lastEntryFor(draft.exercise) : null;
-    $('f-sets').value = last ? (last.sets || '') : '';
-    $('f-reps').value = last ? (last.reps || '') : '';
-    $('f-weight').value = last ? (last.weight || '') : '';
-    $('f-rpe').value = last ? (last.rpe || '') : '';
+    $('f-sets').value = '';
+    $('f-reps').value = '';
+    $('f-weight').value = '';
+    $('f-rpe').value = '';
     $('last-chip').hidden = !last;
     if (last) lastChipText(last);
   }
-  markPrefilled(!isExisting);
 
   show('screen-form');
-}
-
-// Campos que vieram do ultimo treino, e nao digitados agora. Tocar num deles
-// apaga o valor, para escrever o novo sem ter que deletar o antigo.
-var PREFILL_FIELDS = ['f-sets', 'f-reps', 'f-weight', 'f-rpe'];
-var prefilled = {};
-
-function markPrefilled(on) {
-  prefilled = {};
-  if (!on) return;                      // editando entry salva: nada e "do treino anterior"
-  PREFILL_FIELDS.forEach(function (id) { if ($(id).value) prefilled[id] = true; });
 }
 
 /** Textos do formulario que dependem do idioma. Nao toca nos campos digitados,
@@ -1021,16 +1009,7 @@ $('last-chip').addEventListener('click', function () {
   $('f-reps').value = last.reps || '';
   $('f-weight').value = last.weight || '';
   $('f-rpe').value = last.rpe || '';
-  markPrefilled(true);
   toast(t('lastValues'));
-});
-
-PREFILL_FIELDS.forEach(function (id) {
-  $(id).addEventListener('focus', function () {
-    if (!prefilled[id]) return;
-    delete prefilled[id];
-    this.value = '';
-  });
 });
 
 $('save-entry').addEventListener('click', saveEntry);

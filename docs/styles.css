@@ -8,6 +8,7 @@
   --line: #2f3542;
   --text: #f2f4f8;
   --muted: #98a1b3;
+  --placeholder: #4f5563;
   --accent: #2f7dff;
   --danger: #e04f5f;
   --ok: #35c07a;
@@ -225,6 +226,10 @@ input, select {
   -webkit-appearance: none;
   appearance: none;
 }
+/* Exemplo bem mais escuro que o texto digitado (branco), para nao parecer
+   valor ja preenchido. */
+input::placeholder { color: var(--placeholder); opacity: 1; }
+
 input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }

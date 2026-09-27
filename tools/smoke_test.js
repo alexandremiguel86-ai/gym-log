@@ -1,7 +1,7 @@
 /* Teste de fumaca do app.js sem navegador.
  *
  * Monta um DOM minimo a partir dos id= do index.html, carrega o app.js e
- * simula treinos inteiros: iniciar, registrar, conferir o prefill do historico,
+ * simula treinos inteiros: iniciar, registrar, conferir o ultimo treino como referencia,
  * editar, excluir, finalizar (so entao sincroniza), descartar e consultar os
  * treinos anteriores.
  *
@@ -289,21 +289,20 @@ Promise.resolve()
     var btn = pick('Single-Arm Dumbbell Row');
     check('lista mostra o ultimo valor', btn.textContent.indexOf('2x10 @ 25kg') !== -1, btn.textContent);
     btn.click();
-    console.log('\n8. Prefill do historico');
+    console.log('\n8. Ultimo treino como referencia');
     check('chip visivel', el('last-chip').hidden === false);
     check('chip mostra o ultimo', el('last-chip').textContent.indexOf('2x10 @ 25kg') !== -1,
       el('last-chip').textContent);
-    check('sets prefilled', el('f-sets').value === '2', el('f-sets').value);
-    check('reps prefilled', el('f-reps').value === '10', el('f-reps').value);
-    check('weight prefilled', el('f-weight').value === '25kg', el('f-weight').value);
+    check('sets de hoje vazio', el('f-sets').value === '', el('f-sets').value);
+    check('reps de hoje vazio', el('f-reps').value === '', el('f-reps').value);
+    check('weight de hoje vazio', el('f-weight').value === '', el('f-weight').value);
+    check('rpe de hoje vazio', el('f-rpe').value === '', el('f-rpe').value);
 
-    // so mudou a carga: tocar no campo apaga o valor anterior
-    el('f-weight').dispatch('focus');
-    check('tocar apaga o valor do treino anterior', el('f-weight').value === '', el('f-weight').value);
+    // tocar no chip copia o ultimo treino; so mudou a carga
+    el('last-chip').click();
+    check('chip copia sets', el('f-sets').value === '2', el('f-sets').value);
+    check('chip copia reps', el('f-reps').value === '10', el('f-reps').value);
     el('f-weight').value = '27.5kg';
-    el('f-weight').dispatch('focus');
-    check('o que foi digitado nao some ao tocar de novo', el('f-weight').value === '27.5kg', el('f-weight').value);
-    check('campo nao tocado fica preenchido', el('f-reps').value === '10', el('f-reps').value);
     el('save-entry').click();
     check('3 registros no total', entries().length === 3, entries().length);
     check('nova sessao separada', entries()[2].session_id !== entries()[0].session_id);
@@ -320,8 +319,6 @@ Promise.resolve()
     check('abre o formulario em modo edicao', active() === 'screen-form', active());
     check('botao excluir visivel', el('delete-entry').hidden === false);
     check('valores carregados', el('f-sets').value === '5', el('f-sets').value);
-    el('f-sets').dispatch('focus');
-    check('editando: tocar nao apaga', el('f-sets').value === '5', el('f-sets').value);
     el('f-sets').value = '4';
     el('save-entry').click();
     check('nao criou registro novo', entries().length === n, entries().length);

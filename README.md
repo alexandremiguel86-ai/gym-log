@@ -31,8 +31,8 @@ digitação manual na aba `Off_Court`.
 
 1. **START WORKOUT**
 2. **+ ADD EXERCISE** → grupo → exercício
-3. O formulário abre **já preenchido com os valores do último treino** daquele exercício.
-   Ajuste só o que mudou → **SAVE**
+3. O formulário abre **vazio**, com o último treino daquele exercício num quadro acima
+   dos campos, só como referência. Tocar nele copia os valores → ajuste o que mudou → **SAVE**
 4. Repita. Toque num item da lista para editar ou excluir.
 5. **FINISH WORKOUT** (pede confirmação). Só aqui o treino vai para o Google Sheets.
 
@@ -221,7 +221,7 @@ node tools/smoke_test.js              # fluxo completo, sem navegador
 python -m http.server 8000 -d docs    # abrir http://localhost:8000
 ```
 
-O `smoke_test.js` monta um DOM mínimo e simula treinos inteiros (registrar, prefill,
+O `smoke_test.js` monta um DOM mínimo e simula treinos inteiros (registrar, referência do último treino,
 editar, excluir, finalizar, offline, dedupe, descartar, histórico, navegação). Rode depois de mexer no `app.js`.
 
 **Testar o Apps Script pelo terminal:** o `/exec` responde com um **302** e o corpo real vem
