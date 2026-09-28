@@ -265,6 +265,13 @@ Promise.resolve()
     check('reps "40s" preservado', e2.reps === '40s', e2.reps);
     check('group2 = Footwork', e2.group2 === 'Footwork', e2.group2);
     check('2 registros na sessao', entries().length === 2);
+    var cur = el('entry-list').children;
+    check('Gym: borda verde', cur[0].children[0].classList.contains('cat') &&
+      cur[0].children[0].style._props['--cat'] === '#00ff00', cur[0].children[0].style._props['--cat']);
+    check('Conditioning: borda laranja',
+      cur[1].children[0].style._props['--cat'] === '#ff9f43', cur[1].children[0].style._props['--cat']);
+    check('Mobility & Recovery: azul', vm.runInContext('groupColor("Hip Mobility")', sandbox) === '#4d9bff');
+    check('grupo fora do catalogo: sem cor', vm.runInContext('groupColor("Nope")', sandbox) === null);
   })
   .then(function () { return wait(); })
   .then(function () {
@@ -435,6 +442,9 @@ Promise.resolve()
     check('mostra os exercicios', el('workout-list').children.length === 1 &&
       el('workout-list').children[0].textContent.indexOf('Swiss Ball Crunch') !== -1,
       el('workout-list').textContent);
+    check('treino anterior: borda roxa (Core)',
+      el('workout-list').children[0].style._props['--cat'] === '#be29ec',
+      el('workout-list').children[0].style._props['--cat']);
     vm.runInContext('goBack();', sandbox);
     check('voltar -> historico', active() === 'screen-history', active());
 

@@ -199,6 +199,9 @@ main { padding: 16px 14px 120px; }
   background: var(--surface);
   color: var(--text);
 }
+/* Exercicio de um treino: borda esquerda na cor da categoria do grupo,
+   igual aos botoes da tela de grupos. */
+.row-btn.cat { border-left: 4px solid var(--cat); }
 .row-btn .meta { display: block; margin-top: 4px; font-size: 14px; color: var(--muted); }
 .row-btn .tag  { font-size: 12px; color: var(--accent); }
 

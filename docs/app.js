@@ -555,6 +555,7 @@ function openWorkout(w) {
     meta.textContent = [termLabel(e.group1), summarize(e)].filter(Boolean).join(' - ');
     li.appendChild(name);
     li.appendChild(meta);
+    paintCategory(li, e.group1);
     list.appendChild(li);
   });
   show('screen-workout');
@@ -589,6 +590,7 @@ function renderSession() {
     btn.appendChild(name);
     btn.appendChild(meta);
     btn.addEventListener('click', function () { openForm(e); });
+    paintCategory(btn, e.group1);
     li.appendChild(btn);
     list.appendChild(li);
   });
@@ -646,6 +648,22 @@ var CATEGORIES = [
   { name: 'Conditioning', color: '#ff9f43' }
 ];
 var OTHER_COLOR = '#98a1b3';
+
+/** Cor da categoria do grupo (coluna K), ou null se o grupo saiu do catalogo. */
+function groupColor(groupName) {
+  var g = catalog.groups.filter(function (x) { return x.name === groupName; })[0];
+  if (!g) return null;
+  var c = CATEGORIES.filter(function (x) { return x.name === g.category; })[0];
+  return c ? c.color : OTHER_COLOR;
+}
+
+/** Borda esquerda do exercicio na cor da categoria, como na tela de grupos. */
+function paintCategory(row, groupName) {
+  var color = groupColor(groupName);
+  if (!color) return;
+  row.classList.add('cat');
+  row.style.setProperty('--cat', color);
+}
 
 function groupsByCategory() {
   var order = CATEGORIES.map(function (c) { return c.name; });
