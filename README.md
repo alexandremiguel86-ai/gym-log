@@ -32,9 +32,11 @@ digitação manual na aba `Off_Court`.
 1. **START WORKOUT**
 2. **+ ADD EXERCISE** → grupo → exercício
 3. O formulário abre **vazio**, com o último treino daquele exercício num quadro acima
-   dos campos, só como referência. Tocar nele copia os valores → ajuste o que mudou → **SAVE**
-4. Repita. Toque num item da lista para editar ou excluir. Para mudar a ordem, arraste
-   pela alça ☰ à direita (vale até o **FINISH**; é a ordem das linhas no Sheets).
+   dos campos, só como referência. Tocar nele copia os valores; depois, tocar num campo
+   copiado já o apaga para digitar o novo → **SAVE**
+4. Repita. Toque num item da lista para editar ou excluir. Para mudar a ordem, **segure**
+   a alça ☰ à direita um instante e arraste (vale até o **FINISH**; é a ordem das linhas
+   no Sheets). Deslizar sem segurar só rola a tela.
 5. **FINISH WORKOUT** (pede confirmação). Só aqui o treino vai para o Google Sheets.
 
 Enquanto o treino está aberto nada foi enviado, então editar e excluir valem de verdade.

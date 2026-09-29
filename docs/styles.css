@@ -216,7 +216,8 @@ main { padding: 16px 14px 120px; }
   justify-content: center;
   font-size: 22px;
   color: var(--muted);
-  touch-action: none;
+  touch-action: pan-y;          /* rolar pela alca continua valendo; arrastar so segurando */
+  -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
 }

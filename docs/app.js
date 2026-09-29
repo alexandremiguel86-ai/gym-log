@@ -619,11 +619,16 @@ function moveSessionEntry(id, to) {
   save(K_ENTRIES, entries);
 }
 
-// Arrastar pela alca da direita. Pointer events porque o drag-and-drop do
-// HTML nao funciona no Safari do iPhone; a alca e irma do botao (nao filha),
-// entao tocar no resto da linha continua abrindo a edicao, e o touch-action
-// dela impede que o arrasto role a pagina.
-var drag = null;
+// Arrastar pela alca da direita, mas so depois de segurar um instante: sem a
+// espera, rolar a tela com o dedo no lado direito pegava a alca e trocava a
+// ordem. Dedo que se mexe antes do tempo esta rolando, e a rolagem segue
+// normal. Touch events porque o drag-and-drop do HTML nao funciona no Safari
+// do iPhone. A alca e irma do botao (nao filha), entao tocar no resto da linha
+// continua abrindo a edicao.
+var HOLD_MS = 350;      // um pouco mais que o toque de quem so esta rolando
+var HOLD_SLOP = 8;      // px que o dedo pode mexer durante a espera
+var hold = null;        // {timer, x, y}: segurando, esperando o tempo
+var drag = null;        // {li, id, grab}: arrasto ativo
 
 function addDragHandle(li, id) {
   li.classList.add('draggable');
@@ -631,19 +636,44 @@ function addDragHandle(li, id) {
   handle.className = 'drag';
   handle.textContent = '\u2630';
   handle.setAttribute('aria-label', t('dragHint'));
-  handle.addEventListener('pointerdown', function (ev) {
-    ev.preventDefault();
-    handle.setPointerCapture(ev.pointerId);
-    drag = { li: li, id: id, grab: ev.clientY - li.getBoundingClientRect().top };
-    li.classList.add('dragging');
-  });
-  handle.addEventListener('pointermove', function (ev) {
-    if (!drag || drag.li !== li) return;
-    dragMove(ev.clientY);
-  });
-  handle.addEventListener('pointerup', endDrag);
-  handle.addEventListener('pointercancel', endDrag);
+  handle.addEventListener('touchstart', function (ev) {
+    var p = ev.touches[0];
+    armDrag(li, id, p.clientX, p.clientY);
+  }, { passive: true });
+  handle.addEventListener('touchmove', function (ev) {
+    var p = ev.touches[0];
+    if (drag) { ev.preventDefault(); dragMove(p.clientY); return; }
+    if (hold && (Math.abs(p.clientX - hold.x) > HOLD_SLOP ||
+                 Math.abs(p.clientY - hold.y) > HOLD_SLOP)) cancelHold();
+  }, { passive: false });   // passive:false para o preventDefault segurar a rolagem
+  handle.addEventListener('touchend', finishTouch);
+  handle.addEventListener('touchcancel', finishTouch);
+  handle.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
   li.appendChild(handle);
+}
+
+function armDrag(li, id, x, y) {
+  cancelHold();
+  hold = {
+    x: x,
+    y: y,
+    timer: setTimeout(function () {
+      hold = null;
+      drag = { li: li, id: id, grab: y - li.getBoundingClientRect().top };
+      li.classList.add('dragging');     // a linha "levanta": sinal de que pode arrastar
+    }, HOLD_MS)
+  };
+}
+
+function cancelHold() {
+  if (!hold) return;
+  clearTimeout(hold.timer);
+  hold = null;
+}
+
+function finishTouch() {
+  cancelHold();
+  endDrag();
 }
 
 function dragMove(y) {
@@ -906,8 +936,21 @@ function openForm(entry) {
     $('last-chip').hidden = !last;
     if (last) lastChipText(last);
   }
+  markReused(false);
 
   show('screen-form');
+}
+
+// Campos preenchidos pelo "toque para reusar". Tocar num deles apaga o valor
+// antigo, para escrever o novo sem ter que deletar: 2x10 virou 3x10, toca em
+// sets e digita 3. So vale uma vez por campo; o que foi digitado fica.
+var PREFILL_FIELDS = ['f-sets', 'f-reps', 'f-weight', 'f-rpe'];
+var reused = {};
+
+function markReused(on) {
+  reused = {};
+  if (!on) return;
+  PREFILL_FIELDS.forEach(function (id) { if ($(id).value) reused[id] = true; });
 }
 
 /** Textos do formulario que dependem do idioma. Nao toca nos campos digitados,
@@ -1109,7 +1152,16 @@ $('last-chip').addEventListener('click', function () {
   $('f-reps').value = last.reps || '';
   $('f-weight').value = last.weight || '';
   $('f-rpe').value = last.rpe || '';
+  markReused(true);
   toast(t('lastValues'));
+});
+
+PREFILL_FIELDS.forEach(function (id) {
+  $(id).addEventListener('focus', function () {
+    if (!reused[id]) return;
+    delete reused[id];
+    this.value = '';
+  });
 });
 
 $('save-entry').addEventListener('click', saveEntry);
