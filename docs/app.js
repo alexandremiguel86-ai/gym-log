@@ -77,6 +77,7 @@ var STRINGS = {
     newExercise: 'New exercise',
     last: 'Last: {s}',
     tapReuse: '{d} - tap to reuse',
+    dragHint: 'Drag to reorder',
     needName: 'Enter the exercise name',
     needSetsReps: 'Enter at least sets or reps',
     confirmDelete: 'Delete "{x}"?',
@@ -153,6 +154,7 @@ var STRINGS = {
     newExercise: 'Novo exercício',
     last: 'Último: {s}',
     tapReuse: '{d} - toque para reusar',
+    dragHint: 'Arraste para mudar a ordem',
     needName: 'Informe o nome do exercício',
     needSetsReps: 'Informe ao menos séries ou reps',
     confirmDelete: 'Excluir "{x}"?',
@@ -592,9 +594,89 @@ function renderSession() {
     btn.addEventListener('click', function () { openForm(e); });
     paintCategory(btn, e.group1);
     li.appendChild(btn);
+    if (rows.length > 1) addDragHandle(li, e.id);
     list.appendChild(li);
   });
   refreshBadge();
+}
+
+// ---------------------------------------------------------------- ordem
+
+/** Move uma entry do treino aberto para a posicao `to` (0 = primeira).
+    A ordem do array e a ordem em que as linhas chegam ao Sheets, e o treino
+    aberto ainda nao foi enviado: por isso so da para reordenar ate o FINISH. */
+function moveSessionEntry(id, to) {
+  if (!session) return;
+  var rows = sessionEntries();
+  var from = -1;
+  rows.forEach(function (e, i) { if (e.id === id) from = i; });
+  if (from === -1) return;
+  to = Math.max(0, Math.min(rows.length - 1, to));
+  if (from === to) return;
+  rows.splice(to, 0, rows.splice(from, 1)[0]);
+  var open = session.id;
+  entries = entries.filter(function (e) { return e.session_id !== open; }).concat(rows);
+  save(K_ENTRIES, entries);
+}
+
+// Arrastar pela alca da direita. Pointer events porque o drag-and-drop do
+// HTML nao funciona no Safari do iPhone; a alca e irma do botao (nao filha),
+// entao tocar no resto da linha continua abrindo a edicao, e o touch-action
+// dela impede que o arrasto role a pagina.
+var drag = null;
+
+function addDragHandle(li, id) {
+  li.classList.add('draggable');
+  var handle = document.createElement('span');
+  handle.className = 'drag';
+  handle.textContent = '\u2630';
+  handle.setAttribute('aria-label', t('dragHint'));
+  handle.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault();
+    handle.setPointerCapture(ev.pointerId);
+    drag = { li: li, id: id, grab: ev.clientY - li.getBoundingClientRect().top };
+    li.classList.add('dragging');
+  });
+  handle.addEventListener('pointermove', function (ev) {
+    if (!drag || drag.li !== li) return;
+    dragMove(ev.clientY);
+  });
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+  li.appendChild(handle);
+}
+
+function dragMove(y) {
+  var li = drag.li;
+  var list = li.parentNode;
+  // Perto das bordas, rola a tela para alcancar linhas fora de vista.
+  if (y > window.innerHeight - 60) window.scrollBy(0, 12);
+  else if (y < 110) window.scrollBy(0, -12);
+
+  li.style.transform = '';
+  var before = null;
+  var others = Array.prototype.filter.call(list.children, function (c) { return c !== li; });
+  for (var i = 0; i < others.length; i++) {
+    var r = others[i].getBoundingClientRect();
+    if (y < r.top + r.height / 2) { before = others[i]; break; }
+  }
+  if (li.nextSibling !== before || (!before && list.lastChild !== li)) {
+    list.insertBefore(li, before);
+  }
+  var top = li.getBoundingClientRect().top;
+  li.style.transform = 'translateY(' + (y - drag.grab - top) + 'px)';
+}
+
+function endDrag() {
+  if (!drag) return;
+  var li = drag.li;
+  var to = Array.prototype.indexOf.call(li.parentNode.children, li);
+  var id = drag.id;
+  drag = null;
+  li.style.transform = '';
+  li.classList.remove('dragging');
+  moveSessionEntry(id, to);
+  renderSession();
 }
 
 function startSession() {

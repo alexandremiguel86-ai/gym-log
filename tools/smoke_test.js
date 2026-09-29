@@ -43,6 +43,7 @@ function El(tag, id) {
 }
 El.prototype._classes = function () { return this.className.split(/\s+/).filter(Boolean); };
 El.prototype.appendChild = function (c) { this.children.push(c); return c; };
+El.prototype.setAttribute = function (k, v) { this[k] = String(v); };
 El.prototype.addEventListener = function (t, fn) { (this.listeners[t] = this.listeners[t] || []).push(fn); };
 El.prototype.click = function () {
   var self = this;
@@ -537,6 +538,41 @@ Promise.resolve()
     check('nome volta para portugues', el('form-exercise').textContent !== 'Lat Pulldown — Pronated Grip', el('form-exercise').textContent);
     check('ainda no formulario', vm.runInContext('stack[stack.length - 1]', sandbox) === 'screen-form');
 
+    console.log('\n20. Mudar a ordem com o treino aberto');
+    el('lang-en').click();
+    vm.runInContext('reset("screen-home"); startSession();', sandbox);
+    [['Dumbbell Curl', 'Biceps'], ['Swiss Ball Crunch', 'Core'], ['Figure-8 Drill', 'Tennis Conditioning']]
+      .forEach(function (x) {
+        vm.runInContext('openForm(' + JSON.stringify({ exercise: x[0], group1: x[1], group2: x[1] }) + ');', sandbox);
+        fill('3', '10', '', '');
+        el('save-entry').click();
+      });
+    var names = function () {
+      return JSON.parse(vm.runInContext('JSON.stringify(sessionEntries().map(function (e) { return e.exercise; }))', sandbox));
+    };
+    var ids = JSON.parse(vm.runInContext('JSON.stringify(sessionEntries().map(function (e) { return e.id; }))', sandbox));
+    check('cada linha tem a alca de arrastar', el('entry-list').children.every(function (li) {
+      return li.children[1] && li.children[1].className === 'drag';
+    }));
+    var total = entries().length;
+    vm.runInContext('moveSessionEntry(' + JSON.stringify(ids[2]) + ', 0); renderSession();', sandbox);
+    check('terceiro vai para o topo', names().join('|') === 'Figure-8 Drill|Dumbbell Curl|Swiss Ball Crunch', names().join('|'));
+    check('lista redesenhada na nova ordem',
+      el('entry-list').children[0].textContent.indexOf('Figure-8 Drill') === 0, el('entry-list').children[0].textContent);
+    vm.runInContext('moveSessionEntry(' + JSON.stringify(ids[0]) + ', 99);', sandbox);
+    check('posicao alem do fim vai para o ultimo', names().join('|') === 'Figure-8 Drill|Swiss Ball Crunch|Dumbbell Curl', names().join('|'));
+    check('ordem salva', entries().slice(-3).map(function (e) { return e.exercise; }).join('|') === names().join('|'));
+    check('nenhum registro perdido', entries().length === total, entries().length);
+    var before = posted.length;
+    el('finish').click();
+    return wait().then(function () {
+      var sent = posted.length > before ? posted[posted.length - 1].entries.map(function (e) { return e.exercise; }).slice(-3) : [];
+      check('FINISH envia na nova ordem', sent.join('|') === 'Figure-8 Drill|Swiss Ball Crunch|Dumbbell Curl', sent.join('|'));
+      vm.runInContext('moveSessionEntry(' + JSON.stringify(ids[0]) + ', 0);', sandbox);
+      check('treino finalizado nao reordena', entries().slice(-3)[2].exercise === 'Dumbbell Curl');
+    });
+  })
+  .then(function () {
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
     process.exit(failures ? 1 : 0);
   })
