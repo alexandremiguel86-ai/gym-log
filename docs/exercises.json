@@ -11,12 +11,12 @@
   "Hip Mobility": "Mobilidade de Quadril",
   "Mobility & Recovery": "Mobilidade e Recuperação",
   "Lower Body": "Membros Inferiores",
-  "Hinge": "Dobradiça",
+  "Hinge": "Hinge",
   "Isolation": "Isolamento",
   "Squat/Lunge": "Agachamento/Avanço",
   "Lower Body Mobility": "Mobilidade de Membros Inferiores",
   "Lower Body Stretching": "Alongamento de Membros Inferiores",
-  "Lower Leg": "Perna Inferior",
+  "Lower Leg": "Panturrilha",
   "Rotator Cuff": "Manguito Rotador",
   "Shoulder": "Ombro",
   "Shoulder Physio": "Fisio de Ombro",
@@ -27,7 +27,7 @@
   "Tennis Conditioning": "Condicionamento para Tênis",
   "Activation": "Ativação",
   "Conditioning": "Condicionamento",
-  "Footwork": "Movimentação de Pés",
+  "Footwork": "Footwork",
   "Power": "Potência",
   "Rest": "Descanso",
   "Thoracic Mobility": "Mobilidade Torácica",
@@ -291,6 +291,11 @@
      "pt": "Alongamento de Panturrilha em Pé"
     },
     {
+     "n": "Standing Elevated Hamstring Stretch",
+     "g2": "Lower Body Stretching",
+     "pt": "Alongamento de Isquiotibiais em Pé com Elevação"
+    },
+    {
      "n": "Standing Forward Bend (Hamstring)",
      "g2": "Lower Body Stretching",
      "pt": "Flexão Anterior em Pé (Isquiotibiais)"
@@ -410,6 +415,11 @@
      "pt": "Rotação Externa 90/90 com Band"
     },
     {
+     "n": "Banded 90/90 External Rotation + Shoulder Elevation",
+     "g2": "Shoulder Activation",
+     "pt": "Rotação Externa 90/90 com Band + Elevação de Ombro"
+    },
+    {
      "n": "Banded 90/90 Internal Rotation",
      "g2": "Shoulder Activation",
      "pt": "Rotação Interna 90/90 com Band"
@@ -493,6 +503,11 @@
      "n": "Standing Chest Stretch",
      "g2": "Shoulder Mobility",
      "pt": "Alongamento de Peito em Pé"
+    },
+    {
+     "n": "Standing Shoulder Flexion & Chest Stretch – Hands on Table",
+     "g2": "Shoulder Mobility",
+     "pt": "Flexão de Ombro e Alongamento de Peito em Pé – Mãos na Mesa"
     },
     {
      "n": "Standing Sleeper Stretch",
