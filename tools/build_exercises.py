@@ -1,12 +1,12 @@
 """Gera docs/exercises.json a partir da aba Off_Court de Tennis.xlsm.
 
-Le as colunas H/I/J/K (EXERCISE | GROUP 1 | GROUP 2 | GROUP 0) a partir da
+Le as colunas I/J/K/L (EXERCISE | GROUP 1 | GROUP 2 | GROUP 0) a partir da
 linha 3. GROUP 0 e a categoria do grupo (Gym, Mobility & Recovery, ...), que o
 app usa para separar a tela de grupos em secoes.
 
 Portugues (preenchido pelo botao via translate_pt.py, corrigivel a mao):
-  L    EXERCISE (PT) na linha do exercicio  -> "pt" de cada exercicio
-  N:O  glossario TERM (EN) | TERM (PT)      -> "terms" no topo do JSON
+  M    EXERCISE (PT) na linha do exercicio  -> "pt" de cada exercicio
+  O:P  glossario TERM (EN) | TERM (PT)      -> "terms" no topo do JSON
 Sem traducao, o app mostra o nome em ingles.
 Sem dependencias externas: o .xlsm e um zip com XML dentro.
 
@@ -96,29 +96,29 @@ def main():
     terms = {}
     total = 0
     for n in sorted(rows):
-        if n >= FIRST_ROW and rows[n].get("N") and rows[n].get("O"):
-            terms[rows[n]["N"]] = rows[n]["O"]
+        if n >= FIRST_ROW and rows[n].get("O") and rows[n].get("P"):
+            terms[rows[n]["O"]] = rows[n]["P"]
     for n in sorted(rows):
         if n < FIRST_ROW:
             continue
         cells = rows[n]
-        name = cells.get("H")
-        g1 = cells.get("I")
+        name = cells.get("I")
+        g1 = cells.get("J")
         if not name or not g1:
             continue
-        g2 = cells.get("J") or g1
+        g2 = cells.get("K") or g1
         item = {"n": name, "g2": g2}
-        if cells.get("L"):
-            item["pt"] = cells["L"]
+        if cells.get("M"):
+            item["pt"] = cells["M"]
         else:
             untranslated.append(name)
         groups.setdefault(g1, []).append(item)
-        cat = cells.get("K") or UNKNOWN_CATEGORY
+        cat = cells.get("L") or UNKNOWN_CATEGORY
         counts = categories.setdefault(g1, {})
         counts[cat] = counts.get(cat, 0) + 1
         total += 1
 
-    # Um grupo tem uma categoria so. Se a coluna K divergir dentro do grupo,
+    # Um grupo tem uma categoria so. Se a coluna L divergir dentro do grupo,
     # vale a mais frequente e o build avisa - melhor do que partir o grupo em
     # duas secoes no celular.
     warnings = []
@@ -129,7 +129,7 @@ def main():
         if len(counts) > 1:
             warnings.append(f"AVISO: '{g1}' com GROUP 0 misto {counts} - usando '{best}'")
         if best == UNKNOWN_CATEGORY:
-            warnings.append(f"AVISO: '{g1}' sem GROUP 0 na coluna K - vai para '{UNKNOWN_CATEGORY}'")
+            warnings.append(f"AVISO: '{g1}' sem GROUP 0 na coluna L - vai para '{UNKNOWN_CATEGORY}'")
 
     # Dentro do grupo: por subgrupo, depois por nome.
     ordered = []
@@ -147,7 +147,7 @@ def main():
     if untranslated:
         warnings.append(f"AVISO: {len(untranslated)} exercicio(s) sem portugues em L")
     if missing_terms:
-        warnings.append(f"AVISO: termo(s) sem portugues em N:O: {', '.join(missing_terms)}")
+        warnings.append(f"AVISO: termo(s) sem portugues em O:P: {', '.join(missing_terms)}")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(

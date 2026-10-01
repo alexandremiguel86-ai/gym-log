@@ -27,7 +27,7 @@ se resolve lá, nunca aqui e nunca editando o markdown à mão.
 
 ## 4. `docs/exercises.json` é gerado
 
-Vem de `Off_Court!H:L` + glossário `N:O` via `tools/build_exercises.py`. Editar à mão é
+Vem de `Off_Court!I:M` + glossário `O:P` via `tools/build_exercises.py`. Editar à mão é
 trabalho perdido: o próximo build sobrescreve.
 
 O português (`L`, `N:O`) é preenchido pelo botão só em célula **vazia**; nunca sobrescrever

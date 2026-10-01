@@ -4,7 +4,7 @@ Chamado pelo botao "Update Exercise List" (Module_GymLogButtons) ANTES da
 publicacao. Le o Tennis.xlsm do disco e procura:
 
   - exercicios com H preenchido e L (EXERCISE (PT)) vazio;
-  - valores de GROUP 1/2/0 (I, J, K) que nao estao no glossario N:O, ou estao
+  - valores de GROUP 1/2/0 (J, K, L) que nao estao no glossario O:P, ou estao
     com O (TERM (PT)) vazio.
 
 So isso e traduzido. Uma celula de L ou O ja preenchida nunca entra aqui, e e
@@ -15,8 +15,8 @@ as traducoes que ja existem na planilha como glossario, para manter os mesmos
 termos.
 
 Saida: um arquivo de texto UTF-8, uma traducao por linha, separado por TAB:
-    E<TAB>nome em ingles<TAB>nome em portugues      (exercicio -> coluna L)
-    T<TAB>termo em ingles<TAB>termo em portugues    (grupo -> glossario N:O)
+    E<TAB>nome em ingles<TAB>nome em portugues      (exercicio -> coluna M)
+    T<TAB>termo em ingles<TAB>termo em portugues    (grupo -> glossario O:P)
 O VBA le esse arquivo e escreve so nas celulas vazias.
 
 Falhar aqui nao impede a publicacao: o app mostra o nome em ingles para o que
@@ -65,15 +65,15 @@ def collect(rows):
         if n < b.FIRST_ROW:
             continue
         cells = rows[n]
-        name = cells.get("H")
+        name = cells.get("I")
         if not name:
             continue
-        pt = cells.get("L")
+        pt = cells.get("M")
         if pt:
             known_ex[name] = pt
         elif name not in missing_ex:
             missing_ex.append(name)
-        for col in ("I", "J", "K"):
+        for col in ("J", "K", "L"):
             v = cells.get(col)
             if v and v not in terms_used:
                 terms_used.append(v)
@@ -82,8 +82,8 @@ def collect(rows):
     for n in sorted(rows):
         if n < b.FIRST_ROW:
             continue
-        en = rows[n].get("N")
-        pt = rows[n].get("O")
+        en = rows[n].get("O")
+        pt = rows[n].get("P")
         if en and pt:
             known_terms[en] = pt
     missing_terms = [t for t in terms_used if t not in known_terms]

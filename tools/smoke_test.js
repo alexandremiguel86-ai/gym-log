@@ -157,11 +157,12 @@ function active() {
 }
 function entries() { return JSON.parse(localStorage.getItem('gymlog.entries') || '[]'); }
 function el(id) { return byId[id]; }
-function fill(sets, reps, weight, rpe) {
+function fill(sets, reps, weight, rpe, notes) {
   el('f-sets').value = sets;
   el('f-reps').value = reps;
   el('f-weight').value = weight || '';
   el('f-rpe').value = rpe || '';
+  el('f-notes').value = notes || '';
 }
 /** Botoes de grupo, na ordem da tela: secoes (titulo + grade) em sequencia. */
 function groupButtons() {
@@ -202,7 +203,7 @@ Promise.resolve()
     check('catalogo nao vazio',
       catalog.groups.length > 0 &&
       catalog.groups.every(function (g) { return g.exercises.length > 0; }));
-    check('sem campo de observacao', !byId['f-notes']);
+    check('campo de observacao presente', !!byId['f-notes']);
 
     console.log('\n2. Configuracoes');
     el('s-url').value = 'https://script.google.com/fake/exec';
@@ -233,14 +234,14 @@ Promise.resolve()
     pick('Single-Arm Dumbbell Row').click();
     check('tela de formulario', active() === 'screen-form', active());
     check('sem historico ainda -> chip oculto', el('last-chip').hidden === true);
-    fill('2', '10', '25kg', '7');
+    fill('2', '10', '25kg', '7', 'ultima serie facil');
     el('save-entry').click();
     check('volta para a sessao', active() === 'screen-session', active());
     check('1 registro gravado', entries().length === 1, entries().length);
     check('valores gravados como texto',
       entries()[0].sets === '2' && entries()[0].weight === '25kg');
     check('group1/group2 preenchidos', entries()[0].group1 === 'Back');
-    check('notes vai vazio (coluna mantida no Sheets)', entries()[0].notes === '');
+    check('notes gravado (vai para Off_Court!G)', entries()[0].notes === 'ultima serie facil', entries()[0].notes);
   })
   .then(function () { return wait(); })
   .then(function () {

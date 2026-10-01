@@ -116,6 +116,7 @@ var STRINGS = {
     'l-reps': 'Reps / Time',
     'l-weight': 'Weight / Load',
     'l-rpe': 'RPE',
+    'l-notes': 'Notes',
     'save-entry': 'SAVE',
     'delete-entry': 'DELETE',
     'settings-intro': 'Paste the Apps Script Web App URL and the token here. They are stored only on this device and never go to the repository.',
@@ -130,7 +131,8 @@ var STRINGS = {
     'ph-sets': 'e.g. 3',
     'ph-reps': 'e.g. 10 or 30s',
     'ph-weight': 'e.g. 10kg',
-    'ph-rpe': 'e.g. 7'
+    'ph-rpe': 'e.g. 7',
+    'ph-notes': 'e.g. last set felt easy'
   },
   pt: {
     saveError: 'ERRO: nao foi possivel salvar neste aparelho',
@@ -193,6 +195,7 @@ var STRINGS = {
     'l-reps': 'Reps / Tempo',
     'l-weight': 'Peso / Carga',
     'l-rpe': 'RPE',
+    'l-notes': 'Observação',
     'save-entry': 'SALVAR',
     'delete-entry': 'EXCLUIR',
     'settings-intro': 'Cole aqui a URL do Web App do Apps Script e o token. Ficam salvos só neste aparelho e nunca vão para o repositório.',
@@ -207,7 +210,8 @@ var STRINGS = {
     'ph-sets': 'ex.: 3',
     'ph-reps': 'ex.: 10 ou 30s',
     'ph-weight': 'ex.: 10kg',
-    'ph-rpe': 'ex.: 7'
+    'ph-rpe': 'ex.: 7',
+    'ph-notes': 'ex.: última série fácil'
   }
 };
 
@@ -231,11 +235,11 @@ function plural(n, word) {
 // tem o texto num <span id="l-..."> para nao apagar o campo.
 var STATIC_TEXT = ['start', 'open-history', 'open-settings', 'entry-empty', 'add-exercise',
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-sets',
-  'l-reps', 'l-weight', 'l-rpe', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
+  'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
 var STATIC_PLACEHOLDER = {
   search: 'ph-search', 'f-sets': 'ph-sets', 'f-reps': 'ph-reps',
-  'f-weight': 'ph-weight', 'f-rpe': 'ph-rpe'
+  'f-weight': 'ph-weight', 'f-rpe': 'ph-rpe', 'f-notes': 'ph-notes'
 };
 
 function applyStaticText() {
@@ -248,7 +252,7 @@ function applyStaticText() {
   $('lang-en').className = settings.lang === 'en' ? 'active' : '';
 }
 
-// Nomes vindos da planilha: L (exercicio) e N:O (grupos). Sem traducao, ou
+// Nomes vindos da planilha: M (exercicio) e O:P (grupos). Sem traducao, ou
 // exercicio digitado a mao, fica o ingles.
 var ptNames = {};
 
@@ -554,7 +558,7 @@ function openWorkout(w) {
     name.textContent = exLabel(e.exercise);
     var meta = document.createElement('span');
     meta.className = 'meta';
-    meta.textContent = [termLabel(e.group1), summarize(e)].filter(Boolean).join(' - ');
+    meta.textContent = [termLabel(e.group1), summarize(e), e.notes].filter(Boolean).join(' - ');
     li.appendChild(name);
     li.appendChild(meta);
     paintCategory(li, e.group1);
@@ -588,7 +592,7 @@ function renderSession() {
     name.textContent = exLabel(e.exercise);
     var meta = document.createElement('span');
     meta.className = 'meta';
-    meta.textContent = [termLabel(e.group1), summarize(e)].filter(Boolean).join(' - ');
+    meta.textContent = [termLabel(e.group1), summarize(e), e.notes].filter(Boolean).join(' - ');
     btn.appendChild(name);
     btn.appendChild(meta);
     btn.addEventListener('click', function () { openForm(e); });
@@ -924,6 +928,7 @@ function openForm(entry) {
     $('f-reps').value = entry.reps || '';
     $('f-weight').value = entry.weight || '';
     $('f-rpe').value = entry.rpe || '';
+    $('f-notes').value = entry.notes || '';
     $('last-chip').hidden = true;
   } else {
     // Campos de hoje comecam vazios: valor ja escrito pareceria ja registrado.
@@ -933,6 +938,7 @@ function openForm(entry) {
     $('f-reps').value = '';
     $('f-weight').value = '';
     $('f-rpe').value = '';
+    $('f-notes').value = '';
     $('last-chip').hidden = !last;
     if (last) lastChipText(last);
   }
@@ -1010,6 +1016,7 @@ function saveEntry() {
     editing.reps = reps;
     editing.weight = $('f-weight').value.trim();
     editing.rpe = $('f-rpe').value.trim();
+    editing.notes = $('f-notes').value.trim();
   } else {
     entries.push({
       id: uid(),
@@ -1022,9 +1029,8 @@ function saveEntry() {
       reps: reps,
       weight: $('f-weight').value.trim(),
       rpe: $('f-rpe').value.trim(),
-      // Sem campo na tela; a coluna continua no Sheets porque o import do
-      // Excel le as colunas do CSV por posicao.
-      notes: '',
+      // Vai para Off_Court!G (OBS) e dali para o #06, no fim do exercicio.
+      notes: $('f-notes').value.trim(),
       custom: !!draft.custom,
       synced: false
     });

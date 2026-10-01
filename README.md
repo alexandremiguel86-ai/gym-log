@@ -59,10 +59,10 @@ As legendas são escolha dele e podem mudar; o que identifica cada botão é a m
 |---|---|
 | `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) |
 | `UpdateOffCourtLog` | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
-| `PublishExerciseList` | traduz o que é novo (L, N:O) e publica a lista de `H:L` no app |
+| `PublishExerciseList` | traduz o que é novo (M, O:P) e publica a lista de `I:M` no app |
 
 Há também um **Filter List**, feito por ele, que reordena a lista de referência em ordem
-alfabética. Não faz parte deste projeto, mas ordena `H2:L`: se a lista ganhar outra
+alfabética. Não faz parte deste projeto, mas ordena `I2:M`: se a lista ganhar outra
 coluna, o intervalo dele precisa crescer junto, senão a coluna nova descola das linhas.
 
 Fluxo normal depois de um treino: importar → atualizar o log.
@@ -90,14 +90,14 @@ Os nomes em português moram na `Off_Court`:
 
 | Onde | O quê |
 |---|---|
-| `L` (EXERCISE (PT)) | nome do exercício, na mesma linha dele |
-| `N:O` (TERM (EN) \| TERM (PT)) | glossário dos GROUP 1, 2 e 0, um termo por linha |
+| `M` (EXERCISE (PT)) | nome do exercício, na mesma linha dele |
+| `O:P` (TERM (EN) \| TERM (PT)) | glossário dos GROUP 1, 2 e 0, um termo por linha |
 
-Você continua editando só `H:K`, em inglês. A cada **Update Exercise List**, o
-`tools/translate_pt.py` procura exercício com `L` vazio e grupo fora do glossário, pede a
+Você continua editando só `I:L`, em inglês. A cada **Update Exercise List**, o
+`tools/translate_pt.py` procura exercício com `M` vazio e grupo fora do glossário, pede a
 tradução ao Claude Code (`claude -p`, usando as traduções que já existem como glossário) e o
 VBA escreve **só nas células vazias**. Uma tradução corrigida à mão nunca é sobrescrita.
-Renomeou um exercício em inglês e quer uma tradução nova? Apague a célula `L` dele.
+Renomeou um exercício em inglês e quer uma tradução nova? Apague a célula `M` dele.
 
 Se a tradução falhar (sem internet, Claude Code deslogado), a publicação segue: o app mostra
 em inglês o que ficou sem português, e o próximo clique tenta de novo. A primeira leva
@@ -264,7 +264,7 @@ stderr *mesmo quando dá certo*. Só o `$LASTEXITCODE` decide sucesso.
 | `tools/smoke_test.js` | Teste do fluxo completo em Node, sem navegador |
 | `apps_script/Code.gs` | Recebe os POSTs e escreve no Sheets |
 | `vba/Module_OffCourtImport.bas` | Sheets → `Off_Court!B2:G` |
-| `vba/Module_GymLogButtons.bas` | Traduz (preenche `L` / `N:O` vazios) e publica a lista |
+| `vba/Module_GymLogButtons.bas` | Traduz (preenche `M` / `O:P` vazios) e publica a lista |
 | `config.local.txt` | **Não versionado.** URL do CSV publicado |
 
 ## Modelo de dados
@@ -282,9 +282,10 @@ reais na sua planilha. Validar como número quebraria a compatibilidade com o ma
 `id` é um UUID gerado no celular; o Apps Script deduplica por ele, então reenvio depois de
 falha de rede nunca gera linha duplicada.
 
-`notes` vai para a coluna `G` do `Off_Court`, que está livre — o `UpdateOffCourtLog` lê
-apenas `B:F`. O app não tem mais campo de observação e envia `notes` sempre vazio; a coluna
-continua porque o `ImportGymLog` lê o CSV por posição.
+`notes` é o campo **Notes / Observação** do formulário. Vai para a coluna `G` (OBS) do
+`Off_Court`, e o `UpdateOffCourtLog` o leva para o `#06` no fim do exercício
+(`Name, 3×10 — *obs*`). `H` é a coluna vazia que separa o treino da lista de referência,
+que começa em `I`.
 
 ## Limitações conhecidas
 

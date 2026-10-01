@@ -9,9 +9,9 @@ Option Explicit
 '
 ' Escreve:  Off_Court!B2            data da sessao
 '           Off_Court!B5:F<n>       Exercise | Sets | Reps/Time | Weight/Hold | RPE
-'           Off_Court!G5:G<n>       Notes (coluna livre; o Sync le so B:F)
+'           Off_Court!G5:G<n>       OBS (o Sync leva para o #06 no fim do exercicio)
 '
-' NAO toca em H:J (a lista de referencia) nem no markdown. Depois de rodar
+' NAO toca em I:K (a lista de referencia) nem no markdown. Depois de rodar
 ' este import, rode UpdateOffCourtLog como sempre.
 '
 ' Setup (uma vez):
@@ -154,7 +154,7 @@ Public Sub ImportGymLog()
     msg = n & " exercicio(s) importado(s) para " & SHEET_NAME & "."
     If Len(unknown) > 0 Then
         msg = msg & vbCrLf & vbCrLf & _
-              "Fora da lista de referencia (H:J) - o Sync vai marcar como 'Other':" & _
+              "Fora da lista de referencia (I:K) - o Sync vai marcar como 'Other':" & _
               vbCrLf & unknown
     End If
     msg = msg & vbCrLf & vbCrLf & "Agora rode UpdateOffCourtLog."
@@ -195,11 +195,11 @@ Private Sub ClearEntries(ws As Worksheet)
     End If
 End Sub
 
-'--- Avisa sobre exercicios que nao estao em H:J, porque o Sync os joga
+'--- Avisa sobre exercicios que nao estao em I:K, porque o Sync os joga
 '--- no grupo "Other" em vez de falhar - o erro passaria despercebido.
 Private Function UnknownExercises(ws As Worksheet, n As Long) As String
     Dim refLast As Long
-    refLast = ws.Cells(ws.Rows.Count, "H").End(xlUp).Row
+    refLast = ws.Cells(ws.Rows.Count, "I").End(xlUp).Row
 
     Dim known As Object
     Set known = CreateObject("Scripting.Dictionary")
@@ -207,7 +207,7 @@ Private Function UnknownExercises(ws As Worksheet, n As Long) As String
 
     Dim r As Long, nm As String
     For r = 3 To refLast
-        nm = Trim$(CStr(ws.Cells(r, "H").Value & ""))
+        nm = Trim$(CStr(ws.Cells(r, "I").Value & ""))
         If Len(nm) > 0 Then known(nm) = True
     Next r
 

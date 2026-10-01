@@ -4,16 +4,16 @@ Option Explicit
 '=======================================================================
 ' Module_GymLogButtons
 '
-' Publica a lista de exercicios de Off_Court!H:K no app do celular.
+' Publica a lista de exercicios de Off_Court!I:L no app do celular.
 '
 ' Fluxo: salva esta planilha -> tools\translate_pt.py traduz o que ainda
 '        nao tem portugues -> FillPortuguese escreve nas celulas VAZIAS de
-'        L e N:O -> salva -> tools\publish_exercises.ps1 (build_exercises.py
+'        M e O:P -> salva -> tools\publish_exercises.ps1 (build_exercises.py
 '        regera docs\exercises.json -> git commit + push -> GitHub Pages).
 '
-' Portugues:  L    = EXERCISE (PT), na linha do exercicio
-'             N:O  = glossario TERM (EN) | TERM (PT) dos GROUP 1/2/0
-' Uma celula de L ou O ja preenchida nunca e sobrescrita: e assim que uma
+' Portugues:  M    = EXERCISE (PT), na linha do exercicio
+'             O:P  = glossario TERM (EN) | TERM (PT) dos GROUP 1/2/0
+' Uma celula de M ou P ja preenchida nunca e sobrescrita: e assim que uma
 ' correcao feita a mao fica para sempre. Para retraduzir, apague a celula.
 '
 ' O botao "Import Gym Log" chama ImportGymLog, que vive em
@@ -26,10 +26,10 @@ Private Const TRANSLATE_SCRIPT As String = "tools\translate_pt.py"
 
 Private Const SHEET_NAME As String = "Off_Court"
 Private Const FIRST_ROW As Long = 3
-Private Const COL_EN As String = "H"
-Private Const COL_PT As String = "L"
-Private Const COL_TERM_EN As String = "N"
-Private Const COL_TERM_PT As String = "O"
+Private Const COL_EN As String = "I"
+Private Const COL_PT As String = "M"
+Private Const COL_TERM_EN As String = "O"
+Private Const COL_TERM_PT As String = "P"
 
 
 '=======================================================================
@@ -123,8 +123,8 @@ End Sub
 ' Portugues
 '
 ' Le o arquivo gerado por translate_pt.py (UTF-8, separado por TAB):
-'     E <TAB> nome em ingles <TAB> nome em portugues    -> coluna L
-'     T <TAB> termo em ingles <TAB> termo em portugues  -> glossario N:O
+'     E <TAB> nome em ingles <TAB> nome em portugues    -> coluna M
+'     T <TAB> termo em ingles <TAB> termo em portugues  -> glossario O:P
 ' e escreve SO onde a celula esta vazia. E publica para poder ser chamada
 ' tambem por script, sem MsgBox.
 '=======================================================================
@@ -180,8 +180,8 @@ Public Function FillPortuguese(tsvPath As String) As String
         End If
     Next i
 
-    FillPortuguese = "Planilha: " & nEx & " nome(s) em L e " & nTerm & _
-                     " termo(s) em N:O preenchidos."
+    FillPortuguese = "Planilha: " & nEx & " nome(s) em M e " & nTerm & _
+                     " termo(s) em O:P preenchidos."
 End Function
 
 
