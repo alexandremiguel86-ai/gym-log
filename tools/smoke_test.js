@@ -241,6 +241,7 @@ Promise.resolve()
     check('valores gravados como texto',
       entries()[0].sets === '2' && entries()[0].weight === '25kg');
     check('group1/group2 preenchidos', entries()[0].group1 === 'Back');
+    check('group0 = categoria do grupo', entries()[0].group0 === 'Gym', entries()[0].group0);
     check('notes gravado (vai para Off_Court!G)', entries()[0].notes === 'ultima serie facil', entries()[0].notes);
   })
   .then(function () { return wait(); })
@@ -389,14 +390,50 @@ Promise.resolve()
     check('select com todos os grupos',
       el('f-group').children.length === catalog.groups.length,
       el('f-group').children.length + ' vs ' + catalog.groups.length);
+    check('abre no grupo de onde veio', el('f-group').value === 'Back', el('f-group').value);
+    check('group0 ja vem com a categoria do grupo', el('f-group0').value === 'Gym', el('f-group0').value);
     el('f-name').value = 'Landmine Press';
     el('f-group').value = 'Shoulder';
+    el('f-group').dispatch('change');
     fill('3', '8', '15kg', '7');
     el('save-entry').click();
     var last = entries()[entries().length - 1];
     check('exercicio custom gravado', last.exercise === 'Landmine Press', last.exercise);
     check('marcado como custom', last.custom === true);
     check('grupo escolhido da lista', last.group1 === 'Shoulder', last.group1);
+    check('group2 acompanha o group1', last.group2 === 'Shoulder', last.group2);
+
+    console.log('\n12b. Os tres grupos do exercicio digitado');
+    el('add-exercise').click();
+    group('Back').click();
+    el('custom-exercise').click();
+    el('f-group').value = 'Shoulder Physio';
+    el('f-group').dispatch('change');
+    var subs = el('f-group2').children.map(function (o) { return o.value; });
+    check('group2 so com subgrupos do group1',
+      subs.join('|') === 'Shoulder Activation|Shoulder Mobility|Shoulder Strengthening|Shoulder Therapy', subs.join('|'));
+    check('group0 troca junto', el('f-group0').value === 'Mobility & Recovery', el('f-group0').value);
+    check('group0 oferece todas as categorias',
+      el('f-group0').children.length === 4, el('f-group0').children.length);
+    el('f-name').value = 'Band Pull-Apart';
+    el('f-group2').value = 'Shoulder Activation';
+    el('f-group0').value = 'Gym';
+    fill('2', '15', '', '');
+    el('save-entry').click();
+    last = entries()[entries().length - 1];
+    check('grava os tres grupos',
+      last.group1 === 'Shoulder Physio' && last.group2 === 'Shoulder Activation' && last.group0 === 'Gym',
+      [last.group1, last.group2, last.group0].join(' / '));
+    var rowsNow = el('entry-list').children;
+    rowsNow[rowsNow.length - 1].children[0].click();
+    check('editar reabre com os tres grupos',
+      el('f-group').value === 'Shoulder Physio' && el('f-group2').value === 'Shoulder Activation' &&
+      el('f-group0').value === 'Gym',
+      [el('f-group').value, el('f-group2').value, el('f-group0').value].join(' / '));
+    vm.runInContext('backToSession();', sandbox);
+    vm.runInContext('openForm({ id: "velho", custom: true, exercise: "X", group1: "Shoulder", group2: "Fora" });', sandbox);
+    check('group2 fora do catalogo nao some', el('f-group2').value === 'Fora', el('f-group2').value);
+    vm.runInContext('backToSession();', sandbox);
 
     console.log('\n13. Validacao');
     el('add-exercise').click();
@@ -423,6 +460,7 @@ Promise.resolve()
     console.log('\n15. Descartar o treino aberto');
     el('resume').click();
     var n = entries().length;
+    var inSession = vm.runInContext('sessionEntries().length', sandbox);
     confirmAnswer = false;
     el('discard').click();
     check('cancelar mantem o treino', active() === 'screen-session' && entries().length === n);
@@ -430,7 +468,7 @@ Promise.resolve()
     el('discard').click();
     check('volta para o Inicio', active() === 'screen-home', active());
     check('sessao encerrada', localStorage.getItem('gymlog.session') === null);
-    check('exercicios do treino apagados', entries().length === n - 1, entries().length);
+    check('exercicios do treino apagados', entries().length === n - inSession, entries().length);
     check('nenhum registro de Landmine Press',
       entries().every(function (e) { return e.exercise !== 'Landmine Press'; }));
     return wait();

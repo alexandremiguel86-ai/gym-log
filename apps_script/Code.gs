@@ -25,9 +25,12 @@
 
 var SHEET_NAME = 'LOG';
 
+// group0 veio depois e fica no fim de proposito: as linhas antigas e o
+// ImportGymLog continuam lendo as outras colunas nas mesmas posicoes.
 var HEADERS = [
   'id', 'synced_at', 'session_id', 'date', 'exercise',
-  'group1', 'group2', 'sets', 'reps', 'weight', 'rpe', 'notes', 'custom'
+  'group1', 'group2', 'sets', 'reps', 'weight', 'rpe', 'notes', 'custom',
+  'group0'
 ];
 
 function setup() {
@@ -62,6 +65,9 @@ function getSheet_() {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
+  } else if (sheet.getRange(1, HEADERS.length).getValue() !== HEADERS[HEADERS.length - 1]) {
+    // Aba criada por uma versao com menos colunas: completa o cabecalho.
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
   }
   // Colunas de texto puro. Sem isso o Sheets converte "10-12" em data e
   // "20kg + Bar" continua texto mas "3" vira numero - o Excel precisa do
@@ -128,7 +134,8 @@ function doPost(e) {
           str_(entry.weight),
           str_(entry.rpe),
           str_(entry.notes),
-          entry.custom ? 'TRUE' : ''
+          entry.custom ? 'TRUE' : '',
+          str_(entry.group0)
         ]);
       }
 

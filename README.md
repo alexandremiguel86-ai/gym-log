@@ -57,7 +57,7 @@ As legendas são escolha dele e podem mudar; o que identifica cada botão é a m
 
 | Macro | O quê |
 |---|---|
-| `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) |
+| `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) e acrescenta a `I:L` os exercícios novos digitados no app |
 | `UpdateOffCourtLog` | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
 | `PublishExerciseList` | traduz o que é novo (M, O:P) e publica a lista de `I:M` no app |
 
@@ -71,10 +71,19 @@ Fluxo normal depois de um treino: importar → atualizar o log.
 
 ### Adicionou um exercício novo
 
-Digite nas colunas `H` (nome), `I` (GROUP 1), `J` (GROUP 2) e `K` (GROUP 0: `Gym`,
-`Gym - Lower Body/Core`, `Mobility & Recovery` ou `Conditioning`) da `Off_Court`, e clique em
-**Update Exercise List**. Ele salva a planilha, regera o JSON, e só faz commit+push se a
-lista realmente mudou. Depois **feche e reabra o app no iPhone**.
+**Pelo celular (o caminho normal):** *"Other exercise (type it)"* → nome em inglês +
+**Group 1**, **Group 2** e **Group 0**. O Group 2 só oferece os subgrupos do Group 1
+escolhido, e o Group 0 já vem com a categoria dele (dá para trocar). No **Import Gym Log**,
+todo exercício digitado assim que ainda não está em `I` ganha uma linha no fim de `I:L` da
+`Off_Court`, com os três grupos; o aviso final lista o que entrou. Confira o nome e clique em
+**Update Exercise List** para traduzir (`M`) e publicar no app.
+
+**Pela planilha:** digite nas colunas `I` (nome), `J` (GROUP 1), `K` (GROUP 2) e `L` (GROUP
+0: `Gym`, `Gym - Lower Body/Core`, `Mobility & Recovery` ou `Conditioning`) e clique em
+**Update Exercise List**.
+
+O **Update Exercise List** salva a planilha, regera o JSON, e só faz commit+push se a lista
+realmente mudou. Depois **feche e reabra o app no iPhone**.
 
 O GROUP 0 separa a tela de grupos do app em seções coloridas (verde, roxo, azul, laranja). Um
 grupo sem GROUP 0 aparece numa seção cinza "Other", e o build avisa. Uma categoria nova
@@ -103,10 +112,11 @@ Se a tradução falhar (sem internet, Claude Code deslogado), a publicação seg
 em inglês o que ficou sem português, e o próximo clique tenta de novo. A primeira leva
 (116 exercícios) levou ~2 min; depois só vai o que é novo.
 
-No celular, a opção *"Other exercise (type it)"* aceita um nome livre (o grupo continua
-obrigatoriamente da lista). Esses registros vão para o Sheets com `custom = TRUE`, e o
-**Import Gym Log** avisa quais não estão na lista de referência — o `UpdateOffCourtLog`
-jogaria esses no grupo "Other".
+No celular, a opção *"Other exercise (type it)"* aceita um nome livre (os grupos continuam
+obrigatoriamente da lista). Esses registros vão para o Sheets com `custom = TRUE`, e é por
+essa marca que o **Import Gym Log** os acrescenta a `I:L`. Um nome fora da lista **sem** essa
+marca (exercício do catálogo renomeado depois do treino) não é recriado — só aparece no
+aviso, porque o `UpdateOffCourtLog` o jogaria no grupo "Other".
 
 ### Offline
 
@@ -263,7 +273,7 @@ stderr *mesmo quando dá certo*. Só o `$LASTEXITCODE` decide sucesso.
 | `tools/make_icons.py` | Gera os ícones (roda uma vez só) |
 | `tools/smoke_test.js` | Teste do fluxo completo em Node, sem navegador |
 | `apps_script/Code.gs` | Recebe os POSTs e escreve no Sheets |
-| `vba/Module_OffCourtImport.bas` | Sheets → `Off_Court!B2:G` |
+| `vba/Module_OffCourtImport.bas` | Sheets → `Off_Court!B2:G`, e exercício novo do app → fim de `I:L` |
 | `vba/Module_GymLogButtons.bas` | Traduz (preenche `M` / `O:P` vazios) e publica a lista |
 | `config.local.txt` | **Não versionado.** URL do CSV publicado |
 
@@ -272,8 +282,11 @@ stderr *mesmo quando dá certo*. Só o `$LASTEXITCODE` decide sucesso.
 Uma linha por exercício — igual ao `Off_Court`, não uma linha por série.
 
 ```
-id | synced_at | session_id | date | exercise | group1 | group2 | sets | reps | weight | rpe | notes | custom
+id | synced_at | session_id | date | exercise | group1 | group2 | sets | reps | weight | rpe | notes | custom | group0
 ```
+
+`group0` veio depois e por isso fica no fim; nas linhas anteriores a ele a coluna é vazia, e o
+**Import Gym Log** usa a categoria do GROUP 1 na lista.
 
 `sets`, `reps` e `weight` são **texto**, não número: `"40s"` e `"20kg + Bar"` são valores
 reais na sua planilha. Validar como número quebraria a compatibilidade com o macro. O

@@ -10,9 +10,14 @@ Option Explicit
 ' Escreve:  Off_Court!B2            data da sessao
 '           Off_Court!B5:F<n>       Exercise | Sets | Reps/Time | Weight/Hold | RPE
 '           Off_Court!G5:G<n>       OBS (o Sync leva para o #06 no fim do exercicio)
+'           Off_Court!I:L           so linhas NOVAS no fim da lista de referencia:
+'                                   exercicio digitado no app ("Other exercise",
+'                                   custom = TRUE) que ainda nao esta em I.
+'                                   M (portugues) fica vazio para o
+'                                   PublishExerciseList traduzir.
 '
-' NAO toca em I:K (a lista de referencia) nem no markdown. Depois de rodar
-' este import, rode UpdateOffCourtLog como sempre.
+' Nunca altera nem apaga linha que ja existe na lista, e nao toca no markdown.
+' Depois de rodar este import, rode UpdateOffCourtLog como sempre.
 '
 ' Setup (uma vez):
 '   No Google Sheets:  File > Share > Publish to web
@@ -29,18 +34,26 @@ Private Const CONFIG_FILE As String = "D:\ALEXANDRE\CLAUDE\GYM_LOG_APP\config.lo
 Private Const SHEET_NAME As String = "Off_Court"
 Private Const FIRST_DATA_ROW As Long = 5
 
+' Lista de referencia: EXERCISE | GROUP 1 | GROUP 2 | GROUP 0 | EXERCISE (PT)
+Private Const REF_FIRST_ROW As Long = 3
+
 ' Indices das colunas do CSV, 0-based, na ordem definida em Code.gs:
 ' id | synced_at | session_id | date | exercise | group1 | group2 |
-' sets | reps | weight | rpe | notes | custom
+' sets | reps | weight | rpe | notes | custom | group0
+' Linhas gravadas antes de group0 existir chegam com ele vazio.
 Private Const C_SESSION As Long = 2
 Private Const C_DATE As Long = 3
 Private Const C_EXERCISE As Long = 4
+Private Const C_GROUP1 As Long = 5
+Private Const C_GROUP2 As Long = 6
 Private Const C_SETS As Long = 7
 Private Const C_REPS As Long = 8
 Private Const C_WEIGHT As Long = 9
 Private Const C_RPE As Long = 10
 Private Const C_NOTES As Long = 11
-Private Const COL_COUNT As Long = 13
+Private Const C_CUSTOM As Long = 12
+Private Const C_GROUP0 As Long = 13
+Private Const COL_COUNT As Long = 14
 
 
 '=======================================================================
@@ -145,16 +158,22 @@ Public Sub ImportGymLog()
     ws.Range("B2").Value = DateSerial( _
         CLng(Left$(answer, 4)), CLng(Mid$(answer, 6, 2)), CLng(Mid$(answer, 9, 2)))
 
-    Application.ScreenUpdating = True
+    Dim added As String, unknown As String
+    AddNewExercises ws, rows, picked, n, added, unknown
 
-    Dim unknown As String
-    unknown = UnknownExercises(ws, n)
+    Application.ScreenUpdating = True
 
     Dim msg As String
     msg = n & " exercicio(s) importado(s) para " & SHEET_NAME & "."
+    If Len(added) > 0 Then
+        msg = msg & vbCrLf & vbCrLf & _
+              "Exercicio(s) novo(s) acrescentado(s) a lista (I:L):" & vbCrLf & added & _
+              "Confira o nome em ingles e clique em Update Exercise List " & _
+              "para traduzir e publicar no app."
+    End If
     If Len(unknown) > 0 Then
         msg = msg & vbCrLf & vbCrLf & _
-              "Fora da lista de referencia (I:K) - o Sync vai marcar como 'Other':" & _
+              "Fora da lista de referencia (I:L) - o Sync vai marcar como 'Other':" & _
               vbCrLf & unknown
     End If
     msg = msg & vbCrLf & vbCrLf & "Agora rode UpdateOffCourtLog."
@@ -195,31 +214,71 @@ Private Sub ClearEntries(ws As Worksheet)
     End If
 End Sub
 
-'--- Avisa sobre exercicios que nao estao em I:K, porque o Sync os joga
-'--- no grupo "Other" em vez de falhar - o erro passaria despercebido.
-Private Function UnknownExercises(ws As Worksheet, n As Long) As String
+'--- Exercicio importado que nao esta em I:
+'---   custom = TRUE  -> foi digitado no app de proposito: ganha uma linha no fim
+'---                     de I:L, com os grupos escolhidos no app. Sem GROUP 0
+'---                     (app ou Apps Script antigos), usa o do GROUP 1 na lista.
+'---   senao          -> volta em `unknown`, so como aviso. E nome do catalogo que
+'---                     mudou depois do treino; recriar o nome velho na lista
+'---                     desfaria a renomeacao. O Sync o joga em "Other".
+'--- Linha copiada da ultima da lista para herdar a formatacao; M fica vazio.
+Private Sub AddNewExercises(ws As Worksheet, rows() As Variant, picked() As Long, _
+                            n As Long, ByRef added As String, ByRef unknown As String)
     Dim refLast As Long
     refLast = ws.Cells(ws.Rows.Count, "I").End(xlUp).Row
 
-    Dim known As Object
+    Dim known As Object, categoryOf As Object
     Set known = CreateObject("Scripting.Dictionary")
     known.CompareMode = 1                      ' TextCompare
+    Set categoryOf = CreateObject("Scripting.Dictionary")
+    categoryOf.CompareMode = 1
 
-    Dim r As Long, nm As String
-    For r = 3 To refLast
+    Dim r As Long, nm As String, g0 As String, g1 As String, g2 As String
+    For r = REF_FIRST_ROW To refLast
         nm = Trim$(CStr(ws.Cells(r, "I").Value & ""))
         If Len(nm) > 0 Then known(nm) = True
+        g1 = Trim$(CStr(ws.Cells(r, "J").Value & ""))
+        g0 = Trim$(CStr(ws.Cells(r, "L").Value & ""))
+        If Len(g1) > 0 And Len(g0) > 0 Then
+            If Not categoryOf.Exists(g1) Then categoryOf(g1) = g0
+        End If
     Next r
 
-    Dim out As String, i As Long
+    Dim i As Long, nextRow As Long
     For i = 0 To n - 1
-        nm = Trim$(CStr(ws.Cells(FIRST_DATA_ROW + i, "B").Value & ""))
-        If Len(nm) > 0 Then
-            If Not known.Exists(nm) Then out = out & "  - " & nm & vbCrLf
+        nm = Trim$(CStr(rows(picked(i))(C_EXERCISE)))
+        If Len(nm) > 0 And Not known.Exists(nm) Then
+            known(nm) = True                   ' o mesmo exercicio duas vezes no treino
+
+            If UCase$(Trim$(CStr(rows(picked(i))(C_CUSTOM)))) = "TRUE" Then
+                g1 = Trim$(CStr(rows(picked(i))(C_GROUP1)))
+                g2 = Trim$(CStr(rows(picked(i))(C_GROUP2)))
+                g0 = Trim$(CStr(rows(picked(i))(C_GROUP0)))
+                If Len(g2) = 0 Then g2 = g1
+                If Len(g0) = 0 And categoryOf.Exists(g1) Then g0 = categoryOf(g1)
+
+                nextRow = refLast + 1
+                If refLast >= REF_FIRST_ROW Then
+                    ws.Range(ws.Cells(refLast, "I"), ws.Cells(refLast, "M")).Copy _
+                        ws.Range(ws.Cells(nextRow, "I"), ws.Cells(nextRow, "M"))
+                    ws.Range(ws.Cells(nextRow, "I"), ws.Cells(nextRow, "M")).ClearContents
+                Else
+                    nextRow = REF_FIRST_ROW
+                End If
+                ws.Cells(nextRow, "I").Value = nm
+                ws.Cells(nextRow, "J").Value = g1
+                ws.Cells(nextRow, "K").Value = g2
+                ws.Cells(nextRow, "L").Value = g0
+                refLast = nextRow
+
+                added = added & "  - " & nm & "  (" & g1 & " / " & g2 & " / " & _
+                        IIf(Len(g0) > 0, g0, "SEM GROUP 0") & ")" & vbCrLf
+            Else
+                unknown = unknown & "  - " & nm & vbCrLf
+            End If
         End If
     Next i
-    UnknownExercises = out
-End Function
+End Sub
 
 
 '=======================================================================

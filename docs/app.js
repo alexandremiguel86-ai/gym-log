@@ -13,7 +13,7 @@
  * o "Last: 3x10 @ 56kg" e a tela Previous Workouts sem precisar de rede.
  *
  * Idioma: ingles ou portugues so muda o que aparece na tela. O que e gravado e
- * enviado ao Sheets e SEMPRE o nome em ingles (exercise/group1/group2), porque
+ * enviado ao Sheets e SEMPRE o nome em ingles (exercise/group0/1/2), porque
  * e ele que o ImportGymLog e o #06_TRAINING_LOG.md esperam.
  */
 
@@ -111,7 +111,9 @@ var STRINGS = {
     'history-empty': 'No finished workouts yet.',
     'custom-exercise': 'Other exercise (type it)',
     'l-name': 'Exercise name',
-    'l-group': 'Group',
+    'l-group': 'Group 1',
+    'l-group2': 'Group 2',
+    'l-group0': 'Group 0 (category)',
     'l-sets': 'Sets',
     'l-reps': 'Reps / Time',
     'l-weight': 'Weight / Load',
@@ -190,7 +192,9 @@ var STRINGS = {
     'history-empty': 'Nenhum treino finalizado ainda.',
     'custom-exercise': 'Outro exercício (digitar)',
     'l-name': 'Nome do exercício',
-    'l-group': 'Grupo',
+    'l-group': 'Grupo 1',
+    'l-group2': 'Grupo 2',
+    'l-group0': 'Grupo 0 (categoria)',
     'l-sets': 'Séries',
     'l-reps': 'Reps / Tempo',
     'l-weight': 'Peso / Carga',
@@ -234,7 +238,7 @@ function plural(n, word) {
 // Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
 // tem o texto num <span id="l-..."> para nao apagar o campo.
 var STATIC_TEXT = ['start', 'open-history', 'open-settings', 'entry-empty', 'add-exercise',
-  'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-sets',
+  'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
 var STATIC_PLACEHOLDER = {
@@ -398,6 +402,29 @@ function loadCatalog() {
 
 function groupNames() {
   return catalog.groups.map(function (g) { return g.name; });
+}
+
+function catalogGroup(name) {
+  return catalog.groups.filter(function (g) { return g.name === name; })[0] || null;
+}
+
+/** GROUP 2 que ja existem dentro de um GROUP 1, na ordem do catalogo. */
+function subgroupNames(group1) {
+  var g = catalogGroup(group1);
+  var out = [];
+  (g ? g.exercises : []).forEach(function (e) {
+    if (out.indexOf(e.g2) === -1) out.push(e.g2);
+  });
+  return out.length ? out : [group1];
+}
+
+/** GROUP 0 conhecidos: os de CATEGORIES primeiro, depois os que so o catalogo tem. */
+function categoryNames() {
+  var out = CATEGORIES.map(function (c) { return c.name; });
+  catalog.groups.forEach(function (g) {
+    if (g.category && out.indexOf(g.category) === -1) out.push(g.category);
+  });
+  return out;
 }
 
 // ---------------------------------------------------------------- historico
@@ -856,7 +883,7 @@ function renderExercises(filter) {
   catalog.groups.forEach(function (g) {
     if (!q && g.name !== currentGroup) return;
     g.exercises.forEach(function (e) {
-      pool.push({ n: e.n, pt: e.pt || '', g1: g.name, g2: e.g2 });
+      pool.push({ n: e.n, pt: e.pt || '', g0: g.category || '', g1: g.name, g2: e.g2 });
     });
   });
   // Busca nos dois idiomas: quem usa em portugues ainda pode digitar "row".
@@ -889,7 +916,7 @@ function renderExercises(filter) {
       btn.appendChild(meta);
     }
     btn.addEventListener('click', function () {
-      openForm({ exercise: e.n, group1: e.g1, group2: e.g2 });
+      openForm({ exercise: e.n, group0: e.g0, group1: e.g1, group2: e.g2 });
     });
     box.appendChild(btn);
   });
@@ -905,13 +932,14 @@ function renderExercises(filter) {
 // ---------------------------------------------------------------- formulario
 
 var editing = null;   // entry existente sendo editada, ou null
-var draft = null;     // {exercise, group1, group2, custom}
+var draft = null;     // {exercise, group0, group1, group2, custom}
 
 function openForm(entry) {
   var isExisting = !!entry.id;
   editing = isExisting ? entry : null;
   draft = {
     exercise: entry.exercise || '',
+    group0: entry.group0 || '',
     group1: entry.group1 || '',
     group2: entry.group2 || '',
     custom: !!entry.custom
@@ -919,7 +947,7 @@ function openForm(entry) {
 
   $('custom-fields').hidden = !draft.custom;
   if (draft.custom) $('f-name').value = draft.exercise;
-  formLabels(draft.group1);
+  formLabels(draft);
 
   $('delete-entry').hidden = !isExisting;
 
@@ -959,20 +987,42 @@ function markReused(on) {
   PREFILL_FIELDS.forEach(function (id) { if ($(id).value) reused[id] = true; });
 }
 
+/** Preenche um <select> com termos da planilha. O valor e o ingles (e o que e
+    gravado); o texto segue o idioma. Um valor escolhido que nao esta na lista
+    (registro antigo, grupo que saiu do catalogo) entra no fim em vez de sumir. */
+function fillSelect(sel, names, selected) {
+  if (selected && names.indexOf(selected) === -1) names = names.concat([selected]);
+  sel.innerHTML = '';
+  names.forEach(function (name) {
+    var opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = termLabel(name);
+    if (name === selected) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.value = selected && names.indexOf(selected) !== -1 ? selected : names[0];
+}
+
+/** Os tres grupos do exercicio digitado, nas colunas J, K e L do Off_Court.
+    GROUP 2 so oferece os subgrupos do GROUP 1 escolhido; GROUP 0 ja vem com a
+    categoria dele, mas da para trocar. */
+function fillGroupSelects(sel) {
+  fillSelect($('f-group'), groupNames(), sel.group1);
+  var g1 = $('f-group').value;
+  fillSelect($('f-group2'), subgroupNames(g1), sel.group2);
+  var g = catalogGroup(g1);
+  fillSelect($('f-group0'), categoryNames(), sel.group0 || (g && g.category) || '');
+}
+
+/** Trocou o GROUP 1: subgrupo e categoria voltam aos dele. */
+function onGroup1Change() {
+  fillGroupSelects({ group1: $('f-group').value });
+}
+
 /** Textos do formulario que dependem do idioma. Nao toca nos campos digitados,
     para a troca de idioma no meio do preenchimento nao apagar nada. */
-function formLabels(selectedGroup) {
-  if (draft.custom) {
-    var sel = $('f-group');
-    sel.innerHTML = '';
-    groupNames().forEach(function (name) {
-      var opt = document.createElement('option');
-      opt.value = name;                 // valor em ingles: e o que e gravado
-      opt.textContent = termLabel(name);
-      if (name === selectedGroup) opt.selected = true;
-      sel.appendChild(opt);
-    });
-  }
+function formLabels(sel) {
+  if (draft.custom) fillGroupSelects(sel);
 
   $('form-exercise').textContent = draft.exercise ? exLabel(draft.exercise) : t('newExercise');
   $('form-group').textContent = draft.group1
@@ -1001,8 +1051,11 @@ function saveEntry() {
   var name = draft.custom ? $('f-name').value.trim() : draft.exercise;
   if (!name) { toast(t('needName')); return; }
 
+  // group0 so importa para exercicio digitado: o ImportGymLog o leva para a
+  // coluna L quando acrescenta o exercicio novo a lista de referencia.
   var group1 = draft.custom ? $('f-group').value : draft.group1;
-  var group2 = draft.custom ? group1 : draft.group2;
+  var group2 = draft.custom ? $('f-group2').value : draft.group2;
+  var group0 = draft.custom ? $('f-group0').value : draft.group0;
 
   var sets = $('f-sets').value.trim();
   var reps = $('f-reps').value.trim();
@@ -1010,6 +1063,7 @@ function saveEntry() {
 
   if (editing) {
     editing.exercise = name;
+    editing.group0 = group0;
     editing.group1 = group1;
     editing.group2 = group2;
     editing.sets = sets;
@@ -1023,6 +1077,7 @@ function saveEntry() {
       session_id: session.id,
       date: session.date,
       exercise: name,
+      group0: group0,
       group1: group1,
       group2: group2,
       sets: sets,
@@ -1087,7 +1142,7 @@ function setLanguage(lang) {
   if (id === 'screen-group') renderGroups();
   if (id === 'screen-exercise') renderExercises($('search').value);
   if (id === 'screen-form') {
-    formLabels($('f-group').value);
+    formLabels({ group1: $('f-group').value, group2: $('f-group2').value, group0: $('f-group0').value });
     var last = !editing && draft.exercise ? lastEntryFor(draft.exercise) : null;
     if (last) lastChipText(last);
   }
@@ -1150,6 +1205,7 @@ $('discard').addEventListener('click', discardSession);
 
 $('search').addEventListener('input', function () { renderExercises(this.value); });
 $('custom-exercise').addEventListener('click', openCustomForm);
+$('f-group').addEventListener('change', onGroup1Change);
 
 $('last-chip').addEventListener('click', function () {
   var last = lastEntryFor(draft.exercise);
