@@ -105,6 +105,11 @@
      "pt": "Rosca com Haltere"
     },
     {
+     "n": "EZ-Bar Curl",
+     "g2": "Biceps",
+     "pt": "Rosca com Barra EZ"
+    },
+    {
      "n": "EZ-Bar Preacher Curl",
      "g2": "Biceps",
      "pt": "Rosca Scott com Barra EZ"
@@ -636,9 +641,9 @@
      "pt": "Agachamento com Salto"
     },
     {
-     "n": "Lateral Lunge (Cossack)",
+     "n": "Lateral Lunge",
      "g2": "Power",
-     "pt": "Avanço Lateral (Cossaco)"
+     "pt": "Avanço Lateral"
     },
     {
      "n": "Lateral/Side Jumps",
