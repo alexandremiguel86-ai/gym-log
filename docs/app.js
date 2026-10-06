@@ -930,14 +930,47 @@ function renderExercises(filter) {
     });
   }
 
+  // Subgrupos (ou grupos, na busca) em secoes. O titulo de cada secao fica
+  // preso sob o topo enquanto a lista rola, para saber sempre em qual se esta;
+  // com mais de uma secao, chips no alto pulam direto para cada uma.
+  var counts = {};
+  var order = [];
+  pool.forEach(function (e) {
+    var sub = q ? e.g1 : e.g2;
+    if (!counts[sub]) { counts[sub] = 0; order.push(sub); }
+    counts[sub]++;
+  });
+  var sectioned = order.length > 1;
+  var heads = {};
+  if (sectioned && !q) {
+    var nav = document.createElement('div');
+    nav.className = 'sub-nav';
+    order.forEach(function (sub) {
+      var chip = document.createElement('button');
+      chip.textContent = termLabel(sub) + ' · ' + counts[sub];
+      chip.addEventListener('click', function () {
+        heads[sub].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      nav.appendChild(chip);
+    });
+    box.appendChild(nav);
+  }
+
   var lastSub = null;
   pool.forEach(function (e) {
     var sub = q ? e.g1 : e.g2;
-    if (sub !== lastSub) {
+    if (sub !== lastSub && (sectioned || q)) {
       lastSub = sub;
       var h = document.createElement('div');
       h.className = 'sub';
-      h.textContent = termLabel(sub);
+      var label = document.createElement('span');
+      label.textContent = termLabel(sub);
+      var count = document.createElement('span');
+      count.className = 'sub-count';
+      count.textContent = counts[sub];
+      h.appendChild(label);
+      h.appendChild(count);
+      heads[sub] = h;
       box.appendChild(h);
     }
     var btn = document.createElement(browsing ? 'div' : 'button');

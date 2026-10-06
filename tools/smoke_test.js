@@ -650,6 +650,22 @@ Promise.resolve()
     check('outro exercicio de volta', el('custom-exercise').hidden === false);
     pick('Single-Arm Dumbbell Row').click();
     check('pelo treino abre o formulario', active() === 'screen-form', active());
+
+    console.log('\n21b. Secoes de subgrupo');
+    var kinds = function () { return el('exercise-list').children.map(function (c) { return c.className; }); };
+    vm.runInContext('openExerciseList("Shoulder Physio");', sandbox);
+    var subs = el('exercise-list').children.filter(function (c) { return c.className === 'sub'; });
+    check('4 secoes', subs.length === 4, subs.length);
+    check('chips no alto', kinds()[0] === 'sub-nav' && el('exercise-list').children[0].children.length === 4);
+    check('titulo com contagem', subs[0].children[1].className === 'sub-count' && Number(subs[0].children[1].textContent) > 0,
+      subs[0].textContent);
+    var total = subs.reduce(function (n, h) { return n + Number(h.children[1].textContent); }, 0);
+    check('contagens somam o grupo', total === kinds().filter(function (k) { return k === 'row-btn'; }).length, total);
+    vm.runInContext('openExerciseList("Back");', sandbox);
+    check('grupo de um subgrupo so: sem secao nem chips',
+      kinds().every(function (k) { return k === 'row-btn'; }), kinds().join(','));
+    vm.runInContext('renderExercises("press");', sandbox);
+    check('busca: secoes por grupo, sem chips', kinds()[0] === 'sub', kinds()[0]);
   })
   .then(function () {
     console.log('\n22. Tema');
