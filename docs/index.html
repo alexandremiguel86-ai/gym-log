@@ -28,11 +28,45 @@
 
   <!-- ---------- HOME ---------- -->
   <section id="screen-home" class="screen">
-    <button id="start" class="big primary">START WORKOUT</button>
-    <button id="resume" class="big" hidden></button>
-    <button id="open-history" class="big ghost">PREVIOUS WORKOUTS</button>
+    <button id="start" class="hero">
+      <span class="hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>
+      </span>
+      <span class="hero-text">
+        <span id="start-label" class="hero-title">Start Workout</span>
+        <span id="start-sub" class="hero-sub"></span>
+      </span>
+      <span class="hero-chevron" aria-hidden="true">&#8250;</span>
+    </button>
+    <button id="resume" class="hero resume" hidden>
+      <span class="hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>
+      </span>
+      <span class="hero-text">
+        <span id="resume-label" class="hero-title">Continue Workout</span>
+        <span id="resume-sub" class="hero-sub"></span>
+      </span>
+      <span class="hero-chevron" aria-hidden="true">&#8250;</span>
+    </button>
+
+    <div class="tiles">
+      <button id="open-history" class="tile">
+        <span class="tile-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/><path d="M12 7.5V12l3 2"/></svg>
+        </span>
+        <span id="open-history-label" class="tile-title">Previous Workouts</span>
+        <span id="history-sub" class="tile-sub"></span>
+      </button>
+      <button id="open-library" class="tile">
+        <span class="tile-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>
+        </span>
+        <span id="open-library-label" class="tile-title">Exercises</span>
+        <span id="library-sub" class="tile-sub"></span>
+      </button>
+    </div>
+
     <div class="spacer"></div>
-    <p id="home-stats" class="muted"></p>
     <button id="open-settings" class="link">Settings</button>
   </section>
 

@@ -125,6 +125,83 @@ main { padding: 16px 14px 120px; }
 .big.danger  { background: transparent; border-color: var(--danger); color: var(--danger); }
 .big.ghost   { background: transparent; }
 
+/* ---------- inicio ---------- */
+
+/* Iniciar/continuar treino e a acao principal: cartao grande, com cor e
+   brilho. Historico e lista de exercicios ficam abaixo, menores e neutros,
+   lado a lado e com o mesmo peso entre si. */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 104px;
+  padding: 20px;
+  text-align: left;
+  border: 0;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #4b8dff 0%, var(--accent) 45%, #1d5fe0 100%);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(47, 125, 255, .35), inset 0 1px 0 rgba(255, 255, 255, .18);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.hero:active { transform: scale(.98); box-shadow: 0 4px 14px rgba(47, 125, 255, .3); }
+.hero.resume {
+  background: linear-gradient(135deg, #45d68e 0%, var(--ok) 45%, #23955b 100%);
+  box-shadow: 0 10px 28px rgba(53, 192, 122, .3), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.hero[hidden] { display: none; }
+
+.hero-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .2);
+}
+.hero-icon svg { margin-left: 3px; }    /* o triangulo parece centrado assim */
+
+.hero-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.hero-title { font-size: 22px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; }
+.hero-sub { font-size: 14px; font-weight: 500; opacity: .85; }
+.hero-chevron { font-size: 34px; font-weight: 300; line-height: 1; opacity: .7; }
+
+.tiles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gap); }
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-height: 112px;
+  padding: 16px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+}
+.tile:active { background: var(--surface-2); }
+.tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 8px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  color: var(--accent);
+}
+.tile-title { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.tile-sub { font-size: 13px; color: var(--muted); }
+
+/* Lista de exercicios so para consulta: linha sem acao, nao parece botao. */
+.row-btn.static { background: transparent; }
+
 .link {
   background: none;
   border: 0;

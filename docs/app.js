@@ -64,9 +64,9 @@ var STRINGS = {
     syncFailed: 'Sync failed: {e}',
     synced: 'Synced ({n})',
     noConnection: 'No connection - kept in queue',
-    continueBtn: 'CONTINUE ({n})',
-    homeStats: '{n} logged on this device',
-    homeEmpty: 'No workouts logged yet.',
+    lastWorkout: 'Last workout: {d}',
+    firstWorkout: 'Log your first session',
+    noneYet: 'None yet',
     pendingTag: '  (pending)',
     confirmEmpty: 'No exercises logged. Discard this workout?',
     confirmFinish: 'Finish workout? {n} will be sent to the spreadsheet.',
@@ -98,11 +98,14 @@ var STRINGS = {
     't-history': 'Previous Workouts',
     't-workout': 'Workout',
     't-group': 'Group',
+    't-library': 'Exercises',
     't-exercise': 'Exercise',
     't-form': 'Entry',
     't-settings': 'Settings',
-    start: 'START WORKOUT',
-    'open-history': 'PREVIOUS WORKOUTS',
+    'start-label': 'Start Workout',
+    'resume-label': 'Continue Workout',
+    'open-history-label': 'Previous Workouts',
+    'open-library-label': 'Exercises',
     'open-settings': 'Settings',
     'entry-empty': 'No exercises logged yet.',
     'add-exercise': '+ ADD EXERCISE',
@@ -145,9 +148,9 @@ var STRINGS = {
     syncFailed: 'Falha no envio: {e}',
     synced: 'Enviado ({n})',
     noConnection: 'Sem conexão - fica na fila',
-    continueBtn: 'CONTINUAR ({n})',
-    homeStats: '{n} registrados neste aparelho',
-    homeEmpty: 'Nenhum treino registrado ainda.',
+    lastWorkout: 'Último treino: {d}',
+    firstWorkout: 'Registre sua primeira sessão',
+    noneYet: 'Nenhum ainda',
     pendingTag: '  (pendente)',
     confirmEmpty: 'Nenhum exercício registrado. Descartar este treino?',
     confirmFinish: 'Finalizar o treino? {n} serão enviados para a planilha.',
@@ -179,11 +182,14 @@ var STRINGS = {
     't-history': 'Treinos Anteriores',
     't-workout': 'Treino',
     't-group': 'Grupo',
+    't-library': 'Exercícios',
     't-exercise': 'Exercício',
     't-form': 'Registro',
     't-settings': 'Configurações',
-    start: 'INICIAR TREINO',
-    'open-history': 'TREINOS ANTERIORES',
+    'start-label': 'Iniciar Treino',
+    'resume-label': 'Continuar Treino',
+    'open-history-label': 'Treinos Anteriores',
+    'open-library-label': 'Exercícios',
     'open-settings': 'Configurações',
     'entry-empty': 'Nenhum exercício registrado ainda.',
     'add-exercise': '+ ADICIONAR EXERCÍCIO',
@@ -237,7 +243,7 @@ function plural(n, word) {
 
 // Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
 // tem o texto num <span id="l-..."> para nao apagar o campo.
-var STATIC_TEXT = ['start', 'open-history', 'open-settings', 'entry-empty', 'add-exercise',
+var STATIC_TEXT = ['start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
@@ -347,7 +353,8 @@ function render(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
   $(id).classList.add('active');
-  $('title').textContent = TITLES[id] ? t(TITLES[id]) : 'Gym Log';
+  var key = id === 'screen-group' && browsing ? 't-library' : TITLES[id];
+  $('title').textContent = key ? t(key) : 'Gym Log';
   $('back').hidden = stack.length <= 1;
   window.scrollTo(0, 0);
 }
@@ -513,12 +520,16 @@ function renderHome() {
   $('resume').hidden = !open;
   if (open) {
     var n = entries.filter(function (e) { return e.session_id === session.id; }).length;
-    $('resume').textContent = t('continueBtn', { n: plural(n, 'exercise') });
+    $('resume-sub').textContent = plural(n, 'exercise') + ' · ' + shortDate(session.date);
   }
-  var total = finishedWorkouts().length;
-  $('home-stats').textContent = total
-    ? t('homeStats', { n: plural(total, 'workout') })
-    : t('homeEmpty');
+  var done = finishedWorkouts();
+  $('start-sub').textContent = done.length
+    ? t('lastWorkout', { d: shortDate(done[0].date) })
+    : t('firstWorkout');
+  $('history-sub').textContent = done.length ? plural(done.length, 'workout') : t('noneYet');
+  var nEx = 0;
+  catalog.groups.forEach(function (g) { nEx += g.exercises.length; });
+  $('library-sub').textContent = plural(nEx, 'exercise');
   refreshBadge();
 }
 
@@ -781,6 +792,23 @@ function discardSession() {
 
 // ---------------------------------------------------------------- grupo
 
+// Lista de exercicios aberta pelo Inicio, so para consultar: mesmas telas de
+// grupo e exercicio, mas tocar num exercicio nao abre o formulario e nao ha
+// "outro exercicio". Pelo "+ ADD EXERCISE" do treino volta a ser false.
+var browsing = false;
+
+function openLibrary() {
+  browsing = true;
+  renderGroups();
+  show('screen-group');
+}
+
+function openGroupPicker() {
+  browsing = false;
+  renderGroups();
+  show('screen-group');
+}
+
 // Ordem e cor das secoes. A categoria de cada grupo vem da coluna K (GROUP 0)
 // do Off_Court via exercises.json; uma categoria nova que nao esteja aqui
 // aparece depois destas, em cinza.
@@ -867,6 +895,7 @@ var currentGroup = null;
 function openExerciseList(groupName) {
   currentGroup = groupName;
   $('search').value = '';
+  $('custom-exercise').hidden = browsing;
   renderExercises('');
   show('screen-exercise');
   $('title').textContent = termLabel(groupName);
@@ -903,8 +932,8 @@ function renderExercises(filter) {
       h.textContent = termLabel(sub);
       box.appendChild(h);
     }
-    var btn = document.createElement('button');
-    btn.className = 'row-btn';
+    var btn = document.createElement(browsing ? 'div' : 'button');
+    btn.className = browsing ? 'row-btn static' : 'row-btn';
     var name = document.createElement('strong');
     name.textContent = exLabel(e.n);
     btn.appendChild(name);
@@ -915,7 +944,7 @@ function renderExercises(filter) {
       meta.textContent = summarize(last) + '  -  ' + shortDate(last.date);
       btn.appendChild(meta);
     }
-    btn.addEventListener('click', function () {
+    if (!browsing) btn.addEventListener('click', function () {
       openForm({ exercise: e.n, group0: e.g0, group1: e.g1, group2: e.g2 });
     });
     box.appendChild(btn);
@@ -1196,10 +1225,11 @@ $('back').addEventListener('click', goBack);
 $('start').addEventListener('click', startSession);
 $('resume').addEventListener('click', function () { renderSession(); show('screen-session'); });
 $('open-history').addEventListener('click', function () { renderHistory(); show('screen-history'); });
+$('open-library').addEventListener('click', openLibrary);
 $('open-settings').addEventListener('click', openSettings);
 $('sync-badge').addEventListener('click', function () { sync(true); });
 
-$('add-exercise').addEventListener('click', function () { renderGroups(); show('screen-group'); });
+$('add-exercise').addEventListener('click', openGroupPicker);
 $('finish').addEventListener('click', finishSession);
 $('discard').addEventListener('click', discardSession);
 

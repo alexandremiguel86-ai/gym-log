@@ -514,7 +514,7 @@ Promise.resolve()
     el('s-lang').dispatch('change');
     check('idioma salvo', JSON.parse(localStorage.getItem('gymlog.settings')).lang === 'pt');
     check('titulo traduzido', el('title').textContent === 'Configurações', el('title').textContent);
-    check('botao traduzido', el('start').textContent === 'INICIAR TREINO', el('start').textContent);
+    check('botao traduzido', el('start-label').textContent === 'Iniciar Treino', el('start-label').textContent);
     check('rotulo traduzido', el('l-sets').textContent === 'Séries', el('l-sets').textContent);
     check('placeholder traduzido', el('search').placeholder === 'Buscar exercício...', el('search').placeholder);
 
@@ -559,12 +559,12 @@ Promise.resolve()
     check('visivel no inicio', el('lang-toggle').hidden === false);
     check('PT marcado', el('lang-pt').className === 'active' && el('lang-en').className === '');
     el('lang-en').click();
-    check('troca para ingles', el('start').textContent === 'START WORKOUT', el('start').textContent);
+    check('troca para ingles', el('start-label').textContent === 'Start Workout', el('start-label').textContent);
     check('EN marcado', el('lang-en').className === 'active');
     check('salvo', JSON.parse(localStorage.getItem('gymlog.settings')).lang === 'en');
     check('select das configuracoes acompanha', el('s-lang').value === 'en');
     el('lang-pt').click();
-    check('volta para portugues', el('start').textContent === 'INICIAR TREINO', el('start').textContent);
+    check('volta para portugues', el('start-label').textContent === 'Iniciar Treino', el('start-label').textContent);
     el('open-history').click();
     check('visivel no historico', el('lang-toggle').hidden === false);
     el('lang-en').click();
@@ -619,6 +619,32 @@ Promise.resolve()
       vm.runInContext('moveSessionEntry(' + JSON.stringify(ids[0]) + ', 0);', sandbox);
       check('treino finalizado nao reordena', entries().slice(-3)[2].exercise === 'Dumbbell Curl');
     });
+  })
+  .then(function () {
+    console.log('\n21. Lista de exercicios so para consulta');
+    vm.runInContext('reset("screen-home"); renderHome();', sandbox);
+    var nEx = catalog.groups.reduce(function (n, g) { return n + g.exercises.length; }, 0);
+    check('contagem no cartao', el('library-sub').textContent === nEx + ' exercises', el('library-sub').textContent);
+    var before = entries().length;
+    el('open-library').click();
+    check('abre os grupos', active() === 'screen-group', active());
+    check('titulo Exercises', el('title').textContent === 'Exercises', el('title').textContent);
+    group('Back').click();
+    check('sem "outro exercicio"', el('custom-exercise').hidden === true);
+    var rowsB = el('exercise-list').children.filter(function (c) { return c.className === 'row-btn static'; });
+    check('linhas so de leitura', rowsB.length > 0, rowsB.length);
+    rowsB[0].click();
+    check('tocar nao abre formulario', active() === 'screen-exercise', active());
+    check('nada gravado', entries().length === before, entries().length);
+    vm.runInContext('goBack(); goBack();', sandbox);
+    check('volta ao inicio', active() === 'screen-home', active());
+    vm.runInContext('startSession();', sandbox);
+    el('add-exercise').click();
+    check('pelo treino o titulo volta a Group', el('title').textContent === 'Group', el('title').textContent);
+    group('Back').click();
+    check('outro exercicio de volta', el('custom-exercise').hidden === false);
+    pick('Single-Arm Dumbbell Row').click();
+    check('pelo treino abre o formulario', active() === 'screen-form', active());
   })
   .then(function () {
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
