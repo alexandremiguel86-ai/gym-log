@@ -12,8 +12,66 @@
   --accent: #2f7dff;
   --danger: #e04f5f;
   --ok: #35c07a;
+  --hero-1: #4b8dff;
+  --hero-2: #1d5fe0;
+  --hero-glow: rgba(47, 125, 255, .35);
+  --accent-soft: rgba(47, 125, 255, .1);
+  --pending-bg: #4a3a12;
+  --pending-fg: #ffc861;
+  --ok-bg: #12351f;
+  --shadow: rgba(0, 0, 0, .5);
   --tap: 60px;
   --gap: 12px;
+  color-scheme: dark;
+}
+
+/* Temas claros. O escuro (acima) continua o padrao. O tema vem de
+   settings.theme e e aplicado no <html data-theme> por um script no <head>,
+   antes de pintar, para nao piscar escuro ao abrir. */
+:root[data-theme="light"] {
+  --bg: #f2f3f6;
+  --surface: #ffffff;
+  --surface-2: #e9ecf1;
+  --line: #d9dde5;
+  --text: #151821;
+  --muted: #5d6677;
+  --placeholder: #aab1bd;
+  --accent: #2f6fed;
+  --danger: #d33a4b;
+  --ok: #1f9d5c;
+  --hero-1: #4c8bff;
+  --hero-2: #1f56d6;
+  --hero-glow: rgba(47, 111, 237, .28);
+  --accent-soft: rgba(47, 111, 237, .08);
+  --pending-bg: #fff0c7;
+  --pending-fg: #8a5800;
+  --ok-bg: #d9f3e5;
+  --shadow: rgba(20, 24, 33, .18);
+  color-scheme: light;
+}
+
+/* Areia: fundo bege quente com destaque terracota, o tema "papel" comum em
+   apps de treino e leitura. Cansa menos que o branco puro. */
+:root[data-theme="sand"] {
+  --bg: #f1ebe0;
+  --surface: #faf6ef;
+  --surface-2: #e8dfcf;
+  --line: #d9cdb8;
+  --text: #2b241c;
+  --muted: #776a58;
+  --placeholder: #b3a68f;
+  --accent: #c25a2c;
+  --danger: #b8323f;
+  --ok: #3f8a4f;
+  --hero-1: #dc7a45;
+  --hero-2: #a8471f;
+  --hero-glow: rgba(194, 90, 44, .28);
+  --accent-soft: rgba(194, 90, 44, .1);
+  --pending-bg: #f6e2b3;
+  --pending-fg: #7d5200;
+  --ok-bg: #dcebd6;
+  --shadow: rgba(60, 40, 20, .18);
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -93,8 +151,63 @@ body {
   background: var(--surface-2);
   color: var(--muted);
 }
-.badge.pending { background: #4a3a12; color: #ffc861; }
-.badge.ok      { background: #12351f; color: var(--ok); }
+.badge.pending { background: var(--pending-bg); color: var(--pending-fg); }
+.badge.ok      { background: var(--ok-bg); color: var(--ok); }
+
+/* Botao de tema, ao lado do PT/EN: so um icone, para caber no topo. */
+.theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px var(--shadow);
+}
+.theme-menu[hidden] { display: none; }
+.theme-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  text-align: left;
+}
+.theme-menu button.active { background: var(--surface-2); font-weight: 600; }
+.swatch {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(128, 128, 128, .45);
+}
+.swatch.dark  { background: #0f1115; }
+.swatch.light { background: #ffffff; }
+.swatch.sand  { background: #efe6d6; }
 
 /* ---------- telas ---------- */
 
@@ -140,12 +253,12 @@ main { padding: 16px 14px 120px; }
   text-align: left;
   border: 0;
   border-radius: 22px;
-  background: linear-gradient(135deg, #4b8dff 0%, var(--accent) 45%, #1d5fe0 100%);
+  background: linear-gradient(135deg, var(--hero-1) 0%, var(--accent) 45%, var(--hero-2) 100%);
   color: #fff;
-  box-shadow: 0 10px 28px rgba(47, 125, 255, .35), inset 0 1px 0 rgba(255, 255, 255, .18);
+  box-shadow: 0 10px 28px var(--hero-glow), inset 0 1px 0 rgba(255, 255, 255, .18);
   transition: transform .12s ease, box-shadow .12s ease;
 }
-.hero:active { transform: scale(.98); box-shadow: 0 4px 14px rgba(47, 125, 255, .3); }
+.hero:active { transform: scale(.98); box-shadow: 0 4px 14px var(--hero-glow); }
 .hero.resume {
   background: linear-gradient(135deg, #45d68e 0%, var(--ok) 45%, #23955b 100%);
   box-shadow: 0 10px 28px rgba(53, 192, 122, .3), inset 0 1px 0 rgba(255, 255, 255, .18);
@@ -230,6 +343,10 @@ main { padding: 16px 14px 120px; }
   color: var(--cat);
 }
 .cat-head:first-child { margin-top: 0; }
+/* As cores das categorias (verde neon, roxo...) foram escolhidas para o fundo
+   escuro; como texto em fundo claro precisam escurecer para serem lidas. */
+:root[data-theme="light"] .cat-head,
+:root[data-theme="sand"] .cat-head { color: color-mix(in srgb, var(--cat) 65%, #000); }
 
 .grid {
   display: grid;
@@ -299,7 +416,7 @@ main { padding: 16px 14px 120px; }
   user-select: none;
 }
 .list li.dragging { position: relative; z-index: 5; }
-.list li.dragging .row-btn { background: var(--surface-2); box-shadow: 0 8px 20px rgba(0, 0, 0, .5); }
+.list li.dragging .row-btn { background: var(--surface-2); box-shadow: 0 8px 20px var(--shadow); }
 .row-btn .meta { display: block; margin-top: 4px; font-size: 14px; color: var(--muted); }
 .row-btn .tag  { font-size: 12px; color: var(--accent); }
 
@@ -343,7 +460,7 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1p
   text-align: left;
   border: 1px dashed var(--accent);
   border-radius: 12px;
-  background: rgba(47, 125, 255, .1);
+  background: var(--accent-soft);
   color: var(--text);
 }
 .chip small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }

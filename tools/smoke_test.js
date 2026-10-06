@@ -47,7 +47,8 @@ El.prototype.setAttribute = function (k, v) { this[k] = String(v); };
 El.prototype.addEventListener = function (t, fn) { (this.listeners[t] = this.listeners[t] || []).push(fn); };
 El.prototype.click = function () {
   var self = this;
-  (this.listeners.click || []).forEach(function (fn) { fn.call(self, {}); });
+  var ev = { target: self, stopPropagation: function () {} };
+  (this.listeners.click || []).forEach(function (fn) { fn.call(self, ev); });
 };
 El.prototype.dispatch = function (type) {
   var self = this;
@@ -85,7 +86,11 @@ var document = {
     return [];
   },
   querySelector: function () { return null; },
-  documentElement: {},
+  documentElement: {
+    attrs: {},
+    setAttribute: function (k, v) { this.attrs[k] = String(v); },
+    removeAttribute: function (k) { delete this.attrs[k]; }
+  },
   createElement: function (tag) { return new El(tag); },
   addEventListener: function () {}
 };
@@ -645,6 +650,27 @@ Promise.resolve()
     check('outro exercicio de volta', el('custom-exercise').hidden === false);
     pick('Single-Arm Dumbbell Row').click();
     check('pelo treino abre o formulario', active() === 'screen-form', active());
+  })
+  .then(function () {
+    console.log('\n22. Tema');
+    var root = document.documentElement;
+    check('escuro por padrao', !root.attrs['data-theme'] && el('theme-dark').className === 'active');
+    el('theme-menu').hidden = true;          // o DOM minimo nao le o atributo hidden do html
+    el('theme-btn').click();
+    check('botao abre o menu', el('theme-menu').hidden === false);
+    el('theme-sand').click();
+    check('aplica areia', root.attrs['data-theme'] === 'sand', root.attrs['data-theme']);
+    check('menu fecha ao escolher', el('theme-menu').hidden === true);
+    check('tema salvo', JSON.parse(localStorage.getItem('gymlog.settings')).theme === 'sand');
+    check('areia marcada', el('theme-sand').className === 'active' && el('theme-dark').className === '');
+    el('theme-light').click();
+    check('aplica claro', root.attrs['data-theme'] === 'light', root.attrs['data-theme']);
+    el('lang-pt').click();
+    check('rotulo em portugues', el('theme-light-label').textContent === 'Claro', el('theme-light-label').textContent);
+    el('lang-en').click();
+    el('theme-dark').click();
+    check('volta ao escuro', !root.attrs['data-theme']);
+    check('url e token continuam salvos', JSON.parse(localStorage.getItem('gymlog.settings')).token === 'TESTTOKEN');
   })
   .then(function () {
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));

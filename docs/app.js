@@ -24,6 +24,7 @@
 var K_ENTRIES = 'gymlog.entries';
 var K_SESSION = 'gymlog.session';
 var K_SETTINGS = 'gymlog.settings';
+var THEMES = ['dark', 'light', 'sand'];
 
 function load(key, fallback) {
   try {
@@ -50,6 +51,7 @@ var entries = load(K_ENTRIES, []);
 var session = load(K_SESSION, null);
 var settings = load(K_SETTINGS, { url: '', token: '' });
 if (settings.lang !== 'pt') settings.lang = 'en';
+if (THEMES.indexOf(settings.theme) === -1) settings.theme = 'dark';
 var catalog = { groups: [] };
 
 // ---------------------------------------------------------------- idioma
@@ -106,6 +108,9 @@ var STRINGS = {
     'resume-label': 'Continue Workout',
     'open-history-label': 'Previous Workouts',
     'open-library-label': 'Exercises',
+    'theme-dark-label': 'Dark',
+    'theme-light-label': 'Light',
+    'theme-sand-label': 'Sand',
     'open-settings': 'Settings',
     'entry-empty': 'No exercises logged yet.',
     'add-exercise': '+ ADD EXERCISE',
@@ -190,6 +195,9 @@ var STRINGS = {
     'resume-label': 'Continuar Treino',
     'open-history-label': 'Treinos Anteriores',
     'open-library-label': 'Exercícios',
+    'theme-dark-label': 'Escuro',
+    'theme-light-label': 'Claro',
+    'theme-sand-label': 'Areia',
     'open-settings': 'Configurações',
     'entry-empty': 'Nenhum exercício registrado ainda.',
     'add-exercise': '+ ADICIONAR EXERCÍCIO',
@@ -243,7 +251,7 @@ function plural(n, word) {
 
 // Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
 // tem o texto num <span id="l-..."> para nao apagar o campo.
-var STATIC_TEXT = ['start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
+var STATIC_TEXT = ['theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
@@ -1137,6 +1145,28 @@ function deleteEntry() {
   backToSession();
 }
 
+// ---------------------------------------------------------------- tema
+
+// O <head> do index.html ja aplica o tema salvo antes de pintar; aqui ele so
+// troca na hora quando o usuario escolhe outro no menu do topo.
+var THEME_BG = { dark: '#0f1115', light: '#f2f3f6', sand: '#f1ebe0' };
+
+function applyTheme() {
+  var th = settings.theme;
+  if (th === 'dark') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', th);
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = THEME_BG[th];
+  THEMES.forEach(function (x) { $('theme-' + x).className = x === th ? 'active' : ''; });
+}
+
+function setTheme(th) {
+  settings.theme = th;
+  save(K_SETTINGS, settings);
+  applyTheme();
+  $('theme-menu').hidden = true;
+}
+
 // ---------------------------------------------------------------- settings
 
 function openSettings() {
@@ -1263,6 +1293,17 @@ $('save-settings').addEventListener('click', saveSettings);
 $('s-lang').addEventListener('change', changeLanguage);
 $('lang-pt').addEventListener('click', function () { setLanguage('pt'); });
 $('lang-en').addEventListener('click', function () { setLanguage('en'); });
+$('theme-btn').addEventListener('click', function (ev) {
+  ev.stopPropagation();       // senao o clique fora (abaixo) fecha na hora
+  $('theme-menu').hidden = !$('theme-menu').hidden;
+});
+THEMES.forEach(function (th) {
+  $('theme-' + th).addEventListener('click', function () { setTheme(th); });
+});
+document.addEventListener('click', function (ev) {
+  var menu = $('theme-menu');
+  if (!menu.hidden && !menu.contains(ev.target)) menu.hidden = true;
+});
 $('test-sync').addEventListener('click', testSync);
 $('force-sync').addEventListener('click', function () { sync(true); });
 $('export-json').addEventListener('click', exportJSON);
@@ -1273,6 +1314,7 @@ window.addEventListener('offline', refreshBadge);
 // ---------------------------------------------------------------- boot
 
 applyStaticText();
+applyTheme();
 loadCatalog().then(function () {
   renderHome();
   reset('screen-home');
