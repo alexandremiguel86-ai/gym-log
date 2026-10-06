@@ -107,12 +107,12 @@
     {
      "n": "EZ-Bar Curl",
      "g2": "Biceps",
-     "pt": "Rosca com Barra EZ"
+     "pt": "Rosca na Barra EZ"
     },
     {
      "n": "EZ-Bar Preacher Curl",
      "g2": "Biceps",
-     "pt": "Rosca Scott com Barra EZ"
+     "pt": "Rosca Scott na Barra EZ"
     },
     {
      "n": "Single-Arm Dumbbell Preacher Curl",
@@ -378,6 +378,11 @@
    "name": "Shoulder",
    "category": "Gym",
    "exercises": [
+    {
+     "n": "Cable Reverse Fly",
+     "g2": "Shoulder",
+     "pt": "Crucifixo Inverso no Cabo"
+    },
     {
      "n": "Dumbbell Lateral Raise",
      "g2": "Shoulder",
