@@ -97,8 +97,11 @@ player in the gym.
 Rules:
 - Use the terms a Brazilian personal trainer or physiotherapist would actually say.
   Keep an English word when that is what Brazilians use in the gym (e.g. "Crossover",
-  "Swiss Ball", "Band", "Deadlift" may stay if more natural) - naturalness beats
-  literal translation.
+  "Face Pull", "Leg Press", "Smith") - naturalness beats literal translation.
+- House terms, always: Cable -> "na Polia", Band/Banded -> "com Elástico",
+  EZ-Bar -> "Barra W", Swiss Ball -> "Bola Suíça", Triceps Pushdown -> "Tríceps Pulley",
+  Seated Cable Row -> "Remada Baixa", Shoulder Press -> "Desenvolvimento",
+  Hamstring -> "Posterior de Coxa", Single-Arm/Single-Leg -> "Unilateral".
 - Keep equipment/grip/variation details (e.g. "Pronated Grip" -> "Pegada Pronada").
 - Keep the same punctuation structure, including the " — " separator when present.
 - Short, Title Case like the English, no explanations.
