@@ -666,6 +666,17 @@ Promise.resolve()
       kinds().every(function (k) { return k === 'row-btn'; }), kinds().join(','));
     vm.runInContext('renderExercises("press");', sandbox);
     check('busca: secoes por grupo, sem chips', kinds()[0] === 'sub', kinds()[0]);
+
+    console.log('\n21c. Grupo em destaque na lista do treino');
+    vm.runInContext('openForm({ exercise: "Single-Arm Dumbbell Row", group1: "Back", group2: "Back" });', sandbox);
+    fill('3', '10', '20kg', '');
+    el('save-entry').click();
+    var row = el('entry-list').children[0].children[0];
+    var meta = row.children[1];
+    check('etiqueta do grupo', meta.children[0].className === 'group-tag' && meta.children[0].textContent === 'Back',
+      meta.children[0].className + ' ' + meta.children[0].textContent);
+    check('series/peso continuam ao lado', meta.children[1].textContent.indexOf('3x') === 0, meta.children[1].textContent);
+    check('etiqueta na cor da categoria', row.style._props['--cat'] === '#00ff00', row.style._props['--cat']);
   })
   .then(function () {
     console.log('\n22. Tema');

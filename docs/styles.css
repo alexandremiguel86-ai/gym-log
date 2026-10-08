@@ -479,6 +479,23 @@ main { padding: 16px 14px 120px; }
 .list li.dragging { position: relative; z-index: 5; }
 .list li.dragging .row-btn { background: var(--surface-2); box-shadow: 0 8px 20px var(--shadow); }
 .row-btn .meta { display: block; margin-top: 4px; font-size: 14px; color: var(--muted); }
+/* Grupo do exercicio registrado: etiqueta na cor da categoria (--cat vem do
+   paintCategory, a mesma da borda esquerda). Sem categoria conhecida, cinza. */
+.group-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  vertical-align: 1px;
+  color: var(--cat, var(--muted));
+  background: color-mix(in srgb, var(--cat, var(--muted)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat, var(--muted)) 40%, transparent);
+}
+:root[data-theme="light"] .group-tag,
+:root[data-theme="sand"] .group-tag { color: color-mix(in srgb, var(--cat, var(--muted)) 65%, #000); }
 .row-btn .tag  { font-size: 12px; color: var(--accent); }
 
 /* ---------- formulario ---------- */

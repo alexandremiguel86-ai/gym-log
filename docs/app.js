@@ -602,9 +602,7 @@ function openWorkout(w) {
     li.className = 'row-btn';
     var name = document.createElement('strong');
     name.textContent = exLabel(e.exercise);
-    var meta = document.createElement('span');
-    meta.className = 'meta';
-    meta.textContent = [termLabel(e.group1), summarize(e), e.notes].filter(Boolean).join(' - ');
+    var meta = entryMeta(e);
     li.appendChild(name);
     li.appendChild(meta);
     paintCategory(li, e.group1);
@@ -614,6 +612,24 @@ function openWorkout(w) {
 }
 
 // ---------------------------------------------------------------- sessao
+
+/** Linha de baixo de um exercicio registrado: o grupo como etiqueta na cor
+    da categoria (a mesma da borda esquerda) e, depois, series/peso e a
+    observacao como texto normal. */
+function entryMeta(e) {
+  var meta = document.createElement('span');
+  meta.className = 'meta';
+  if (e.group1) {
+    var tag = document.createElement('span');
+    tag.className = 'group-tag';
+    tag.textContent = termLabel(e.group1);
+    meta.appendChild(tag);
+  }
+  var rest = document.createElement('span');
+  rest.textContent = [summarize(e), e.notes].filter(Boolean).join(' - ');
+  meta.appendChild(rest);
+  return meta;
+}
 
 function sessionEntries() {
   if (!session) return [];
@@ -636,9 +652,7 @@ function renderSession() {
     btn.innerHTML = '';
     var name = document.createElement('strong');
     name.textContent = exLabel(e.exercise);
-    var meta = document.createElement('span');
-    meta.className = 'meta';
-    meta.textContent = [termLabel(e.group1), summarize(e), e.notes].filter(Boolean).join(' - ');
+    var meta = entryMeta(e);
     btn.appendChild(name);
     btn.appendChild(meta);
     btn.addEventListener('click', function () { openForm(e); });
