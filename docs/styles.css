@@ -317,6 +317,22 @@ main { padding: 16px 14px 120px; }
 /* Lista de exercicios so para consulta: linha sem acao, nao parece botao. */
 .row-btn.static { background: transparent; }
 
+/* Na lista de consulta, tocar no exercicio abre o historico dele: seta a direita. */
+.row-btn.browse { position: relative; padding-right: 36px; }
+.row-btn.browse::after {
+  content: 'A';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  color: var(--muted);
+}
+
+/* Historico de um exercicio */
+.xh-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 0; color: var(--muted); font-size: 14px; }
+.xh-meta .group-tag { margin-right: 4px; }
+
 .link {
   background: none;
   border: 0;

@@ -94,6 +94,9 @@ var STRINGS = {
     sets: 'sets',
     exercise: ['exercise', 'exercises'],
     workout: ['workout', 'workouts'],
+    time: ['time', 'times'],
+    loggedTimes: 'Logged {n}',
+    currentWorkout: '  (current workout)',
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     't-home': 'Gym Log',
     't-session': 'Workout',
@@ -104,6 +107,7 @@ var STRINGS = {
     't-exercise': 'Exercise',
     't-form': 'Entry',
     't-settings': 'Settings',
+    't-exhistory': 'Exercise History',
     'start-label': 'Start Workout',
     'resume-label': 'Continue Workout',
     'open-history-label': 'Previous Workouts',
@@ -117,6 +121,7 @@ var STRINGS = {
     finish: 'FINISH WORKOUT',
     discard: 'Discard workout',
     'history-empty': 'No finished workouts yet.',
+    'xh-empty': 'Not logged on this device yet.',
     'custom-exercise': 'Other exercise (type it)',
     'l-name': 'Exercise name',
     'l-group': 'Group 1',
@@ -181,6 +186,9 @@ var STRINGS = {
     sets: 'séries',
     exercise: ['exercício', 'exercícios'],
     workout: ['treino', 'treinos'],
+    time: ['vez', 'vezes'],
+    loggedTimes: 'Registrado {n}',
+    currentWorkout: '  (treino atual)',
     months: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
     't-home': 'Gym Log',
     't-session': 'Treino',
@@ -191,6 +199,7 @@ var STRINGS = {
     't-exercise': 'Exercício',
     't-form': 'Registro',
     't-settings': 'Configurações',
+    't-exhistory': 'Histórico do Exercício',
     'start-label': 'Iniciar Treino',
     'resume-label': 'Continuar Treino',
     'open-history-label': 'Treinos Anteriores',
@@ -204,6 +213,7 @@ var STRINGS = {
     finish: 'FINALIZAR TREINO',
     discard: 'Descartar treino',
     'history-empty': 'Nenhum treino finalizado ainda.',
+    'xh-empty': 'Ainda não registrado neste aparelho.',
     'custom-exercise': 'Outro exercício (digitar)',
     'l-name': 'Nome do exercício',
     'l-group': 'Grupo 1',
@@ -251,7 +261,7 @@ function plural(n, word) {
 
 // Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
 // tem o texto num <span id="l-..."> para nao apagar o campo.
-var STATIC_TEXT = ['theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
+var STATIC_TEXT = ['xh-empty', 'theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
@@ -353,7 +363,8 @@ var TITLES = {
   'screen-group': 't-group',
   'screen-exercise': 't-exercise',
   'screen-form': 't-form',
-  'screen-settings': 't-settings'
+  'screen-settings': 't-settings',
+  'screen-ex-history': 't-exhistory'
 };
 
 /** Troca a tela visivel. `stack` e o historico; o topo e sempre a tela atual. */
@@ -394,7 +405,9 @@ function goBack() {
   if (id === 'screen-home') renderHome();
   if (id === 'screen-group') renderGroups();
   if (id === 'screen-history') renderHistory();
+  if (id === 'screen-exercise') renderExercises($('search').value);
   render(id);
+  if (id === 'screen-exercise') $('title').textContent = termLabel(currentGroup);
 }
 
 // ---------------------------------------------------------------- catalogo
@@ -987,8 +1000,8 @@ function renderExercises(filter) {
       heads[sub] = h;
       box.appendChild(h);
     }
-    var btn = document.createElement(browsing ? 'div' : 'button');
-    btn.className = browsing ? 'row-btn static' : 'row-btn';
+    var btn = document.createElement('button');
+    btn.className = browsing ? 'row-btn browse' : 'row-btn';
     var name = document.createElement('strong');
     name.textContent = exLabel(e.n);
     btn.appendChild(name);
@@ -999,8 +1012,9 @@ function renderExercises(filter) {
       meta.textContent = summarize(last) + '  -  ' + shortDate(last.date);
       btn.appendChild(meta);
     }
-    if (!browsing) btn.addEventListener('click', function () {
-      openForm({ exercise: e.n, group0: e.g0, group1: e.g1, group2: e.g2 });
+    btn.addEventListener('click', function () {
+      if (browsing) openExerciseHistory(e);
+      else openForm({ exercise: e.n, group0: e.g0, group1: e.g1, group2: e.g2 });
     });
     box.appendChild(btn);
   });
@@ -1011,6 +1025,65 @@ function renderExercises(filter) {
     p.textContent = t('nothingFound');
     box.appendChild(p);
   }
+}
+
+// ---------------------------------------------------------------- historico do exercicio
+
+// Pela lista de consulta: todas as vezes que o exercicio foi registrado neste
+// aparelho, da mais recente para a mais antiga. So leitura.
+var currentExHistory = null;   // {n, g1, g2} do catalogo
+
+function openExerciseHistory(ex) {
+  currentExHistory = ex;
+  renderExerciseHistory();
+  show('screen-ex-history');
+}
+
+function renderExerciseHistory() {
+  var ex = currentExHistory;
+  $('xh-name').textContent = exLabel(ex.n);
+
+  var meta = $('xh-meta');
+  meta.innerHTML = '';
+  var tag = document.createElement('span');
+  tag.className = 'group-tag';
+  tag.textContent = ex.g2 && ex.g2 !== ex.g1
+    ? termLabel(ex.g1) + ' / ' + termLabel(ex.g2)
+    : termLabel(ex.g1);
+  meta.appendChild(tag);
+  paintCategory(meta, ex.g1);
+
+  // Mesma data: o registrado depois vem primeiro.
+  var rows = [];
+  entries.forEach(function (e, i) { if (e.exercise === ex.n) rows.push({ e: e, i: i }); });
+  rows.sort(function (a, b) {
+    if (a.e.date !== b.e.date) return a.e.date < b.e.date ? 1 : -1;
+    return b.i - a.i;
+  });
+  if (rows.length) {
+    var count = document.createElement('span');
+    count.textContent = t('loggedTimes', { n: plural(rows.length, 'time') });
+    meta.appendChild(count);
+  }
+
+  var list = $('xh-list');
+  list.innerHTML = '';
+  $('xh-empty').hidden = rows.length > 0;
+  var open = session ? session.id : null;
+  rows.forEach(function (r) {
+    var e = r.e;
+    var li = document.createElement('li');
+    li.className = 'row-btn';
+    var date = document.createElement('strong');
+    date.textContent = prettyDate(e.date) + (e.session_id === open ? t('currentWorkout') : '');
+    var line = document.createElement('span');
+    line.className = 'meta';
+    line.textContent = [summarize(e), e.notes].filter(Boolean).join(' - ');
+    li.appendChild(date);
+    li.appendChild(line);
+    paintCategory(li, e.group1 || ex.g1);
+    list.appendChild(li);
+  });
 }
 
 // ---------------------------------------------------------------- formulario
@@ -1247,6 +1320,7 @@ function setLanguage(lang) {
   if (id === 'screen-workout' && currentWorkout) openWorkout(currentWorkout);
   if (id === 'screen-group') renderGroups();
   if (id === 'screen-exercise') renderExercises($('search').value);
+  if (id === 'screen-ex-history') renderExerciseHistory();
   if (id === 'screen-form') {
     formLabels({ group1: $('f-group').value, group2: $('f-group2').value, group0: $('f-group0').value });
     var last = !editing && draft.exercise ? lastEntryFor(draft.exercise) : null;

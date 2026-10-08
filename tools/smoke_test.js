@@ -636,11 +636,33 @@ Promise.resolve()
     check('titulo Exercises', el('title').textContent === 'Exercises', el('title').textContent);
     group('Back').click();
     check('sem "outro exercicio"', el('custom-exercise').hidden === true);
-    var rowsB = el('exercise-list').children.filter(function (c) { return c.className === 'row-btn static'; });
-    check('linhas so de leitura', rowsB.length > 0, rowsB.length);
-    rowsB[0].click();
-    check('tocar nao abre formulario', active() === 'screen-exercise', active());
+    var rowsB = el('exercise-list').children.filter(function (c) { return c.className === 'row-btn browse'; });
+    check('linhas de consulta', rowsB.length > 0, rowsB.length);
+    var rowName = 'Single-Arm Dumbbell Row';
+    var rowB = rowsB.filter(function (c) { return c.children[0].textContent === rowName; })[0];
+    rowB.click();
+    check('tocar abre o historico, nao o formulario', active() === 'screen-ex-history', active());
+    check('titulo do historico', el('title').textContent === 'Exercise History', el('title').textContent);
+    check('nome do exercicio', el('xh-name').textContent === rowName, el('xh-name').textContent);
+    var logged = entries().filter(function (e) { return e.exercise === rowName; });
+    var xh = el('xh-list').children;
+    check('uma linha por registro', logged.length > 0 && xh.length === logged.length, xh.length + '/' + logged.length);
+    var dates = logged.map(function (e) { return e.date; }).sort().reverse();
+    check('mais recente primeiro',
+      xh[0].children[0].textContent.indexOf(vm.runInContext('prettyDate(' + JSON.stringify(dates[0]) + ')', sandbox)) === 0,
+      xh[0].children[0].textContent);
+    check('detalhes series/reps/peso', /\dx\d/.test(xh[0].children[1].textContent), xh[0].children[1].textContent);
+    check('vazio escondido', el('xh-empty').hidden === true);
     check('nada gravado', entries().length === before, entries().length);
+    vm.runInContext('goBack();', sandbox);
+    check('voltar -> lista do grupo', active() === 'screen-exercise' && el('title').textContent === 'Back', el('title').textContent);
+    var never = catalog.groups.filter(function (g) { return g.name === 'Back'; })[0].exercises
+      .filter(function (x) { return !entries().some(function (e) { return e.exercise === x.n; }); })[0];
+    if (never) {
+      vm.runInContext('openExerciseHistory(' + JSON.stringify({ n: never.n, g1: 'Back', g2: never.g2 }) + ');', sandbox);
+      check('nunca registrado: aviso de vazio', el('xh-empty').hidden === false && el('xh-list').children.length === 0);
+      vm.runInContext('goBack();', sandbox);
+    }
     vm.runInContext('goBack(); goBack();', sandbox);
     check('volta ao inicio', active() === 'screen-home', active());
     vm.runInContext('startSession();', sandbox);
