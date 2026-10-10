@@ -6,7 +6,7 @@ Regras que seria **erro** violar. O `README.md` tem o resto (setup, arquivos, UR
 
 Vai para `github.com/alexandremiguel86-ai/gym-log` e é servido pelo GitHub Pages.
 Nada de token, URL de Apps Script, dado de treino ou qualquer coisa vinda de
-`D:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM` — aquela pasta tem prontuário
+`C:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM` — aquela pasta tem prontuário
 médico. Segredos ficam no `localStorage` do iPhone, nas Script Properties do Apps Script
 e no `config.local.txt` (que está no `.gitignore`).
 

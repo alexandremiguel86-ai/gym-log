@@ -6,7 +6,7 @@ digitação. Os registros vão para o Google Sheets e de lá para a aba `Off_Cou
 `#06_TRAINING_LOG.md`.
 
 A planilha e o markdown moram juntos em
-`D:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\`.
+`C:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\`.
 
 **App:** https://alexandremiguel86-ai.github.io/gym-log/
 

@@ -18,7 +18,7 @@
 
 $ErrorActionPreference = 'Stop'
 
-$Workbook = 'D:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\Tennis.xlsm'
+$Workbook = 'C:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\Tennis.xlsm'
 $repo = Split-Path -Parent $PSScriptRoot
 
 # Modulo -> arquivo .bas. Cada modulo mora junto do projeto dono dele:
@@ -28,7 +28,7 @@ $repo = Split-Path -Parent $PSScriptRoot
 $modules = [ordered]@{
     'Module_OffCourtImport' = "$repo\vba\Module_OffCourtImport.bas"
     'Module_GymLogButtons'  = "$repo\vba\Module_GymLogButtons.bas"
-    'Module_OffCourtSync'   = 'D:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\tools\Module_OffCourtSync.bas'
+    'Module_OffCourtSync'   = 'C:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\tools\Module_OffCourtSync.bas'
 }
 
 if (-not (Test-Path $Workbook)) { throw "Nao encontrei $Workbook" }

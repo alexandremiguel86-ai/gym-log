@@ -29,7 +29,7 @@ Option Explicit
 ' O config.local.txt esta no .gitignore.
 '=======================================================================
 
-Private Const CONFIG_FILE As String = "D:\ALEXANDRE\CLAUDE\GYM_LOG_APP\config.local.txt"
+Private Const CONFIG_FILE As String = "C:\ALEXANDRE\CLAUDE\GYM_LOG_APP\config.local.txt"
 
 Private Const SHEET_NAME As String = "Off_Court"
 Private Const FIRST_DATA_ROW As Long = 5

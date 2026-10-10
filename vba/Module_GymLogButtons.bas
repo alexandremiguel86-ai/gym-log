@@ -20,7 +20,7 @@ Option Explicit
 ' Module_OffCourtImport. Este modulo cuida so da publicacao da lista.
 '=======================================================================
 
-Private Const REPO_DIR As String = "D:\ALEXANDRE\CLAUDE\GYM_LOG_APP"
+Private Const REPO_DIR As String = "C:\ALEXANDRE\CLAUDE\GYM_LOG_APP"
 Private Const PUBLISH_SCRIPT As String = "tools\publish_exercises.ps1"
 Private Const TRANSLATE_SCRIPT As String = "tools\translate_pt.py"
 
