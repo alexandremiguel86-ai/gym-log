@@ -65,6 +65,9 @@ var STRINGS = {
     needSettings: 'Set the URL and token first',
     syncFailed: 'Sync failed: {e}',
     synced: 'Synced ({n})',
+    imported: 'Backup restored: {n} exercise(s)',
+    importNothing: 'Nothing new in this backup',
+    importInvalid: 'Not a Gym Log backup file',
     noConnection: 'No connection - kept in queue',
     lastWorkout: 'Last workout: {d}',
     firstWorkout: 'Log your first session',
@@ -142,6 +145,7 @@ var STRINGS = {
     'test-sync': 'TEST CONNECTION',
     'force-sync': 'SYNC NOW',
     'export-json': 'Export backup (JSON)',
+    'import-json': 'Import backup (JSON)',
     'ph-search': 'Search exercise...',
     'ph-sets': 'e.g. 3',
     'ph-reps': 'e.g. 10 or 30s',
@@ -157,6 +161,9 @@ var STRINGS = {
     needSettings: 'Configure a URL e o token primeiro',
     syncFailed: 'Falha no envio: {e}',
     synced: 'Enviado ({n})',
+    imported: 'Backup restaurado: {n} exercício(s)',
+    importNothing: 'Nada novo neste backup',
+    importInvalid: 'Este arquivo não é um backup do Gym Log',
     noConnection: 'Sem conexão - fica na fila',
     lastWorkout: 'Último treino: {d}',
     firstWorkout: 'Registre sua primeira sessão',
@@ -234,6 +241,7 @@ var STRINGS = {
     'test-sync': 'TESTAR CONEXÃO',
     'force-sync': 'ENVIAR AGORA',
     'export-json': 'Exportar backup (JSON)',
+    'import-json': 'Importar backup (JSON)',
     'ph-search': 'Buscar exercício...',
     'ph-sets': 'ex.: 3',
     'ph-reps': 'ex.: 10 ou 30s',
@@ -264,7 +272,7 @@ function plural(n, word) {
 var STATIC_TEXT = ['xh-empty', 'theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
-  'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json'];
+  'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json', 'import-json'];
 var STATIC_PLACEHOLDER = {
   search: 'ph-search', 'f-sets': 'ph-sets', 'f-reps': 'ph-reps',
   'f-weight': 'ph-weight', 'f-rpe': 'ph-rpe', 'f-notes': 'ph-notes'
@@ -1361,12 +1369,61 @@ function testSync() {
 }
 
 function exportJSON() {
-  var blob = new Blob([JSON.stringify(entries, null, 1)], { type: 'application/json' });
+  var name = 'gymlog-backup-' + todayISO() + '.json';
+  var text = JSON.stringify(entries, null, 1);
+  // No app da tela de inicio do iPhone o download por <a> nem sempre funciona;
+  // a folha de compartilhamento oferece "Salvar em Arquivos".
+  if (navigator.canShare && typeof File === 'function') {
+    var file = new File([text], name, { type: 'application/json' });
+    if (navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file] }).catch(function () {});
+      return;
+    }
+  }
+  var blob = new Blob([text], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'gymlog-backup-' + todayISO() + '.json';
+  a.download = name;
   a.click();
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+}
+
+/**
+ * Restaura um backup do exportJSON. Mescla pelo id: o que ja existe aqui fica
+ * como esta, entao importar duas vezes nao duplica. O que vier com synced:false
+ * entra na fila; o Apps Script tambem ignora id repetido.
+ * Devolve quantos registros entraram, ou -1 se o arquivo nao for um backup.
+ */
+function importBackup(text) {
+  var data;
+  try { data = JSON.parse(text); } catch (e) { data = null; }
+  if (!Array.isArray(data) || !data.every(function (e) { return e && e.id && e.session_id && e.date && e.exercise; })) {
+    toast(t('importInvalid'));
+    return -1;
+  }
+  var have = {};
+  entries.forEach(function (e) { have[e.id] = true; });
+  var fresh = data.filter(function (e) {
+    if (have[e.id]) return false;
+    have[e.id] = true;
+    return true;
+  });
+  if (!fresh.length) {
+    toast(t('importNothing'));
+    return 0;
+  }
+  // Na frente: o backup e mais antigo que o que foi registrado depois de reinstalar.
+  entries = fresh.concat(entries);
+  if (!save(K_ENTRIES, entries)) {
+    entries = entries.slice(fresh.length);
+    return -1;
+  }
+  renderHome();
+  refreshBadge();
+  $('queue-info').textContent = t('queueInfo', { p: pending().length, t: entries.length });
+  toast(t('imported', { n: fresh.length }));
+  sync(false);
+  return fresh.length;
 }
 
 // ---------------------------------------------------------------- eventos
@@ -1428,6 +1485,13 @@ document.addEventListener('click', function (ev) {
 $('test-sync').addEventListener('click', testSync);
 $('force-sync').addEventListener('click', function () { sync(true); });
 $('export-json').addEventListener('click', exportJSON);
+$('import-json').addEventListener('click', function () { $('import-file').click(); });
+$('import-file').addEventListener('change', function () {
+  var input = this;
+  var file = input.files && input.files[0];
+  if (!file) return;
+  file.text().then(importBackup).then(function () { input.value = ''; });
+});
 
 window.addEventListener('online', function () { refreshBadge(); sync(false); });
 window.addEventListener('offline', refreshBadge);

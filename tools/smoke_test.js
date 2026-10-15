@@ -722,6 +722,31 @@ Promise.resolve()
     check('url e token continuam salvos', JSON.parse(localStorage.getItem('gymlog.settings')).token === 'TESTTOKEN');
   })
   .then(function () {
+    console.log('\n23. Backup: exportar e restaurar num aparelho zerado');
+    // Ponto de partida: nenhum treino aberto e tudo ja enviado.
+    vm.runInContext('session = null; entries.forEach(function (e) { e.synced = true; }); save(K_ENTRIES, entries);', sandbox);
+    var backup = JSON.parse(localStorage.getItem('gymlog.entries'));
+    backup[0].synced = false;                  // um que nunca chegou ao Sheets
+    var text = JSON.stringify(backup);
+    var workoutsBefore = vm.runInContext('finishedWorkouts().length', sandbox);
+    vm.runInContext('entries = []; session = null; save(K_ENTRIES, entries);', sandbox);
+    check('aparelho zerado', vm.runInContext('entries.length', sandbox) === 0);
+    sandbox.__text = text;
+    posted.length = 0;
+    var n = vm.runInContext('importBackup(__text)', sandbox);
+    check('restaura tudo', n === backup.length, n + ' de ' + backup.length);
+    check('gravado no aparelho', JSON.parse(localStorage.getItem('gymlog.entries')).length === backup.length);
+    check('treinos anteriores voltam', vm.runInContext('finishedWorkouts().length', sandbox) === workoutsBefore);
+    check('reimportar nao duplica', vm.runInContext('importBackup(__text)', sandbox) === 0);
+    sandbox.__text = '{"nao": "backup"}';
+    check('arquivo errado recusado', vm.runInContext('importBackup(__text)', sandbox) === -1);
+    check('nada mudou', vm.runInContext('entries.length', sandbox) === backup.length);
+    return new Promise(function (r) { setTimeout(r, 20); }).then(function () {
+      var sent = posted.length ? posted[0].entries.map(function (e) { return e.id; }) : [];
+      check('so o pendente vai para a fila', sent.length === 1 && sent[0] === backup[0].id, JSON.stringify(sent));
+    });
+  })
+  .then(function () {
     console.log('\n' + (failures ? failures + ' FALHA(S)' : 'Todos os testes passaram.'));
     process.exit(failures ? 1 : 0);
   })
