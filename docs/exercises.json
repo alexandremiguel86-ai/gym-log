@@ -29,7 +29,6 @@
   "Conditioning": "Condicionamento",
   "Footwork": "Footwork",
   "Power": "Potência",
-  "Rest": "Descanso",
   "Thoracic Mobility": "Mobilidade Torácica",
   "Triceps": "Tríceps"
  },
@@ -664,11 +663,6 @@
      "n": "Lateral Lunge",
      "g2": "Power",
      "pt": "Avanço Lateral"
-    },
-    {
-     "n": "Rest",
-     "g2": "Rest",
-     "pt": "Descanso"
     }
    ]
   },
