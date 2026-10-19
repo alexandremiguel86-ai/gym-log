@@ -133,6 +133,7 @@ var STRINGS = {
     'l-sets': 'Sets',
     'l-reps': 'Reps / Time',
     'l-weight': 'Weight / Load',
+    'l-date': 'Workout date',
     'l-rpe': 'RPE',
     'l-notes': 'Notes',
     'save-entry': 'SAVE',
@@ -229,6 +230,7 @@ var STRINGS = {
     'l-sets': 'Séries',
     'l-reps': 'Reps / Tempo',
     'l-weight': 'Peso / Carga',
+    'l-date': 'Data do treino',
     'l-rpe': 'RPE',
     'l-notes': 'Observação',
     'save-entry': 'SALVAR',
@@ -271,7 +273,7 @@ function plural(n, word) {
 // tem o texto num <span id="l-..."> para nao apagar o campo.
 var STATIC_TEXT = ['xh-empty', 'theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
   'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
-  'l-reps', 'l-weight', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
+  'l-reps', 'l-weight', 'l-date', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json', 'import-json'];
 var STATIC_PLACEHOLDER = {
   search: 'ph-search', 'f-sets': 'ph-sets', 'f-reps': 'ph-reps',
@@ -660,6 +662,7 @@ function sessionEntries() {
 function renderSession() {
   if (!session) { reset('screen-home'); renderHome(); return; }
   $('session-date').textContent = prettyDate(session.date);
+  $('f-date').value = session.date;
 
   var list = $('entry-list');
   list.innerHTML = '';
@@ -800,6 +803,18 @@ function startSession() {
   renderSession();
   show('screen-session');
 }
+
+// Data do treino em andamento (padrao: hoje). Trocar vale para a sessao toda,
+// inclusive os exercicios ja lancados nela.
+$('f-date').addEventListener('change', function () {
+  var v = this.value;
+  if (!session || !/^\d{4}-\d{2}-\d{2}$/.test(v)) { if (session) this.value = session.date; return; }
+  session.date = v;
+  save(K_SESSION, session);
+  entries.forEach(function (e) { if (e.session_id === session.id) e.date = v; });
+  save(K_ENTRIES, entries);
+  renderSession();
+});
 
 function closeSession() {
   session = null;
