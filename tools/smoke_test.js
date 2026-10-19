@@ -290,6 +290,11 @@ Promise.resolve()
     check('cancelar nao envia', posted.length === 0, posted.length);
     confirmAnswer = true;
     el('finish').click();
+    check('finalizar mostra o resumo', active() === 'screen-summary', active());
+    check('resumo conta 2 exercicios', el('summary-body').children[0].textContent === '2 exercises', el('summary-body').children[0].textContent);
+    var sum = vm.runInContext('buildSummary(' + JSON.stringify(entries()) + ')', sandbox);
+    check('resumo agrupa por categoria e grupo', sum.reduce(function (n, c) { return n + c.total; }, 0) === 2 && sum.every(function (c) { return c.groups.reduce(function (n, g) { return n + g.n; }, 0) === c.total; }), JSON.stringify(sum));
+    el('summary-ok').click();
     check('volta para o Inicio', active() === 'screen-home', active());
     check('sessao encerrada', localStorage.getItem('gymlog.session') === null);
     return wait();

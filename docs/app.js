@@ -105,6 +105,7 @@ var STRINGS = {
     't-session': 'Workout',
     't-history': 'Previous Workouts',
     't-workout': 'Workout',
+    't-summary': 'Workout summary',
     't-group': 'Group',
     't-library': 'Exercises',
     't-exercise': 'Exercise',
@@ -202,6 +203,7 @@ var STRINGS = {
     't-session': 'Treino',
     't-history': 'Treinos Anteriores',
     't-workout': 'Treino',
+    't-summary': 'Resumo do treino',
     't-group': 'Grupo',
     't-library': 'Exercícios',
     't-exercise': 'Exercício',
@@ -370,6 +372,7 @@ var TITLES = {
   'screen-session': 't-session',
   'screen-history': 't-history',
   'screen-workout': 't-workout',
+  'screen-summary': 't-summary',
   'screen-group': 't-group',
   'screen-exercise': 't-exercise',
   'screen-form': 't-form',
@@ -830,8 +833,62 @@ function finishSession() {
     return;
   }
   if (!confirm(t('confirmFinish', { n: plural(n, 'exercise') }))) return;
+  var done = sessionEntries();
   closeSession();
   sync(true);
+  renderSummary(done);
+}
+
+/** Conta os exercicios do treino por categoria (GROUP 0) e, dentro dela, por
+    grupo (GROUP 1). Categorias na ordem de CATEGORIES; as que o app nao conhece
+    vao depois; grupos na ordem em que apareceram no treino. */
+function buildSummary(list) {
+  var cats = {};
+  var order = [];
+  list.forEach(function (e) {
+    var c = e.group0 || 'Other';
+    if (!cats[c]) { cats[c] = { name: c, total: 0, groups: [], byName: {} }; order.push(c); }
+    var cat = cats[c];
+    var g1 = e.group1 || 'Other';
+    if (!cat.byName[g1]) { cat.byName[g1] = { name: g1, n: 0 }; cat.groups.push(cat.byName[g1]); }
+    cat.byName[g1].n++;
+    cat.total++;
+  });
+  var known = CATEGORIES.map(function (c) { return c.name; });
+  var sorted = known.filter(function (n) { return cats[n]; })
+    .concat(order.filter(function (n) { return known.indexOf(n) === -1; }));
+  return sorted.map(function (n) { return cats[n]; });
+}
+
+function renderSummary(list) {
+  var body = $('summary-body');
+  body.innerHTML = '';
+  var total = document.createElement('p');
+  total.className = 'summary-total';
+  total.textContent = plural(list.length, 'exercise');
+  body.appendChild(total);
+  buildSummary(list).forEach(function (cat) {
+    var box = document.createElement('div');
+    box.className = 'summary-cat';
+    var color = CATEGORIES.filter(function (c) { return c.name === cat.name; })[0];
+    box.style.borderLeftColor = color ? color.color : OTHER_COLOR;
+    var head = document.createElement('strong');
+    head.textContent = termLabel(cat.name) + ' · ' + plural(cat.total, 'exercise');
+    box.appendChild(head);
+    cat.groups.forEach(function (g) {
+      var row = document.createElement('div');
+      row.className = 'summary-row';
+      var nm = document.createElement('span');
+      nm.textContent = termLabel(g.name);
+      var n = document.createElement('span');
+      n.textContent = g.n;
+      row.appendChild(nm);
+      row.appendChild(n);
+      box.appendChild(row);
+    });
+    body.appendChild(box);
+  });
+  reset('screen-summary');
 }
 
 /** Apaga o treino aberto inteiro. Nada dele foi enviado, entao nada sobra no Sheets. */
@@ -1454,6 +1511,7 @@ $('sync-badge').addEventListener('click', function () { sync(true); });
 
 $('add-exercise').addEventListener('click', openGroupPicker);
 $('finish').addEventListener('click', finishSession);
+$('summary-ok').addEventListener('click', function () { renderHome(); reset('screen-home'); });
 $('discard').addEventListener('click', discardSession);
 
 $('search').addEventListener('input', function () { renderExercises(this.value); });
