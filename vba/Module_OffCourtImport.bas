@@ -10,6 +10,8 @@ Option Explicit
 ' Escreve:  Off_Court!B2            data da sessao
 '           Off_Court!B5:F<n>       Exercise | Sets | Reps/Time | Weight/Hold | RPE
 '           Off_Court!G5:G<n>       OBS (o Sync leva para o #06 no fim do exercicio)
+'           Off_Court!H5:H<n>       Min: duracao do bloco Tennis Conditioning, informada
+'                                   no app ao finalizar (so na 1a linha do bloco)
 '           Off_Court!I:L           so linhas NOVAS no fim da lista de referencia:
 '                                   exercicio digitado no app ("Other exercise",
 '                                   custom = TRUE) que ainda nao esta em I.
@@ -39,8 +41,8 @@ Private Const REF_FIRST_ROW As Long = 3
 
 ' Indices das colunas do CSV, 0-based, na ordem definida em Code.gs:
 ' id | synced_at | session_id | date | exercise | group1 | group2 |
-' sets | reps | weight | rpe | notes | custom | group0
-' Linhas gravadas antes de group0 existir chegam com ele vazio.
+' sets | reps | weight | rpe | notes | custom | group0 | duration
+' Linhas gravadas antes de group0 / duration existirem chegam com eles vazios.
 Private Const C_SESSION As Long = 2
 Private Const C_DATE As Long = 3
 Private Const C_EXERCISE As Long = 4
@@ -53,7 +55,8 @@ Private Const C_RPE As Long = 10
 Private Const C_NOTES As Long = 11
 Private Const C_CUSTOM As Long = 12
 Private Const C_GROUP0 As Long = 13
-Private Const COL_COUNT As Long = 14
+Private Const C_DURATION As Long = 14
+Private Const COL_COUNT As Long = 15
 
 
 '=======================================================================
@@ -151,7 +154,9 @@ Public Sub ImportGymLog()
         ws.Cells(target, "E").Value = CStr(rows(r)(C_WEIGHT))
         ws.Cells(target, "F").Value = CStr(rows(r)(C_RPE))
         ws.Cells(target, "G").Value = CStr(rows(r)(C_NOTES))
+        ws.Cells(target, "H").Value = DurationValue(CStr(rows(r)(C_DURATION)))
     Next i
+    ws.Cells(FIRST_DATA_ROW - 1, "H").Value = "Min"
 
     ' DateSerial e nao CDate: CDate de "2026-09-20" depende do locale e pode
     ' virar 20/09 ou falhar dependendo da configuracao do Windows.
@@ -166,10 +171,11 @@ Public Sub ImportGymLog()
     Dim msg As String
     msg = n & " exercicio(s) importado(s) para " & SHEET_NAME & "."
     If Len(added) > 0 Then
+        ' Exercicio novo: traduz e publica a lista sozinho (antes era o botao
+        ' Update Exercise List). Edicao manual de I:M continua pelo botao.
         msg = msg & vbCrLf & vbCrLf & _
               "Exercicio(s) novo(s) acrescentado(s) a lista (I:L):" & vbCrLf & added & _
-              "Confira o nome em ingles e clique em Update Exercise List " & _
-              "para traduzir e publicar no app."
+              vbCrLf & PublishExerciseListSilent()
     End If
     If Len(unknown) > 0 Then
         msg = msg & vbCrLf & vbCrLf & _
@@ -210,9 +216,20 @@ Private Sub ClearEntries(ws As Worksheet)
     Dim lastRow As Long
     lastRow = ws.Cells(ws.Rows.Count, "B").End(xlUp).Row
     If lastRow >= FIRST_DATA_ROW Then
-        ws.Range(ws.Cells(FIRST_DATA_ROW, "B"), ws.Cells(lastRow, "G")).ClearContents
+        ws.Range(ws.Cells(FIRST_DATA_ROW, "B"), ws.Cells(lastRow, "H")).ClearContents
     End If
 End Sub
+
+'--- Duracao (minutos) do app: numero, ou vazio. Texto qualquer vira vazio, e o
+'--- Sync cai na estimativa.
+Private Function DurationValue(s As String) As Variant
+    s = Replace$(Trim$(s), ",", ".")
+    If Len(s) > 0 And IsNumeric(s) Then
+        DurationValue = Val(s)
+    Else
+        DurationValue = ""
+    End If
+End Function
 
 '--- Exercicio importado que nao esta em I:
 '---   custom = TRUE  -> foi digitado no app de proposito: ganha uma linha no fim

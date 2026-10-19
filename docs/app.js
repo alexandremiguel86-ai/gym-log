@@ -75,6 +75,7 @@ var STRINGS = {
     pendingTag: '  (pending)',
     confirmEmpty: 'No exercises logged. Discard this workout?',
     confirmFinish: 'Finish workout? {n} will be sent to the spreadsheet.',
+    askDuration: 'How many minutes did the Tennis Conditioning block last? (estimate: {est})',
     confirmDiscardN: 'Discard this workout? Its {n} will be deleted. This cannot be undone.',
     confirmDiscard: 'Discard this workout?',
     discarded: 'Workout discarded',
@@ -173,6 +174,7 @@ var STRINGS = {
     pendingTag: '  (pendente)',
     confirmEmpty: 'Nenhum exercício registrado. Descartar este treino?',
     confirmFinish: 'Finalizar o treino? {n} serão enviados para a planilha.',
+    askDuration: 'Quantos minutos durou o bloco Tennis Conditioning? (estimativa: {est})',
     confirmDiscardN: 'Descartar este treino? Seus {n} serão apagados. Não dá para desfazer.',
     confirmDiscard: 'Descartar este treino?',
     discarded: 'Treino descartado',
@@ -826,6 +828,71 @@ function closeSession() {
   reset('screen-home');
 }
 
+// ---------------------------------------------------------------- duracao do condicionamento
+
+var CONDITIONING_GROUP = 'Tennis Conditioning';
+
+/** Segundos de trabalho por serie de um campo Reps/Time: "40s" -> 40, "2min" -> 120,
+    "4min46s" / "4:46" -> 286. Numero sem unidade e repeticao -> 0. Parenteses sao
+    comentario. Mesma regra do WorkSeconds no Module_OffCourtSync (VBA). */
+function workSeconds(reps) {
+  var s = String(reps || '').toLowerCase().replace(/\([^)]*\)?/g, '')
+    .replace(/,/g, '.').replace(/\s+/g, '');
+  if (!s) return 0;
+  var p = s.indexOf(':');
+  if (p >= 0) return (parseFloat(s.slice(0, p)) || 0) * 60 + (parseFloat(s.slice(p + 1)) || 0);
+  var total = 0;
+  var re = /(\d*\.?\d+|\d+\.)([a-z]*)/g;
+  var m;
+  while ((m = re.exec(s))) {
+    var v = parseFloat(m[1]) || 0;
+    var u = m[2].charAt(0);
+    if (u === 'h') total += v * 3600;
+    else if (u === 'm') total += v * 60;
+    else if (u === 's') total += v;
+  }
+  return total;
+}
+
+/** Estimativa de minutos de um bloco: cada serie ocupa 1 min (descanso incluso);
+    "Rest" vale o tempo escrito; serie com mais de 60 s vale o proprio tempo.
+    Mesma regra do EstimateMinutes no VBA (conferida com o treino de 6/Oct: 32 min). */
+function estimateMinutes(run) {
+  var total = 0;
+  run.forEach(function (e) {
+    var sets = String(e.sets || '').trim() === ''
+      ? 1 : (parseFloat(String(e.sets).replace(',', '.')) || 0);
+    var work = workSeconds(e.reps);
+    var perSet = (String(e.exercise).toLowerCase() === 'rest' || work > 60) ? work : 60;
+    total += sets * perSet;
+  });
+  return Math.floor(total / 60 + 0.5);
+}
+
+/** Ao finalizar: para cada bloco seguido de Tennis Conditioning, pergunta quantos
+    minutos durou (ja com a estimativa). O valor vai na 1a entrada do bloco, no campo
+    `duration`, e o Import o coloca em Off_Court!H. Cancelar = sem duracao (o #06
+    cai na estimativa). */
+function askConditioningDurations(list) {
+  var runs = [];
+  var cur = null;
+  list.forEach(function (e) {
+    if (e.group1 === CONDITIONING_GROUP) {
+      if (!cur) { cur = []; runs.push(cur); }
+      cur.push(e);
+    } else {
+      cur = null;
+    }
+  });
+  runs.forEach(function (run) {
+    var est = estimateMinutes(run);
+    var ans = prompt(t('askDuration', { est: est }), String(est));
+    var v = ans === null ? 0 : parseFloat(String(ans).replace(',', '.'));
+    if (v > 0) run[0].duration = String(Math.round(v));
+  });
+  save(K_ENTRIES, entries);
+}
+
 function finishSession() {
   var n = sessionEntries().length;
   if (n === 0) {
@@ -833,6 +900,7 @@ function finishSession() {
     return;
   }
   if (!confirm(t('confirmFinish', { n: plural(n, 'exercise') }))) return;
+  askConditioningDurations(sessionEntries());
   var done = sessionEntries();
   closeSession();
   sync(true);

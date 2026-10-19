@@ -25,12 +25,13 @@
 
 var SHEET_NAME = 'LOG';
 
-// group0 veio depois e fica no fim de proposito: as linhas antigas e o
-// ImportGymLog continuam lendo as outras colunas nas mesmas posicoes.
+// group0 e duration vieram depois e ficam no fim de proposito: as linhas antigas
+// e o ImportGymLog continuam lendo as outras colunas nas mesmas posicoes.
+// duration = minutos do bloco Tennis Conditioning, so na 1a linha do bloco.
 var HEADERS = [
   'id', 'synced_at', 'session_id', 'date', 'exercise',
   'group1', 'group2', 'sets', 'reps', 'weight', 'rpe', 'notes', 'custom',
-  'group0'
+  'group0', 'duration'
 ];
 
 function setup() {
@@ -135,7 +136,8 @@ function doPost(e) {
           str_(entry.rpe),
           str_(entry.notes),
           entry.custom ? 'TRUE' : '',
-          str_(entry.group0)
+          str_(entry.group0),
+          str_(entry.duration)
         ]);
       }
 

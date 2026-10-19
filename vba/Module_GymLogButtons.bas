@@ -36,16 +36,6 @@ Private Const COL_TERM_PT As String = "P"
 ' Ponto de entrada (botao "Update Exercise List")
 '=======================================================================
 Public Sub PublishExerciseList()
-    Dim scriptPath As String
-    scriptPath = REPO_DIR & "\" & PUBLISH_SCRIPT
-
-    If Len(Dir$(scriptPath)) = 0 Then
-        MsgBox "Nao encontrei:" & vbCrLf & scriptPath & vbCrLf & vbCrLf & _
-               "Confira REPO_DIR no topo do Module_GymLogButtons.", _
-               vbCritical, "Publicar lista"
-        Exit Sub
-    End If
-
     ' Os scripts leem o .xlsm do DISCO, nao a copia aberta na memoria. Sem
     ' salvar antes, um exercicio recem-digitado nao seria visto.
     If Not ThisWorkbook.Saved Then
@@ -53,6 +43,43 @@ Public Sub PublishExerciseList()
                   "Salvar agora e publicar?", vbYesNo + vbQuestion, _
                   "Publicar lista") <> vbYes Then Exit Sub
     End If
+
+    Dim report As String
+    If RunPublish(report) Then
+        MsgBox report, vbInformation, "Lista publicada"
+    Else
+        MsgBox "A publicacao falhou." & vbCrLf & vbCrLf & report, _
+               vbCritical, "Publicar lista"
+    End If
+End Sub
+
+
+'=======================================================================
+' Mesma publicacao, sem pergunta nem MsgBox: usada pelo ImportGymLog quando
+' o treino trouxe exercicio novo. Devolve o relatorio; falha nao levanta erro.
+'=======================================================================
+Public Function PublishExerciseListSilent() As String
+    Dim report As String
+    If RunPublish(report) Then
+        PublishExerciseListSilent = "Lista publicada no app." & vbCrLf & report
+    Else
+        PublishExerciseListSilent = "A publicacao da lista FALHOU (o Import foi concluido)." & _
+            vbCrLf & "Clique em Update Exercise List para tentar de novo." & vbCrLf & report
+    End If
+End Function
+
+
+'--- Salva, traduz e publica. True se o script de publicacao terminou com codigo 0.
+Private Function RunPublish(ByRef report As String) As Boolean
+    Dim scriptPath As String
+    scriptPath = REPO_DIR & "\" & PUBLISH_SCRIPT
+
+    If Len(Dir$(scriptPath)) = 0 Then
+        report = "Nao encontrei:" & vbCrLf & scriptPath & vbCrLf & _
+                 "Confira REPO_DIR no topo do Module_GymLogButtons."
+        Exit Function
+    End If
+
     ThisWorkbook.Save
 
     Dim shell As Object
@@ -103,20 +130,15 @@ Public Sub PublishExerciseList()
     Application.Cursor = xlDefault
     Application.StatusBar = False
 
-    Dim report As String
     report = ReadTextFile(outFile)
     If Len(Trim$(report)) = 0 Then
         report = "(o script nao produziu saida)"
     End If
     report = trReport & vbCrLf & vbCrLf & report
+    If code <> 0 Then report = "(codigo " & code & ")" & vbCrLf & report
 
-    If code = 0 Then
-        MsgBox report, vbInformation, "Lista publicada"
-    Else
-        MsgBox "A publicacao falhou (codigo " & code & ")." & vbCrLf & vbCrLf & _
-               report, vbCritical, "Publicar lista"
-    End If
-End Sub
+    RunPublish = (code = 0)
+End Function
 
 
 '=======================================================================

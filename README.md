@@ -75,12 +75,25 @@ Fluxo normal depois de um treino: importar → atualizar o log.
 **Group 1**, **Group 2** e **Group 0**. O Group 2 só oferece os subgrupos do Group 1
 escolhido, e o Group 0 já vem com a categoria dele (dá para trocar). No **Import Gym Log**,
 todo exercício digitado assim que ainda não está em `I` ganha uma linha no fim de `I:L` da
-`Off_Court`, com os três grupos; o aviso final lista o que entrou. Confira o nome e clique em
-**Update Exercise List** para traduzir (`M`) e publicar no app.
+`Off_Court`, com os três grupos, e o próprio Import já traduz (`M`) e publica a lista no app
+(o mesmo que o **Update Exercise List**). O aviso final lista o que entrou e diz se a
+publicação deu certo; se falhar, clique em **Update Exercise List**.
 
 **Pela planilha:** digite nas colunas `I` (nome), `J` (GROUP 1), `K` (GROUP 2) e `L` (GROUP
 0: `Gym`, `Gym - Lower Body/Core`, `Mobility & Recovery` ou `Conditioning`) e clique em
-**Update Exercise List**.
+**Update Exercise List** (edição à mão em `I:M` não passa pelo Import, então é este botão).
+
+### Duração do Tennis Conditioning
+
+Ao **finalizar** um treino que tem exercício do grupo *Tennis Conditioning*, o app pergunta
+quantos minutos durou, já com a estimativa (cada série = 1 min, descanso incluso; mesma regra
+da macro). A resposta vai no campo `duration` (coluna `duration` do Google Sheets) e o
+**Import Gym Log** a coloca em `Off_Court!H` na primeira linha do bloco; dali o **Update
+Training Log** a leva para o `#06` como `(N min)`. Cancelar a pergunta = sem duração no app e
+a macro usa a estimativa. Para mudar depois, edite `H` antes do Update Training Log.
+
+⚠️ O `Code.gs` ganhou a coluna `duration`: **Deploy → Manage deployments → New version** no
+Apps Script, senão a duração não chega à planilha.
 
 O **Update Exercise List** salva a planilha, regera o JSON, e só faz commit+push se a lista
 realmente mudou. Depois **feche e reabra o app no iPhone**.
