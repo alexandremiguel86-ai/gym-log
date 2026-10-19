@@ -315,12 +315,14 @@ Promise.resolve()
 
     // tocar no chip copia o ultimo treino; so mudou a carga
     el('f-weight').dispatch('focus');
-    check('sem reusar: tocar nao muda nada', el('f-weight').value === '', el('f-weight').value);
+    check('foco em peso vazio pre-preenche kg', el('f-weight').value === 'kg', el('f-weight').value);
+    el('f-weight').dispatch('blur');
+    check('sair sem digitar apaga o kg', el('f-weight').value === '', el('f-weight').value);
     el('last-chip').click();
     check('chip copia sets', el('f-sets').value === '2', el('f-sets').value);
     check('chip copia reps', el('f-reps').value === '10', el('f-reps').value);
     el('f-weight').dispatch('focus');
-    check('tocar no campo reusado apaga', el('f-weight').value === '', el('f-weight').value);
+    check('tocar no campo reusado apaga (e pre-preenche kg)', el('f-weight').value === 'kg', el('f-weight').value);
     el('f-weight').value = '27.5kg';
     el('f-weight').dispatch('focus');
     check('o que foi digitado nao some ao tocar de novo', el('f-weight').value === '27.5kg', el('f-weight').value);
