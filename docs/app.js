@@ -1464,6 +1464,18 @@ PREFILL_FIELDS.forEach(function (id) {
   });
 });
 
+// Peso/carga: ao tocar no campo vazio ja vem "kg" com o cursor antes dele;
+// digitar 10 vira "10kg". Se sair sem digitar, o "kg" sozinho some (nao grava lixo).
+$('f-weight').addEventListener('focus', function () {
+  var el = this;
+  if (el.value !== '') return;
+  el.value = 'kg';
+  setTimeout(function () { if (el.setSelectionRange) el.setSelectionRange(0, 0); }, 0);
+});
+$('f-weight').addEventListener('blur', function () {
+  if (this.value.trim() === 'kg') this.value = '';
+});
+
 $('save-entry').addEventListener('click', saveEntry);
 $('delete-entry').addEventListener('click', deleteEntry);
 
