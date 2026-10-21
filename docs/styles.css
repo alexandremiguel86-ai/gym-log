@@ -23,6 +23,7 @@
   --tap: 60px;
   --gap: 12px;
   --topbar-h: 62px;     /* altura fixa: os titulos de secao grudam logo abaixo */
+  --top: calc(var(--topbar-h) + env(safe-area-inset-top));   /* topo + status bar do iPhone */
   color-scheme: dark;
 }
 
@@ -82,25 +83,29 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: none;   /* sem o "elastico" do iOS puxando a tela */
 }
 
 body {
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+  padding: var(--top) env(safe-area-inset-right)
            env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* ---------- topo ---------- */
 
+/* Fixo de verdade. Com sticky ele subia a altura da status bar antes de parar
+   e ficava meio escondido atras do relogio. */
 #topbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
   align-items: center;
   gap: 8px;
-  height: var(--topbar-h);
-  padding: 0 14px;
+  height: var(--top);
+  padding: env(safe-area-inset-top) calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left));
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
@@ -395,7 +400,7 @@ main { padding: 16px 14px 120px; }
    que esta visivel e sempre o da secao em que se esta. */
 .list .sub {
   position: sticky;
-  top: var(--topbar-h);
+  top: var(--top);
   z-index: 5;
   display: flex;
   align-items: center;
@@ -407,7 +412,7 @@ main { padding: 16px 14px 120px; }
   color: var(--text);
   background: var(--bg);
   border-bottom: 1px solid var(--line);
-  scroll-margin-top: var(--topbar-h);
+  scroll-margin-top: var(--top);
 }
 .list .sub::before {             /* barra de destaque a esquerda */
   content: '';
@@ -571,14 +576,34 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  /* Embaixo, so o que a barrinha do iPhone pede: o ultimo botao fica rente a borda. */
+  padding: 10px 14px max(6px, env(safe-area-inset-bottom) - 20px);
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 .screen:not(.active) .sticky-bottom { display: none; }
 
 /* O rodape do treino tem dois botoes grandes + o "Discard": sem esta folga o
    ultimo exercicio da lista fica escondido atras dele. */
-#screen-session { padding-bottom: 110px; }
+#screen-session { padding-bottom: 60px; }
+
+/* Data do treino: uma linha so, rotulo a esquerda e seletor compacto a direita,
+   colada no topo. */
+.date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: -8px;
+}
+.date-row input {
+  width: auto;
+  min-width: 150px;
+  min-height: 40px;
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 16px;
+}
+.date-row input::-webkit-date-and-time-value { text-align: right; }
 
 /* ---------- diversos ---------- */
 

@@ -674,7 +674,6 @@ function sessionEntries() {
 
 function renderSession() {
   if (!session) { reset('screen-home'); renderHome(); return; }
-  $('session-date').textContent = prettyDate(session.date);
   $('f-date').value = session.date;
 
   var list = $('entry-list');
