@@ -398,7 +398,7 @@ function render(id) {
   var key = id === 'screen-group' && browsing ? 't-library' : TITLES[id];
   $('title').textContent = key ? t(key) : 'Gym Log';
   $('back').hidden = stack.length <= 1;
-  window.scrollTo(0, 0);
+  $('scroller').scrollTop = 0;
 }
 
 /** Avanca para uma tela nova. */
@@ -780,8 +780,8 @@ function dragMove(y) {
   var li = drag.li;
   var list = li.parentNode;
   // Perto das bordas, rola a tela para alcancar linhas fora de vista.
-  if (y > window.innerHeight - 60) window.scrollBy(0, 12);
-  else if (y < 110) window.scrollBy(0, -12);
+  if (y > window.innerHeight - 60) $('scroller').scrollTop += 12;
+  else if (y < 110) $('scroller').scrollTop -= 12;
 
   li.style.transform = '';
   var before = null;
@@ -1482,7 +1482,7 @@ function setLanguage(lang) {
   refreshBadge();
 
   var id = stack[stack.length - 1];
-  var y = window.scrollY;
+  var y = $('scroller').scrollTop;
   if (id === 'screen-home') renderHome();
   if (id === 'screen-session') renderSession();
   if (id === 'screen-summary') renderSummary(sessionEntries());
@@ -1502,7 +1502,7 @@ function setLanguage(lang) {
   if (!id) return;                      // antes do catalogo carregar
   render(id);
   if (id === 'screen-exercise') $('title').textContent = termLabel(currentGroup);
-  window.scrollTo(0, y);                // trocar o idioma nao deve pular para o topo
+  $('scroller').scrollTop = y;          // trocar o idioma nao deve pular para o topo
 }
 
 function saveSettings() {
@@ -1673,25 +1673,10 @@ $('import-file').addEventListener('change', function () {
 window.addEventListener('online', function () { refreshBadge(); sync(false); });
 window.addEventListener('offline', refreshBadge);
 
-/** App instalado no iPhone com status bar transparente: o iOS as vezes informa
-    uma altura menor que a da tela, e o "bottom: 0" fica acima da borda real.
-    Mede a diferenca para o rodape fixo descer ate o fim. So em pe; o teto
-    evita estrago se alguma versao do iOS informar algo estranho. */
-function fixBottomGap() {
-  var gap = 0;
-  if (navigator.standalone && window.screen && window.innerHeight > window.innerWidth) {
-    gap = window.screen.height - window.innerHeight;
-    if (gap < 0 || gap > 80) gap = 0;
-  }
-  document.documentElement.style.setProperty('--bottom-gap', gap + 'px');
-}
-window.addEventListener('resize', fixBottomGap);
-
 // ---------------------------------------------------------------- boot
 
 applyStaticText();
 applyTheme();
-fixBottomGap();
 loadCatalog().then(function () {
   renderHome();
   reset('screen-home');
