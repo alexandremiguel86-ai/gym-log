@@ -23,7 +23,7 @@ Uma linha por exercício, não por série.
 
 Ele grava na aba `LOG` do Google Sheets e para por aí. O bloco de `#06_TRAINING_LOG.md`
 é gerado por um script Python **no projeto de tênis** (`tools\gym_auto_import.py`), que lê
-o CSV publicado do `LOG` todo dia às 23:30 ou pelo botão **Update Training Log** — não
+o CSV publicado do `LOG` a cada 15 minutos ou pelo botão **Update Training Log** — não
 mais pelas macros do `Tennis.xlsm` nem a partir de `Off_Court!B5:G`. Pedido de mudança no
 formato do log se resolve lá, nunca aqui e nunca editando o markdown à mão.
 

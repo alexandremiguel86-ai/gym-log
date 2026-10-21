@@ -2,8 +2,8 @@
 
 PWA para registrar treinos de academia no iPhone, **durante** o treino, com o mínimo de
 digitação. Os registros vão para o Google Sheets; de lá, um script no PC (no projeto de
-tênis, fora deste repositório) lê o CSV publicado e gera o bloco de `#06_TRAINING_LOG.md`, todo dia
-à noite ou sob demanda. A aba `Off_Court` do `Tennis.xlsm` guarda a lista de exercícios.
+tênis, fora deste repositório) lê o CSV publicado e gera o bloco de `#06_TRAINING_LOG.md` a cada
+15 minutos ou sob demanda. A aba `Off_Court` do `Tennis.xlsm` guarda a lista de exercícios.
 
 A planilha e o markdown moram juntos em
 `C:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\`.
@@ -15,7 +15,7 @@ iPhone (PWA)  ──POST──►  Apps Script  ──►  Google Sheets (aba LO
                                                │ publicado como CSV
                           ┌────────────────────┘
                           ▼
-      script no PC (diário, ou botão Update Training Log)  ──►  #06_TRAINING_LOG.md
+      script no PC (a cada 15 min, ou botão Update Training Log)  ──►  #06_TRAINING_LOG.md
               [Import Gym Log]  ──►  só a lista de exercícios (Off_Court!I:L)
 ```
 
