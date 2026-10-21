@@ -582,9 +582,9 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
   bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  /* Embaixo, so o que a barrinha do iPhone pede: o ultimo botao fica rente a borda. */
-  padding: 10px 14px max(4px, env(safe-area-inset-bottom) - 28px);
+  gap: 6px;
+  /* O ultimo botao fica praticamente encostado na borda de baixo. */
+  padding: 8px 14px max(2px, env(safe-area-inset-bottom) - 32px);
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 .sticky-bottom[hidden] { display: none; }
