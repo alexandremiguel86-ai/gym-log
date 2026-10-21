@@ -74,7 +74,6 @@ var STRINGS = {
     noneYet: 'None yet',
     pendingTag: '  (pending)',
     confirmEmpty: 'No exercises logged. Discard this workout?',
-    confirmFinish: 'Finish workout? {n} will be sent to the spreadsheet.',
     askDuration: 'How many minutes did the Tennis Conditioning block last? (estimate: {est})',
     confirmDiscardN: 'Discard this workout? Its {n} will be deleted. This cannot be undone.',
     confirmDiscard: 'Discard this workout?',
@@ -124,6 +123,8 @@ var STRINGS = {
     'entry-empty': 'No exercises logged yet.',
     'add-exercise': '+ ADD EXERCISE',
     finish: 'FINISH WORKOUT',
+    'summary-ok': 'CONFIRM AND SEND',
+    'summary-back': 'Back to workout',
     discard: 'Discard workout',
     'history-empty': 'No finished workouts yet.',
     'xh-empty': 'Not logged on this device yet.',
@@ -173,7 +174,6 @@ var STRINGS = {
     noneYet: 'Nenhum ainda',
     pendingTag: '  (pendente)',
     confirmEmpty: 'Nenhum exercício registrado. Descartar este treino?',
-    confirmFinish: 'Finalizar o treino? {n} serão enviados para a planilha.',
     askDuration: 'Quantos minutos durou o bloco Tennis Conditioning? (estimativa: {est})',
     confirmDiscardN: 'Descartar este treino? Seus {n} serão apagados. Não dá para desfazer.',
     confirmDiscard: 'Descartar este treino?',
@@ -223,6 +223,8 @@ var STRINGS = {
     'entry-empty': 'Nenhum exercício registrado ainda.',
     'add-exercise': '+ ADICIONAR EXERCÍCIO',
     finish: 'FINALIZAR TREINO',
+    'summary-ok': 'CONFIRMAR E ENVIAR',
+    'summary-back': 'Voltar ao treino',
     discard: 'Descartar treino',
     'history-empty': 'Nenhum treino finalizado ainda.',
     'xh-empty': 'Ainda não registrado neste aparelho.',
@@ -276,7 +278,7 @@ function plural(n, word) {
 // Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
 // tem o texto num <span id="l-..."> para nao apagar o campo.
 var STATIC_TEXT = ['xh-empty', 'theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
-  'finish', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
+  'finish', 'summary-ok', 'summary-back', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-date', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json', 'import-json'];
 var STATIC_PLACEHOLDER = {
@@ -899,12 +901,17 @@ function finishSession() {
     if (confirm(t('confirmEmpty'))) closeSession();
     return;
   }
-  if (!confirm(t('confirmFinish', { n: plural(n, 'exercise') }))) return;
+  // O resumo vem antes do envio: e a ultima conferida. Nada sai ate o CONFIRMAR.
+  renderSummary(sessionEntries());
+  show('screen-summary');
+}
+
+function confirmFinish() {
   askConditioningDurations(sessionEntries());
-  var done = sessionEntries();
   closeSession();
   sync(true);
-  renderSummary(done);
+  renderHome();
+  reset('screen-home');
 }
 
 /** Conta os exercicios do treino por categoria (GROUP 0) e, dentro dela, por
@@ -956,7 +963,6 @@ function renderSummary(list) {
     });
     body.appendChild(box);
   });
-  reset('screen-summary');
 }
 
 /** Apaga o treino aberto inteiro. Nada dele foi enviado, entao nada sobra no Sheets. */
@@ -1579,7 +1585,8 @@ $('sync-badge').addEventListener('click', function () { sync(true); });
 
 $('add-exercise').addEventListener('click', openGroupPicker);
 $('finish').addEventListener('click', finishSession);
-$('summary-ok').addEventListener('click', function () { renderHome(); reset('screen-home'); });
+$('summary-ok').addEventListener('click', confirmFinish);
+$('summary-back').addEventListener('click', goBack);
 $('discard').addEventListener('click', discardSession);
 
 $('search').addEventListener('input', function () { renderExercises(this.value); });
@@ -1593,6 +1600,7 @@ $('last-chip').addEventListener('click', function () {
   $('f-reps').value = last.reps || '';
   $('f-weight').value = last.weight || '';
   $('f-rpe').value = last.rpe || '';
+  $('f-notes').value = last.notes || '';
   markReused(true);
   toast(t('lastValues'));
 });

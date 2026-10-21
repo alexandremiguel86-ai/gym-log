@@ -132,6 +132,8 @@ var sandbox = {
   setTimeout: setTimeout,
   clearTimeout: clearTimeout,
   confirm: function () { return confirmAnswer; },
+  // duracao do Tennis Conditioning: aceita a estimativa sugerida
+  prompt: function (msg, def) { return def; },
   Promise: Promise,
   Blob: function () {},
   URL: { createObjectURL: function () { return ''; }, revokeObjectURL: function () {} },
@@ -283,14 +285,15 @@ Promise.resolve()
   })
   .then(function () { return wait(); })
   .then(function () {
-    console.log('\n7. Finalizar pede confirmacao e so entao envia');
-    confirmAnswer = false;
-    el('finish').click();
-    check('cancelar mantem o treino aberto', active() === 'screen-session', active());
-    check('cancelar nao envia', posted.length === 0, posted.length);
-    confirmAnswer = true;
+    console.log('\n7. Finalizar mostra o resumo e so envia no CONFIRMAR');
     el('finish').click();
     check('finalizar mostra o resumo', active() === 'screen-summary', active());
+    check('resumo ainda nao envia', posted.length === 0, posted.length);
+    el('summary-back').click();
+    check('voltar mantem o treino aberto', active() === 'screen-session', active());
+    check('voltar nao envia', posted.length === 0, posted.length);
+    check('sessao continua aberta', localStorage.getItem('gymlog.session') !== null);
+    el('finish').click();
     check('resumo conta 2 exercicios', el('summary-body').children[0].textContent === '2 exercises', el('summary-body').children[0].textContent);
     var sum = vm.runInContext('buildSummary(' + JSON.stringify(entries()) + ')', sandbox);
     check('resumo agrupa por categoria e grupo', sum.reduce(function (n, c) { return n + c.total; }, 0) === 2 && sum.every(function (c) { return c.groups.reduce(function (n, g) { return n + g.n; }, 0) === c.total; }), JSON.stringify(sum));
@@ -326,6 +329,7 @@ Promise.resolve()
     el('last-chip').click();
     check('chip copia sets', el('f-sets').value === '2', el('f-sets').value);
     check('chip copia reps', el('f-reps').value === '10', el('f-reps').value);
+    check('chip copia a observacao', el('f-notes').value === 'ultima serie facil', el('f-notes').value);
     el('f-weight').dispatch('focus');
     check('tocar no campo reusado apaga (e pre-preenche kg)', el('f-weight').value === 'kg', el('f-weight').value);
     el('f-weight').value = '27.5kg';
@@ -365,6 +369,7 @@ Promise.resolve()
     console.log('\n10. Offline ao finalizar: fila e reenvio');
     networkUp = false;
     el('finish').click();
+    el('summary-ok').click();
     return wait();
   })
   .then(function () {
@@ -625,6 +630,7 @@ Promise.resolve()
     check('nenhum registro perdido', entries().length === total, entries().length);
     var before = posted.length;
     el('finish').click();
+    el('summary-ok').click();
     return wait().then(function () {
       var sent = posted.length > before ? posted[posted.length - 1].entries.map(function (e) { return e.exercise; }).slice(-3) : [];
       check('FINISH envia na nova ordem', sent.join('|') === 'Figure-8 Drill|Swiss Ball Crunch|Dumbbell Curl', sent.join('|'));
