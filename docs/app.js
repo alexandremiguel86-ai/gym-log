@@ -390,11 +390,19 @@ var TITLES = {
   'screen-ex-history': 't-exhistory'
 };
 
+// Rodapes fixos (fora do <main>, ver index.html), por tela.
+var FOOTERS = {
+  'screen-session': 'foot-session',
+  'screen-summary': 'foot-summary',
+  'screen-form': 'foot-form'
+};
+
 /** Troca a tela visivel. `stack` e o historico; o topo e sempre a tela atual. */
 function render(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
   $(id).classList.add('active');
+  Object.keys(FOOTERS).forEach(function (s) { $(FOOTERS[s]).hidden = s !== id; });
   var key = id === 'screen-group' && browsing ? 't-library' : TITLES[id];
   $('title').textContent = key ? t(key) : 'Gym Log';
   $('back').hidden = stack.length <= 1;

@@ -97,11 +97,6 @@
     </label>
     <ul id="entry-list" class="list"></ul>
     <p id="entry-empty" class="muted center">No exercises logged yet.</p>
-    <div class="sticky-bottom">
-      <button id="add-exercise" class="big primary">+ ADD EXERCISE</button>
-      <button id="finish" class="big ghost">FINISH WORKOUT</button>
-      <button id="discard" class="link danger">Discard workout</button>
-    </div>
   </section>
 
   <!-- ---------- HISTORICO ---------- -->
@@ -119,10 +114,6 @@
   <!-- ---------- RESUMO (ao finalizar) ---------- -->
   <section id="screen-summary" class="screen">
     <div id="summary-body"></div>
-    <div class="sticky-bottom">
-      <button id="summary-ok" class="big primary">CONFIRM AND SEND</button>
-      <button id="summary-back" class="big ghost">Back to workout</button>
-    </div>
   </section>
 
   <!-- ---------- GRUPO ---------- -->
@@ -189,10 +180,6 @@
       <input id="f-notes" type="text" autocapitalize="sentences" enterkeyhint="done" placeholder="e.g. last set felt easy">
     </label>
 
-    <div class="sticky-bottom">
-      <button id="save-entry" class="big primary">SAVE</button>
-      <button id="delete-entry" class="big danger" hidden>DELETE</button>
-    </div>
   </section>
 
   <!-- ---------- CONFIGURACOES ---------- -->
@@ -226,6 +213,22 @@
   </section>
 
 </main>
+
+<!-- Rodapes fixos ficam fora do <main>: dentro dele o iOS os arrasta no
+     elastico da rolagem. O app.js mostra o da tela ativa. -->
+<div id="foot-session" class="sticky-bottom" hidden>
+  <button id="add-exercise" class="big primary">+ ADD EXERCISE</button>
+  <button id="finish" class="big ghost">FINISH WORKOUT</button>
+  <button id="discard" class="link danger">Discard workout</button>
+</div>
+<div id="foot-summary" class="sticky-bottom" hidden>
+  <button id="summary-ok" class="big primary">CONFIRM AND SEND</button>
+  <button id="summary-back" class="big ghost">Back to workout</button>
+</div>
+<div id="foot-form" class="sticky-bottom" hidden>
+  <button id="save-entry" class="big primary">SAVE</button>
+  <button id="delete-entry" class="big danger" hidden>DELETE</button>
+</div>
 
 <div id="toast" class="toast" hidden></div>
 

@@ -587,7 +587,7 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
   padding: 10px 14px max(4px, env(safe-area-inset-bottom) - 26px);
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
-.screen:not(.active) .sticky-bottom { display: none; }
+.sticky-bottom[hidden] { display: none; }
 
 /* O rodape do treino tem dois botoes grandes + o "Discard": sem esta folga o
    ultimo exercicio da lista fica escondido atras dele. */

@@ -244,6 +244,8 @@ Promise.resolve()
     fill('2', '10', '25kg', '7', 'ultima serie facil');
     el('save-entry').click();
     check('volta para a sessao', active() === 'screen-session', active());
+    check('rodape do treino visivel, o do formulario nao',
+      el('foot-session').hidden === false && el('foot-form').hidden === true && el('foot-summary').hidden === true);
     check('1 registro gravado', entries().length === 1, entries().length);
     check('valores gravados como texto',
       entries()[0].sets === '2' && entries()[0].weight === '25kg');
