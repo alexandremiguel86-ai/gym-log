@@ -1673,10 +1673,25 @@ $('import-file').addEventListener('change', function () {
 window.addEventListener('online', function () { refreshBadge(); sync(false); });
 window.addEventListener('offline', refreshBadge);
 
+/** App instalado no iPhone com status bar transparente: o iOS as vezes informa
+    uma altura menor que a da tela, e o "bottom: 0" fica acima da borda real.
+    Mede a diferenca para o rodape fixo descer ate o fim. So em pe; o teto
+    evita estrago se alguma versao do iOS informar algo estranho. */
+function fixBottomGap() {
+  var gap = 0;
+  if (navigator.standalone && window.screen && window.innerHeight > window.innerWidth) {
+    gap = window.screen.height - window.innerHeight;
+    if (gap < 0 || gap > 80) gap = 0;
+  }
+  document.documentElement.style.setProperty('--bottom-gap', gap + 'px');
+}
+window.addEventListener('resize', fixBottomGap);
+
 // ---------------------------------------------------------------- boot
 
 applyStaticText();
 applyTheme();
+fixBottomGap();
 loadCatalog().then(function () {
   renderHome();
   reset('screen-home');

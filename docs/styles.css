@@ -83,7 +83,7 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  overscroll-behavior-y: none;   /* sem o "elastico" do iOS puxando a tela */
+  overscroll-behavior-y: contain;
 }
 
 body {
@@ -572,12 +572,14 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  /* --bottom-gap: a tela que o iOS informa ao app instalado pode ser mais baixa
+     que a real; o app.js mede a diferenca e o rodape desce ate a borda. */
+  bottom: calc(-1 * var(--bottom-gap, 0px));
   display: flex;
   flex-direction: column;
   gap: 8px;
   /* Embaixo, so o que a barrinha do iPhone pede: o ultimo botao fica rente a borda. */
-  padding: 10px 14px max(6px, env(safe-area-inset-bottom) - 20px);
+  padding: 10px 14px max(4px, env(safe-area-inset-bottom) - 26px);
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 .screen:not(.active) .sticky-bottom { display: none; }

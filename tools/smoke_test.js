@@ -88,6 +88,7 @@ var document = {
   querySelector: function () { return null; },
   documentElement: {
     attrs: {},
+    style: { _props: {}, setProperty: function (k, v) { this._props[k] = v; } },
     setAttribute: function (k, v) { this.attrs[k] = String(v); },
     removeAttribute: function (k) { delete this.attrs[k]; }
   },
