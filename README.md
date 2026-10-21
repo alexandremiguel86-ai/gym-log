@@ -1,9 +1,9 @@
 # Gym Log
 
 PWA para registrar treinos de academia no iPhone, **durante** o treino, com o mínimo de
-digitação. Os registros vão para o Google Sheets e de lá para a aba `Off_Court` do
-`Tennis.xlsm`, onde o macro `UpdateOffCourtLog` que já existia gera o bloco de
-`#06_TRAINING_LOG.md`.
+digitação. Os registros vão para o Google Sheets; de lá, um script no PC (no projeto de
+tênis, fora deste repositório) lê o CSV publicado e gera o bloco de `#06_TRAINING_LOG.md`, todo dia
+à noite ou sob demanda. A aba `Off_Court` do `Tennis.xlsm` guarda a lista de exercícios.
 
 A planilha e o markdown moram juntos em
 `C:\ALEXANDRE\CLAUDE\PROJECT_TENNIS_PERFORMANCE_TEAM\`.
@@ -15,9 +15,8 @@ iPhone (PWA)  ──POST──►  Apps Script  ──►  Google Sheets (aba LO
                                                │ publicado como CSV
                           ┌────────────────────┘
                           ▼
-              [Import Gym Log]  ──►  Off_Court!B5:G
-                                          │
-                          [Update Training Log]  ──►  #06_TRAINING_LOG.md
+      script no PC (diário, ou botão Update Training Log)  ──►  #06_TRAINING_LOG.md
+              [Import Gym Log]  ──►  só a lista de exercícios (Off_Court!I:L)
 ```
 
 O app **não** gera markdown e **não** reimplementa agrupamento. Ele substitui apenas a
@@ -57,8 +56,8 @@ As legendas são escolha dele e podem mudar; o que identifica cada botão é a m
 
 | Macro | O quê |
 |---|---|
-| `ImportGymLog` | baixa o treino do Sheets para `Off_Court!B5:G` (pergunta a data) e acrescenta a `I:L` os exercícios novos digitados no app |
-| `UpdateOffCourtLog` | o de sempre: `Off_Court` → `#06_TRAINING_LOG.md` |
+| `ImportGymLog` | acrescenta a `I:L` os exercícios novos digitados no app e publica a lista no app (também baixa o treino para `Off_Court!B5:H`, que o `#06` não usa mais) |
+| `UpdateOffCourtLog` | roda o script que gera o `#06_TRAINING_LOG.md` a partir do Sheets |
 | `PublishExerciseList` | traduz o que é novo (M, O:P) e publica a lista de `I:M` no app |
 
 Há também um **Filter List**, feito por ele, que reordena a lista de referência em ordem
@@ -88,9 +87,9 @@ publicação deu certo; se falhar, clique em **Update Exercise List**.
 Ao **finalizar** um treino que tem exercício do grupo *Tennis Conditioning*, o app pergunta
 quantos minutos durou, já com a estimativa (cada série = 1 min, descanso incluso; mesma regra
 da macro). A resposta vai no campo `duration` (coluna `duration` do Google Sheets) e o
-**Import Gym Log** a coloca em `Off_Court!H` na primeira linha do bloco; dali o **Update
-Training Log** a leva para o `#06` como `(N min)`. Cancelar a pergunta = sem duração no app e
-a macro usa a estimativa. Para mudar depois, edite `H` antes do Update Training Log.
+script do `#06` a lê direto do LOG (primeira linha do bloco) e grava `(N min)`. Cancelar a
+pergunta = sem duração no app e o script usa a estimativa. Para mudar depois, edite o número no
+`#06`.
 
 ⚠️ O `Code.gs` ganhou a coluna `duration`: **Deploy → Manage deployments → New version** no
 Apps Script, senão a duração não chega à planilha.
@@ -129,7 +128,7 @@ No celular, a opção *"Other exercise (type it)"* aceita um nome livre (os grup
 obrigatoriamente da lista). Esses registros vão para o Sheets com `custom = TRUE`, e é por
 essa marca que o **Import Gym Log** os acrescenta a `I:L`. Um nome fora da lista **sem** essa
 marca (exercício do catálogo renomeado depois do treino) não é recriado — só aparece no
-aviso, porque o `UpdateOffCourtLog` o jogaria no grupo "Other".
+aviso (o script do `#06` o mantém no grupo que o app gravou).
 
 ### Offline
 
@@ -309,9 +308,9 @@ reais na sua planilha. Validar como número quebraria a compatibilidade com o ma
 falha de rede nunca gera linha duplicada.
 
 `notes` é o campo **Notes / Observação** do formulário. Vai para a coluna `G` (OBS) do
-`Off_Court`, e o `UpdateOffCourtLog` o leva para o `#06` no fim do exercício
-(`Name, 3×10 — *obs*`). `H` é a coluna vazia que separa o treino da lista de referência,
-que começa em `I`.
+`Off_Court`, e o script do `#06` o leva para lá no fim do exercício
+(`Name, 3×10 (obs)`). A lista de referência começa em `I`; `H` guarda os minutos do
+Tennis Conditioning no `Off_Court`.
 
 ## Limitações conhecidas
 

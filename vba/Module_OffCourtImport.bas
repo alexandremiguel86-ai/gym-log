@@ -19,7 +19,8 @@ Option Explicit
 '                                   PublishExerciseList traduzir.
 '
 ' Nunca altera nem apaga linha que ja existe na lista, e nao toca no markdown.
-' Depois de rodar este import, rode UpdateOffCourtLog como sempre.
+' O #06 NAO depende mais disto: tools\gym_auto_import.py le o LOG do app direto (todo dia 23:30).
+' O import continua util para acrescentar exercicio novo a lista I:L e publica-la no app.
 '
 ' Setup (uma vez):
 '   No Google Sheets:  File > Share > Publish to web
@@ -182,7 +183,7 @@ Public Sub ImportGymLog()
               "Fora da lista de referencia (I:L) - o Sync vai marcar como 'Other':" & _
               vbCrLf & unknown
     End If
-    msg = msg & vbCrLf & vbCrLf & "Agora rode UpdateOffCourtLog."
+    msg = msg & vbCrLf & vbCrLf & "O #06 e atualizado as 23:30 (ou clique em Update Training Log)."
     MsgBox msg, vbInformation, "Importar treino"
 End Sub
 
