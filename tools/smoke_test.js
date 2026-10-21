@@ -292,6 +292,10 @@ Promise.resolve()
     var sumText = el('summary-body').textContent;
     check('resumo lista exercicio com series x reps', sumText.indexOf('Single-Arm Dumbbell Row') !== -1 && sumText.indexOf('2x10') !== -1, sumText);
     check('resumo sem carga nem observacao', sumText.indexOf('25kg') === -1 && sumText.indexOf('ultima serie facil') === -1, sumText);
+    var sumBefore = el('summary-body').children[0].textContent;
+    vm.runInContext('setLanguage("pt")', sandbox);
+    check('resumo troca de idioma', el('summary-body').children[0].textContent !== sumBefore && active() === 'screen-summary', el('summary-body').children[0].textContent);
+    vm.runInContext('setLanguage("en")', sandbox);
     el('summary-back').click();
     check('voltar mantem o treino aberto', active() === 'screen-session', active());
     check('voltar nao envia', posted.length === 0, posted.length);

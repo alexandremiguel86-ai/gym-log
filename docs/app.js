@@ -1486,6 +1486,7 @@ function setLanguage(lang) {
   var y = window.scrollY;
   if (id === 'screen-home') renderHome();
   if (id === 'screen-session') renderSession();
+  if (id === 'screen-summary') renderSummary(sessionEntries());
   if (id === 'screen-history') renderHistory();
   if (id === 'screen-workout' && currentWorkout) openWorkout(currentWorkout);
   if (id === 'screen-group') renderGroups();
