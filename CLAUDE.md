@@ -21,9 +21,14 @@ Uma linha por exercício, não por série.
 
 ## 3. O app não gera markdown
 
-Ele alimenta `Off_Court!B5:G` e para por aí. O bloco de `#06_TRAINING_LOG.md` é gerado
-por `Module_OffCourtSync`, dentro do `Tennis.xlsm`. Pedido de mudança no formato do log
-se resolve lá, nunca aqui e nunca editando o markdown à mão.
+Ele grava na aba `LOG` do Google Sheets e para por aí. O bloco de `#06_TRAINING_LOG.md`
+é gerado por um script Python **no projeto de tênis** (`tools\gym_auto_import.py`), que lê
+o CSV publicado do `LOG` todo dia às 23:30 ou pelo botão **Update Training Log** — não
+mais pelas macros do `Tennis.xlsm` nem a partir de `Off_Court!B5:G`. Pedido de mudança no
+formato do log se resolve lá, nunca aqui e nunca editando o markdown à mão.
+
+O que o app grava (campos, ordem das linhas, `notes`, `duration`) é o que o script lê:
+mudar o formato do envio exige conferir o script do outro lado.
 
 ## 4. `docs/exercises.json` é gerado
 
