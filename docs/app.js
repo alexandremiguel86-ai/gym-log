@@ -358,11 +358,17 @@ function toast(msg) {
 }
 
 /** "3x10 @ 56kg" - mesma leitura do #06_TRAINING_LOG.md. */
+/** So series x reps, sem carga nem RPE: o que o resumo do FINALIZAR mostra. */
+function setsReps(entry) {
+  if (entry.sets && entry.reps) return entry.sets + 'x' + entry.reps;
+  if (entry.sets) return entry.sets + ' ' + t('sets');
+  return entry.reps || '';
+}
+
 function summarize(entry) {
   var parts = [];
-  if (entry.sets && entry.reps) parts.push(entry.sets + 'x' + entry.reps);
-  else if (entry.sets) parts.push(entry.sets + ' ' + t('sets'));
-  else if (entry.reps) parts.push(entry.reps);
+  var sr = setsReps(entry);
+  if (sr) parts.push(sr);
   if (entry.weight) parts.push('@ ' + entry.weight);
   if (entry.rpe) parts.push('RPE ' + entry.rpe);
   return parts.join(' ');
@@ -925,14 +931,27 @@ function buildSummary(list) {
     if (!cats[c]) { cats[c] = { name: c, total: 0, groups: [], byName: {} }; order.push(c); }
     var cat = cats[c];
     var g1 = e.group1 || 'Other';
-    if (!cat.byName[g1]) { cat.byName[g1] = { name: g1, n: 0 }; cat.groups.push(cat.byName[g1]); }
+    if (!cat.byName[g1]) { cat.byName[g1] = { name: g1, n: 0, entries: [] }; cat.groups.push(cat.byName[g1]); }
     cat.byName[g1].n++;
+    cat.byName[g1].entries.push(e);
     cat.total++;
   });
   var known = CATEGORIES.map(function (c) { return c.name; });
   var sorted = known.filter(function (n) { return cats[n]; })
     .concat(order.filter(function (n) { return known.indexOf(n) === -1; }));
   return sorted.map(function (n) { return cats[n]; });
+}
+
+function summaryRow(cls, left, right) {
+  var row = document.createElement('div');
+  row.className = cls;
+  var a = document.createElement('span');
+  a.textContent = left;
+  var b = document.createElement('span');
+  b.textContent = right;
+  row.appendChild(a);
+  row.appendChild(b);
+  return row;
 }
 
 function renderSummary(list) {
@@ -950,16 +969,13 @@ function renderSummary(list) {
     var head = document.createElement('strong');
     head.textContent = termLabel(cat.name) + ' · ' + plural(cat.total, 'exercise');
     box.appendChild(head);
+    // Grupo como subtitulo e, embaixo, cada exercicio com series x reps:
+    // e uma conferida de "esqueci algo?", entao sem carga, RPE nem observacao.
     cat.groups.forEach(function (g) {
-      var row = document.createElement('div');
-      row.className = 'summary-row';
-      var nm = document.createElement('span');
-      nm.textContent = termLabel(g.name);
-      var n = document.createElement('span');
-      n.textContent = g.n;
-      row.appendChild(nm);
-      row.appendChild(n);
-      box.appendChild(row);
+      box.appendChild(summaryRow('summary-group', termLabel(g.name), g.n));
+      g.entries.forEach(function (e) {
+        box.appendChild(summaryRow('summary-row', exLabel(e.exercise), setsReps(e)));
+      });
     });
     body.appendChild(box);
   });

@@ -602,5 +602,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 8px 0; }
 }
 
 .summary-total { font-size: 1.1rem; font-weight: 600; margin: 0; }
-.summary-cat { border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
-.summary-row { display: flex; justify-content: space-between; }
+.summary-cat { border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.summary-group { display: flex; justify-content: space-between; margin-top: 6px; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.summary-row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.95rem; }
+.summary-row span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
