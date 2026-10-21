@@ -584,14 +584,32 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
   flex-direction: column;
   gap: 8px;
   /* Embaixo, so o que a barrinha do iPhone pede: o ultimo botao fica rente a borda. */
-  padding: 10px 14px max(4px, env(safe-area-inset-bottom) - 26px);
+  padding: 10px 14px max(4px, env(safe-area-inset-bottom) - 28px);
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 .sticky-bottom[hidden] { display: none; }
 
-/* O rodape do treino tem dois botoes grandes + o "Discard": sem esta folga o
+/* Descartar (quadrado, so o icone) a esquerda do Finalizar. */
+.foot-row { display: flex; gap: 8px; }
+.foot-row .big { flex: 1; }
+.big.square {
+  flex: 0 0 var(--tap);
+  width: var(--tap);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* O rodape do treino tem duas linhas de botoes grandes: sem esta folga o
    ultimo exercicio da lista fica escondido atras dele. */
-#screen-session { padding-bottom: 60px; }
+#screen-session { padding-bottom: 20px; }
+
+/* Lista do treino aberto mais compacta (~15% mais baixa) para caber mais
+   exercicios na tela. So o vertical: a direita fica a alca de arrastar. */
+#entry-list { gap: 6px; }
+#entry-list .row-btn { min-height: 0; padding-top: 9px; padding-bottom: 9px; }
+#entry-list .row-btn .meta { margin-top: 2px; }
 
 /* Data do treino: uma linha so, rotulo a esquerda e seletor compacto a direita,
    colada no topo. */

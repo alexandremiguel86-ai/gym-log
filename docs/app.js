@@ -278,7 +278,7 @@ function plural(n, word) {
 // Textos fixos do index.html, por id do elemento. Rotulos com <input> dentro
 // tem o texto num <span id="l-..."> para nao apagar o campo.
 var STATIC_TEXT = ['xh-empty', 'theme-dark-label', 'theme-light-label', 'theme-sand-label', 'start-label', 'resume-label', 'open-history-label', 'open-library-label', 'open-settings', 'entry-empty', 'add-exercise',
-  'finish', 'summary-ok', 'summary-back', 'discard', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
+  'finish', 'summary-ok', 'summary-back', 'history-empty', 'custom-exercise', 'l-name', 'l-group', 'l-group2', 'l-group0', 'l-sets',
   'l-reps', 'l-weight', 'l-date', 'l-rpe', 'l-notes', 'save-entry', 'delete-entry', 'settings-intro', 'l-lang',
   'l-url', 'l-token', 'save-settings', 'test-sync', 'force-sync', 'export-json', 'import-json'];
 var STATIC_PLACEHOLDER = {
@@ -288,6 +288,7 @@ var STATIC_PLACEHOLDER = {
 
 function applyStaticText() {
   STATIC_TEXT.forEach(function (id) { $(id).textContent = t(id); });
+  $('discard').setAttribute('aria-label', t('discard'));   // botao so com icone
   Object.keys(STATIC_PLACEHOLDER).forEach(function (id) {
     $(id).placeholder = t(STATIC_PLACEHOLDER[id]);
   });
