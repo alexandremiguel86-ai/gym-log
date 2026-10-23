@@ -402,13 +402,10 @@ main {
 
 .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 
-/* Titulo de secao (subgrupo) da lista de exercicios. Gruda sob o topo
-   enquanto a lista rola: o da secao seguinte sobe e cobre o anterior, entao o
-   que esta visivel e sempre o da secao em que se esta. */
+/* Titulo de secao (subgrupo) da lista de exercicios. Rola junto com a lista:
+   sticky parava no meio da tela em vez de sob o topo. */
 .list .sub {
-  position: sticky;
-  top: var(--top);
-  z-index: 5;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
