@@ -12,3 +12,6 @@ desktop.ini
 # URL do CSV publicado da planilha: quem tem a URL le o log de treinos inteiro.
 # Nunca versionar.
 config.local.txt
+
+# ids do LOG que o tools/auto_add_exercises.py ja viu.
+auto_add_state.local.json

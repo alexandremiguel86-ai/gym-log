@@ -72,11 +72,22 @@ Fluxo normal depois de um treino: importar → atualizar o log.
 
 **Pelo celular (o caminho normal):** *"Other exercise (type it)"* → nome em inglês +
 **Group 1**, **Group 2** e **Group 0**. O Group 2 só oferece os subgrupos do Group 1
-escolhido, e o Group 0 já vem com a categoria dele (dá para trocar). No **Import Gym Log**,
-todo exercício digitado assim que ainda não está em `I` ganha uma linha no fim de `I:L` da
-`Off_Court`, com os três grupos, e o próprio Import já traduz (`M`) e publica a lista no app
-(o mesmo que o **Update Exercise List**). O aviso final lista o que entrou e diz se a
-publicação deu certo; se falhar, clique em **Update Exercise List**.
+escolhido, e o Group 0 já vem com a categoria dele (dá para trocar). Depois que o treino é
+enviado, o `tools/auto_add_exercises.py` (tarefa **GymLog_Nightly**, a cada 15 minutos, junto
+com o `#06`) acrescenta no fim de `I:L` da `Off_Court` todo exercício digitado assim que ainda
+não está em `I`, com os três grupos, e publica a lista no app (o mesmo que o **Update Exercise
+List**: traduz `M`, gera o JSON, push). Na próxima abertura do app ele já está na lista, em
+geral 20 a 30 minutos depois do treino. Um aviso do Windows diz o que entrou.
+
+- Usa o próprio Excel. Planilha fechada: abre escondida e fecha. Aberta **e salva**: escreve
+  nela e salva. Aberta **com alteração não salva** (ou Excel ocupado): não mexe, avisa e
+  tenta de novo a cada rodada.
+- Só olha linhas do LOG que nunca viu (`auto_add_state.local.json`, fora do git). Exercício
+  digitado no app e depois renomeado na planilha não volta com o nome velho.
+- Publicação que falhou fica pendente e é refeita na rodada seguinte.
+- PC desligado: acontece na primeira rodada depois que ligar.
+
+O **Import Gym Log** continua fazendo o mesmo, na hora, para quem quiser clicar.
 
 **Pela planilha:** digite nas colunas `I` (nome), `J` (GROUP 1), `K` (GROUP 2) e `L` (GROUP
 0: `Gym`, `Gym - Lower Body/Core`, `Mobility & Recovery` ou `Conditioning`) e clique em
@@ -281,6 +292,7 @@ stderr *mesmo quando dá certo*. Só o `$LASTEXITCODE` decide sucesso.
 | `tools/build_exercises.py` | `Tennis.xlsm` → `exercises.json` |
 | `tools/translate_pt.py` | Traduz para português o que falta em `L` / `N:O` |
 | `tools/publish_exercises.ps1` | rebuild + commit + push (botão da planilha) |
+| `tools/auto_add_exercises.py` | exercício novo do app → fim de `I:L` → publica (a cada 15 min) |
 | `tools/install_vba.ps1` | instala os módulos VBA no `Tennis.xlsm` (não toca nos botões) |
 | `tools/make_icons.py` | Gera os ícones (roda uma vez só) |
 | `tools/smoke_test.js` | Teste do fluxo completo em Node, sem navegador |
