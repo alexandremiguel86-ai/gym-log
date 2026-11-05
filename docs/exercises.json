@@ -151,6 +151,16 @@
    "category": "Gym - Lower Body/Core",
    "exercises": [
     {
+     "n": "Crunch",
+     "g2": "Abs",
+     "pt": "Abdominal Crunch"
+    },
+    {
+     "n": "Elbow To Knee",
+     "g2": "Abs",
+     "pt": "Cotovelo ao Joelho"
+    },
+    {
      "n": "Lying Leg Raise",
      "g2": "Abs",
      "pt": "Elevação de Pernas Deitado"
@@ -164,6 +174,11 @@
      "n": "Russian Twist",
      "g2": "Abs",
      "pt": "Russian Twist"
+    },
+    {
+     "n": "Sit Up",
+     "g2": "Abs",
+     "pt": "Abdominal Supra"
     },
     {
      "n": "Swiss Ball Crunch",
