@@ -1308,6 +1308,21 @@ function openForm(entry) {
   markReused(false);
 
   show('screen-form');
+  fitNotes();
+}
+
+/** Observacao cresce para baixo, uma linha por vez, em vez de rolar para o
+    lado: no celular editar o meio de uma linha comprida exigia arrastar.
+    So depois do show(): com a tela escondida o scrollHeight vem zero. */
+function fitNotes() {
+  var el = $('f-notes');
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight + el.offsetHeight - el.clientHeight) + 'px';
+}
+
+/** Quebra de linha vira espaco: a observacao e uma linha so no LOG e no #06. */
+function notesValue() {
+  return $('f-notes').value.replace(/\s*[\r\n]+\s*/g, ' ').trim();
 }
 
 // Campos preenchidos pelo "toque para reusar". Tocar num deles apaga o valor
@@ -1405,7 +1420,7 @@ function saveEntry() {
     editing.reps = reps;
     editing.weight = $('f-weight').value.trim();
     editing.rpe = $('f-rpe').value.trim();
-    editing.notes = $('f-notes').value.trim();
+    editing.notes = notesValue();
   } else {
     entries.push({
       id: uid(),
@@ -1420,7 +1435,7 @@ function saveEntry() {
       weight: $('f-weight').value.trim(),
       rpe: $('f-rpe').value.trim(),
       // Vai para Off_Court!G (OBS) e dali para o #06, no fim do exercicio.
-      notes: $('f-notes').value.trim(),
+      notes: notesValue(),
       custom: !!draft.custom,
       synced: false
     });
@@ -1618,6 +1633,12 @@ $('search').addEventListener('input', function () { renderExercises(this.value);
 $('custom-exercise').addEventListener('click', openCustomForm);
 $('f-group').addEventListener('change', onGroup1Change);
 
+$('f-notes').addEventListener('input', fitNotes);
+// Enter fecha o teclado (como no campo de uma linha) em vez de pular linha.
+$('f-notes').addEventListener('keydown', function (ev) {
+  if (ev.key === 'Enter') { ev.preventDefault(); ev.target.blur(); }
+});
+
 $('last-chip').addEventListener('click', function () {
   var last = lastEntryFor(draft.exercise);
   if (!last) return;
@@ -1626,6 +1647,7 @@ $('last-chip').addEventListener('click', function () {
   $('f-weight').value = last.weight || '';
   $('f-rpe').value = last.rpe || '';
   $('f-notes').value = last.notes || '';
+  fitNotes();
   markReused(true);
   toast(t('lastValues'));
 });

@@ -534,7 +534,7 @@ label {
   color: var(--muted);
 }
 
-input, select {
+input, select, textarea {
   width: 100%;
   min-height: 56px;
   margin-top: 6px;
@@ -549,9 +549,9 @@ input, select {
 }
 /* Exemplo bem mais escuro que o texto digitado (branco), para nao parecer
    valor ja preenchido. */
-input::placeholder { color: var(--placeholder); opacity: 1; }
+input::placeholder, textarea::placeholder { color: var(--placeholder); opacity: 1; }
 
-input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
 
@@ -602,11 +602,27 @@ h2 { margin: 0; font-size: 20px; line-height: 1.25; }
    ultimo exercicio da lista fica escondido atras dele. */
 #screen-session { padding-bottom: 20px; }
 
-/* Lista do treino aberto mais compacta (~15% mais baixa) para caber mais
-   exercicios na tela. So o vertical: a direita fica a alca de arrastar. */
-#entry-list { gap: 6px; }
-#entry-list .row-btn { min-height: 0; padding-top: 9px; padding-bottom: 9px; }
-#entry-list .row-btn .meta { margin-top: 2px; }
+/* Observacao: cresce uma linha por vez (fitNotes no app.js), sem rolar. */
+textarea {
+  display: block;
+  resize: none;
+  overflow: hidden;
+  font-family: inherit;
+  line-height: 1.35;
+}
+
+/* Lista do treino aberto e do treino antigo: compacta (~25% mais baixa que a
+   versao anterior) para caber mais exercicios na tela. So o vertical: a
+   direita fica a alca de arrastar. As duas listas tem a mesma altura. */
+#entry-list, #workout-list { gap: 4px; }
+#entry-list .row-btn, #workout-list .row-btn {
+  min-height: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 1.25;
+}
+#entry-list .row-btn .meta, #workout-list .row-btn .meta { margin-top: 1px; line-height: 1.25; }
+#entry-list .group-tag, #workout-list .group-tag { padding: 0 7px; font-size: 12px; line-height: 1.35; }
 
 /* Data do treino: uma linha so, rotulo a esquerda e seletor compacto a direita,
    colada no topo. */
